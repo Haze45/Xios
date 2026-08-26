@@ -1,0 +1,8 @@
+# Copy this file to "local.properties" (same folder) and fill in your
+# real values. local.properties is git-ignored — it will NOT be committed.
+#
+# Android Studio also uses local.properties for the sdk.dir path, which
+# it manages automatically — you don't need to add that yourself.
+
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here

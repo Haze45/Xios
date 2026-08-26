@@ -1,0 +1,10 @@
+package com.yourapp.music.domain.usecase.auth
+
+import com.yourapp.music.domain.repository.AuthRepository
+import javax.inject.Inject
+
+class LogoutUseCase @Inject constructor(
+    private val authRepository: AuthRepository
+) {
+    operator fun invoke() = authRepository.logout()
+}
