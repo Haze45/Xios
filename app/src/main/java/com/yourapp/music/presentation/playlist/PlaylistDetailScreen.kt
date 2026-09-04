@@ -25,15 +25,18 @@ import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
+import com.yourapp.music.presentation.player.PlayerViewModel
 
 @Composable
 fun PlaylistDetailScreen(
     onBackClick: () -> Unit,
     onSongClick: (Song, List<Song>) -> Unit,
     onPlayAll: (List<Song>) -> Unit,
-    viewModel: PlaylistDetailViewModel = hiltViewModel()
+    viewModel: PlaylistDetailViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val playerState by playerViewModel.uiState.collectAsState()
     val playlist = state.playlist
 
     Column(
@@ -117,8 +120,9 @@ fun PlaylistDetailScreen(
                             SongListItem(
                                 song = song,
                                 onClick = { onSongClick(song, state.songs) },
-                                onPlayClick = { onSongClick(song, state.songs) },
-                                modifier = Modifier.weight(1f)
+                                onPlayClick = { playerViewModel.playSong(song, state.songs) },
+                                modifier = Modifier.weight(1f),
+                                isPlaying = playerState.currentSong?.id == song.id
                             )
                             IconButton(onClick = { viewModel.removeSong(song.id) }) {
                                 Icon(

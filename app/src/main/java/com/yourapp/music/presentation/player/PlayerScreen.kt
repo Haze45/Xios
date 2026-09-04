@@ -5,9 +5,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
-import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -59,7 +56,7 @@ fun PlayerScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
             Text("Now Playing", style = MaterialTheme.typography.titleMedium)
             IconButton(onClick = viewModel::toggleFavorite) {
@@ -121,7 +118,7 @@ fun PlayerScreen(
                 onClick = { showAddToPlaylistSheet = true },
                 enabled = song != null
             ) {
-                Icon(Icons.AutoMirrored.Filled.PlaylistAdd, contentDescription = "Add to Playlist", tint = TextSecondary)
+                Icon(Icons.Filled.PlaylistAdd, contentDescription = "Add to Playlist", tint = TextSecondary)
             }
         }
 
@@ -200,7 +197,7 @@ fun PlayerScreen(
                 Icon(Icons.Filled.SkipNext, contentDescription = "Next", modifier = Modifier.size(36.dp))
             }
             IconButton(onClick = { showQueueSheet = true }) {
-                Icon(Icons.AutoMirrored.Filled.QueueMusic, contentDescription = "Queue")
+                Icon(Icons.Filled.QueueMusic, contentDescription = "Queue")
             }
         }
 

@@ -43,6 +43,14 @@ class PlaylistApi @Inject constructor(
         }
     }
 
+    suspend fun renamePlaylist(playlistId: String, newTitle: String) {
+        supabase.from(Constants.PLAYLISTS_TABLE).update({
+            set("title", newTitle)
+        }) {
+            filter { eq("id", playlistId) }
+        }
+    }
+
     suspend fun deletePlaylist(playlistId: String) {
         supabase.from(Constants.PLAYLISTS_TABLE).delete {
             filter { eq("id", playlistId) }

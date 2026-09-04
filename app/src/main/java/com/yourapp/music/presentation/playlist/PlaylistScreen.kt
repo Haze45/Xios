@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.BackgroundBlack
+import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.PlaylistRowItem
@@ -54,7 +55,8 @@ fun PlaylistScreen(
                     items(state.playlists, key = { it.id }) { playlist ->
                         PlaylistRowItem(
                             playlist = playlist,
-                            onClick = { onPlaylistClick(playlist) }
+                            onClick = { onPlaylistClick(playlist) },
+                            onMenuClick = { viewModel.onShowOptions(playlist) }
                         )
                     }
                 }
@@ -94,6 +96,53 @@ fun PlaylistScreen(
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.onShowCreateDialog(false) }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // Kebab menu — cover art + name, then Rename / Delete.
+    state.playlistForOptions?.let { playlist ->
+        PlaylistOptionsSheet(
+            playlist = playlist,
+            onDismiss = viewModel::onDismissOptions,
+            onRenameClick = viewModel::onRequestRename,
+            onDeleteClick = viewModel::onRequestDelete
+        )
+    }
+
+    state.playlistBeingRenamed?.let {
+        AlertDialog(
+            onDismissRequest = viewModel::onCancelRename,
+            title = { Text("Rename Playlist") },
+            text = {
+                OutlinedTextField(
+                    value = state.renameTitle,
+                    onValueChange = viewModel::onRenameTitleChange,
+                    placeholder = { Text("Playlist name") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = viewModel::confirmRename) { Text("Save", color = AccentGreen) }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::onCancelRename) { Text("Cancel") }
+            }
+        )
+    }
+
+    state.playlistPendingDelete?.let { playlist ->
+        AlertDialog(
+            onDismissRequest = viewModel::onCancelDelete,
+            title = { Text("Delete Playlist") },
+            text = { Text("Delete \"${playlist.title}\"? This can't be undone.") },
+            confirmButton = {
+                TextButton(onClick = viewModel::confirmDelete) {
+                    Text("Delete", color = ErrorRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::onCancelDelete) { Text("Cancel") }
             }
         )
     }

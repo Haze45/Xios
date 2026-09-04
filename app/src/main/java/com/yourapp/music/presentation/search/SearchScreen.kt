@@ -27,14 +27,17 @@ import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.GenreTile
 import com.yourapp.music.presentation.components.SongListItem
+import com.yourapp.music.presentation.player.PlayerViewModel
 
 @Composable
 fun SearchScreen(
     onCancelClick: () -> Unit,
     onSongClick: (Song, List<Song>) -> Unit,
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val playerState by playerViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -77,7 +80,8 @@ fun SearchScreen(
                     SongListItem(
                         song = song,
                         onClick = { viewModel.onSearchSubmit(song.title); onSongClick(song, state.searchResults) },
-                        onPlayClick = { onSongClick(song, state.searchResults) }
+                        onPlayClick = { playerViewModel.playSong(song, state.searchResults) },
+                        isPlaying = playerState.currentSong?.id == song.id
                     )
                 }
             }

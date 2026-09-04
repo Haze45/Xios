@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 
@@ -24,7 +25,8 @@ fun SongListItem(
     song: Song,
     onClick: () -> Unit,
     onPlayClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPlaying: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -43,7 +45,12 @@ fun SongListItem(
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+            Text(
+                song.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (isPlaying) AccentGreen else MaterialTheme.typography.titleMedium.color,
+                maxLines = 1
+            )
             Text("By ${song.artist}", style = MaterialTheme.typography.bodyMedium, color = TextSecondary, maxLines = 1)
         }
         IconButton(onClick = onPlayClick) {

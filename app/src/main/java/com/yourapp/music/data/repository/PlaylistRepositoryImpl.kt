@@ -135,6 +135,18 @@ class PlaylistRepositoryImpl @Inject constructor(
         playlistDao.upsertPlaylists(listOf(updatedEntity))
     }
 
+    override suspend fun renamePlaylist(playlistId: String, newTitle: String): Resource<Unit> = try {
+        playlistApi.renamePlaylist(playlistId, newTitle)
+        // Keep the Room cache in sync so the new name shows up immediately everywhere.
+        val existing = playlistDao.getPlaylistById(playlistId)
+        if (existing != null) {
+            playlistDao.upsertPlaylists(listOf(existing.copy(title = newTitle)))
+        }
+        Resource.Success(Unit)
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Couldn't rename playlist", e)
+    }
+
     override suspend fun deletePlaylist(playlistId: String): Resource<Unit> = try {
         playlistApi.deletePlaylist(playlistId)
         playlistDao.deletePlaylist(playlistId)

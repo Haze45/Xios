@@ -64,6 +64,12 @@ class MusicPlayerServiceConnection @Inject constructor(
 
     private data class RestoredPlayback(val song: Song, val queue: List<Song>, val positionMs: Long)
 
+    // Remembers the pre-shuffle queue order so toggling shuffle back off
+    // restores it exactly, rather than leaving the queue permanently
+    // scrambled. Cleared whenever a fresh playSong()/playInternal() call
+    // starts a genuinely new queue.
+    private var originalQueueOrder: List<Song>? = null
+
     // Background scope for persistence I/O — this class isn't a ViewModel
     // and outlives any single screen, so it manages its own small scope
     // for the lifetime of the app process.
@@ -180,6 +186,8 @@ class MusicPlayerServiceConnection @Inject constructor(
     }
 
     private fun playInternal(activeController: MediaController, song: Song, queue: List<Song>, startPositionMs: Long) {
+        originalQueueOrder = null // fresh queue — any previous shuffle no longer applies
+
         val mediaItems = queue.map {
             MediaItem.Builder()
                 .setUri(it.audioUrl)
@@ -190,7 +198,9 @@ class MusicPlayerServiceConnection @Inject constructor(
         activeController.setMediaItems(mediaItems, startIndex, startPositionMs)
         activeController.prepare()
         activeController.play()
-        _playerState.update { it.copy(currentSong = song, queue = queue, currentIndex = startIndex) }
+        _playerState.update {
+            it.copy(currentSong = song, queue = queue, currentIndex = startIndex, isShuffleEnabled = false)
+        }
 
         connectionScope.launch {
             playbackStateStore.saveLastPlayed(song.id, queue.map { it.id }, startPositionMs)
@@ -247,11 +257,18 @@ class MusicPlayerServiceConnection @Inject constructor(
         val activeController = controller ?: return
         val queue = _playerState.value.queue
         if (index !in queue.indices) return
+        val removedSongId = queue[index].id
 
         activeController.removeMediaItem(index)
 
         val newQueue = queue.toMutableList().apply { removeAt(index) }
         val newIndex = activeController.currentMediaItemIndex
+
+        // Keep the remembered pre-shuffle order consistent — if shuffle
+        // gets turned off later, we shouldn't resurrect a song the person
+        // deliberately removed.
+        originalQueueOrder = originalQueueOrder?.filterNot { it.id == removedSongId }
+
         _playerState.update {
             it.copy(
                 queue = newQueue,
@@ -261,10 +278,63 @@ class MusicPlayerServiceConnection @Inject constructor(
         }
     }
 
+    /**
+     * Real reordering, not just ExoPlayer's internal (invisible) shuffle
+     * mode — that only changes the hidden next()/previous() order without
+     * ever updating _playerState.queue, so the Queue sheet would keep
+     * showing the original, unshuffled order even though shuffle was "on".
+     *
+     * What already played (everything up to and including the current
+     * song) is left untouched — only the upcoming portion of the queue
+     * gets shuffled, matching how shuffle behaves in most music apps.
+     * Toggling shuffle back off restores the exact original order.
+     */
     fun toggleShuffle() {
-        val enabled = !(_playerState.value.isShuffleEnabled)
-        controller?.shuffleModeEnabled = enabled
-        _playerState.update { it.copy(isShuffleEnabled = enabled) }
+        loadRestoredSessionIfNeeded()
+        val activeController = controller ?: return
+        val state = _playerState.value
+        val currentIndex = state.currentIndex.coerceAtLeast(0)
+
+        if (!state.isShuffleEnabled) {
+            // Turning ON — remember the real order so we can restore it later.
+            originalQueueOrder = state.queue
+
+            val played = state.queue.subList(0, (currentIndex + 1).coerceAtMost(state.queue.size))
+            val upcoming = state.queue.subList((currentIndex + 1).coerceAtMost(state.queue.size), state.queue.size)
+            val shuffledUpcoming = upcoming.shuffled()
+            val newQueue = played + shuffledUpcoming
+
+            replaceUpcomingMediaItems(activeController, currentIndex, shuffledUpcoming)
+            _playerState.update { it.copy(queue = newQueue, isShuffleEnabled = true) }
+        } else {
+            // Turning OFF — restore the exact pre-shuffle order.
+            val original = originalQueueOrder ?: state.queue
+            val currentSongId = state.currentSong?.id
+            val restoredIndex = original.indexOfFirst { it.id == currentSongId }.coerceAtLeast(0)
+            val upcomingOriginal = original.subList((restoredIndex + 1).coerceAtMost(original.size), original.size)
+
+            replaceUpcomingMediaItems(activeController, restoredIndex, upcomingOriginal)
+            originalQueueOrder = null
+            _playerState.update { it.copy(queue = original, currentIndex = restoredIndex, isShuffleEnabled = false) }
+        }
+    }
+
+    /**
+     * Swaps out everything after `fromIndex` in the actual ExoPlayer
+     * timeline to match `newUpcoming`, without touching or interrupting
+     * whatever's currently playing at/before `fromIndex`.
+     */
+    private fun replaceUpcomingMediaItems(controller: MediaController, fromIndex: Int, newUpcoming: List<Song>) {
+        val removeFrom = fromIndex + 1
+        if (removeFrom < controller.mediaItemCount) {
+            controller.removeMediaItems(removeFrom, controller.mediaItemCount)
+        }
+        if (newUpcoming.isNotEmpty()) {
+            val newMediaItems = newUpcoming.map {
+                MediaItem.Builder().setUri(it.audioUrl).setMediaId(it.id).build()
+            }
+            controller.addMediaItems(removeFrom, newMediaItems)
+        }
     }
 
     /**

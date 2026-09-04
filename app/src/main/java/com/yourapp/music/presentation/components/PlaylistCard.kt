@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -45,7 +46,8 @@ fun PlaylistGridItem(
 fun PlaylistRowItem(
     playlist: Playlist,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMenuClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
@@ -70,6 +72,14 @@ fun PlaylistRowItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )
+        }
+        // Only rendered where the caller actually wants a menu available
+        // right in the list (e.g. the Playlists tab) — Home/Library keep
+        // showing this row without it, unaffected.
+        if (onMenuClick != null) {
+            IconButton(onClick = onMenuClick) {
+                Icon(Icons.Filled.MoreVert, contentDescription = "Playlist options")
+            }
         }
     }
 }

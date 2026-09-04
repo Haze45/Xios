@@ -1,7 +1,6 @@
 package com.yourapp.music.presentation.favorites
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,14 +19,18 @@ import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
+import com.yourapp.music.presentation.components.SongListItem
+import com.yourapp.music.presentation.player.PlayerViewModel
 
 @Composable
 fun FavoritesScreen(
     onBackClick: () -> Unit,
     onSongClick: (Song, List<Song>) -> Unit,
-    viewModel: FavoritesViewModel = hiltViewModel()
+    viewModel: FavoritesViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val playerState by playerViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -57,23 +60,14 @@ fun FavoritesScreen(
         } else {
             LazyColumn {
                 items(state.songs, key = { it.id }) { song ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { onSongClick(song, state.songs) }
-                        ) {
-                            Text(song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
-                            Text(
-                                "By ${song.artist}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
-                                maxLines = 1
-                            )
-                        }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        SongListItem(
+                            song = song,
+                            onClick = { onSongClick(song, state.songs) },
+                            onPlayClick = { playerViewModel.playSong(song, state.songs) },
+                            modifier = Modifier.weight(1f),
+                            isPlaying = playerState.currentSong?.id == song.id
+                        )
                         IconButton(onClick = { viewModel.removeFavorite(song.id) }) {
                             Icon(Icons.Filled.Favorite, contentDescription = "Unlike", tint = AccentGreen)
                         }

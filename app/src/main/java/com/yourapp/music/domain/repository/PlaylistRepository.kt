@@ -17,6 +17,7 @@ interface PlaylistRepository {
     suspend fun createPlaylist(title: String, ownerId: String): Resource<Playlist>
     suspend fun addSongToPlaylist(playlistId: String, songId: String): Resource<Unit>
     suspend fun removeSongFromPlaylist(playlistId: String, songId: String): Resource<Unit>
+    suspend fun renamePlaylist(playlistId: String, newTitle: String): Resource<Unit>
     suspend fun deletePlaylist(playlistId: String): Resource<Unit>
     suspend fun refreshPlaylists(): Resource<Unit>
 }
