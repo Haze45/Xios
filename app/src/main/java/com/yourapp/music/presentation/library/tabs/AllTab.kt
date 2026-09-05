@@ -25,8 +25,15 @@ fun AllTab(
             SongListItem(
                 song = song,
                 onClick = { onSongClick(song, songs) },
-                onPlayClick = { playerViewModel.playSong(song, songs) },
-                isPlaying = playerState.currentSong?.id == song.id
+                onPlayClick = {
+                    if (playerState.currentSong?.id == song.id) {
+                        playerViewModel.togglePlayPause()
+                    } else {
+                        playerViewModel.playSong(song, songs)
+                    }
+                },
+                isCurrentSong = playerState.currentSong?.id == song.id,
+                isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
             )
         }
     }

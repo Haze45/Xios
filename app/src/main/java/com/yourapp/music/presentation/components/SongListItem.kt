@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +27,10 @@ fun SongListItem(
     onClick: () -> Unit,
     onPlayClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isPlaying: Boolean = false
+    /** True when this song is the one currently loaded in the player (playing OR paused) — colors the title green. */
+    isCurrentSong: Boolean = false,
+    /** True only when this song is both current AND actually playing right now — swaps the icon to Pause. */
+    isActivelyPlaying: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -48,13 +52,16 @@ fun SongListItem(
             Text(
                 song.title,
                 style = MaterialTheme.typography.titleMedium,
-                color = if (isPlaying) AccentGreen else MaterialTheme.typography.titleMedium.color,
+                color = if (isCurrentSong) AccentGreen else MaterialTheme.typography.titleMedium.color,
                 maxLines = 1
             )
             Text("By ${song.artist}", style = MaterialTheme.typography.bodyMedium, color = TextSecondary, maxLines = 1)
         }
         IconButton(onClick = onPlayClick) {
-            Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+            Icon(
+                if (isActivelyPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                contentDescription = if (isActivelyPlaying) "Pause" else "Play"
+            )
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.yourapp.music.presentation.album
 
-import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.BackgroundBlack
@@ -28,7 +26,6 @@ import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
-@OptIn(UnstableApi::class)
 @Composable
 fun AlbumDetailScreen(
     onBackClick: () -> Unit,
@@ -51,33 +48,17 @@ fun AlbumDetailScreen(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBackClick) {
-                Icon(
-                    Icons.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
-            Text(
-                "Album",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Text("Album", style = MaterialTheme.typography.titleMedium)
         }
 
         if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else if (album == null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                 Text(
                     state.errorMessage ?: "Album not found",
                     color = TextSecondary,
@@ -98,10 +79,7 @@ fun AlbumDetailScreen(
                 )
                 Spacer(Modifier.width(16.dp))
                 Column {
-                    Text(
-                        album.title,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    Text(album.title, style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "${album.artistName} • ${album.songCount} Songs",
@@ -116,16 +94,10 @@ fun AlbumDetailScreen(
             Button(
                 onClick = { onPlayAll(state.songs) },
                 enabled = state.songs.isNotEmpty(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentGreen,
-                    contentColor = BackgroundBlack
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = BackgroundBlack),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    Icons.Filled.PlayArrow,
-                    contentDescription = null
-                )
+                Icon(Icons.Filled.PlayArrow, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text("Play All")
             }
@@ -133,24 +105,19 @@ fun AlbumDetailScreen(
             Spacer(Modifier.height(16.dp))
 
             LazyColumn {
-                items(
-                    state.songs,
-                    key = { it.id }) { song ->
+                items(state.songs, key = { it.id }) { song ->
                     SongListItem(
                         song = song,
-                        onClick = {
-                            onSongClick(
-                                song,
-                                state.songs
-                            )
-                        },
+                        onClick = { onSongClick(song, state.songs) },
                         onPlayClick = {
-                            playerViewModel.playSong(
-                                song,
-                                state.songs
-                            )
+                            if (playerState.currentSong?.id == song.id) {
+                                playerViewModel.togglePlayPause()
+                            } else {
+                                playerViewModel.playSong(song, state.songs)
+                            }
                         },
-                        isPlaying = playerState.currentSong?.id == song.id
+                        isCurrentSong = playerState.currentSong?.id == song.id,
+                        isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
                     )
                 }
             }

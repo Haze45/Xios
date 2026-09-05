@@ -80,8 +80,15 @@ fun SearchScreen(
                     SongListItem(
                         song = song,
                         onClick = { viewModel.onSearchSubmit(song.title); onSongClick(song, state.searchResults) },
-                        onPlayClick = { playerViewModel.playSong(song, state.searchResults) },
-                        isPlaying = playerState.currentSong?.id == song.id
+                        onPlayClick = {
+                            if (playerState.currentSong?.id == song.id) {
+                                playerViewModel.togglePlayPause()
+                            } else {
+                                playerViewModel.playSong(song, state.searchResults)
+                            }
+                        },
+                        isCurrentSong = playerState.currentSong?.id == song.id,
+                        isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
                     )
                 }
             }

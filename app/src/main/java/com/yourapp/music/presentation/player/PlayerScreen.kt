@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,7 +41,11 @@ fun PlayerScreen(
     val state by viewModel.uiState.collectAsState()
     val song = state.currentSong
     var showQueueSheet by remember { mutableStateOf(false) }
-    var showAddToPlaylistSheet by remember { mutableStateOf(false) }
+    var showAddToPlaylistSheet by remember {
+        mutableStateOf(
+            false
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -56,9 +61,15 @@ fun PlayerScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                Icon(
+                    Icons.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
             }
-            Text("Now Playing", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Now Playing",
+                style = MaterialTheme.typography.titleMedium
+            )
             IconButton(onClick = viewModel::toggleFavorite) {
                 Icon(
                     if (state.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
@@ -70,7 +81,10 @@ fun PlayerScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             AsyncImage(
                 model = song?.albumArtUrl,
                 contentDescription = song?.title,
@@ -118,7 +132,11 @@ fun PlayerScreen(
                 onClick = { showAddToPlaylistSheet = true },
                 enabled = song != null
             ) {
-                Icon(Icons.Filled.PlaylistAdd, contentDescription = "Add to Playlist", tint = TextSecondary)
+                Icon(
+                    Icons.AutoMirrored.Filled.PlaylistAdd,
+                    contentDescription = "Add to Playlist",
+                    tint = TextSecondary
+                )
             }
         }
 
@@ -133,7 +151,8 @@ fun PlayerScreen(
         Slider(
             value = state.positionMs.toFloat(),
             onValueChange = { viewModel.seekTo(it.toLong()) },
-            valueRange = 0f..(state.durationMs.takeIf { it > 0 }?.toFloat() ?: 1f),
+            valueRange = 0f..(state.durationMs.takeIf { it > 0 }
+                ?.toFloat() ?: 1f),
             track = { sliderState ->
                 SliderDefaults.Track(
                     sliderState = sliderState,
@@ -147,7 +166,9 @@ fun PlayerScreen(
             thumb = {
                 SliderDefaults.Thumb(
                     interactionSource = remember { MutableInteractionSource() },
-                    colors = SliderDefaults.colors(thumbColor = AccentGreen),
+                    colors = SliderDefaults.colors(
+                        thumbColor = AccentGreen
+                    ),
                     thumbSize = DpSize(14.dp, 14.dp)
                 )
             }
@@ -157,10 +178,17 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(formatMs(state.positionMs), style = MaterialTheme.typography.labelSmall)
+            Text(
+                formatMs(state.positionMs),
+                style = MaterialTheme.typography.labelSmall
+            )
             // Remaining time shown as a countdown (e.g. "-2:15"), matching the reference.
             Text(
-                "-" + formatMs((state.durationMs - state.positionMs).coerceAtLeast(0)),
+                "-" + formatMs(
+                    (state.durationMs - state.positionMs).coerceAtLeast(
+                        0
+                    )
+                ),
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -180,11 +208,18 @@ fun PlayerScreen(
                 )
             }
             IconButton(onClick = viewModel::skipToPrevious) {
-                Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous", modifier = Modifier.size(36.dp))
+                Icon(
+                    Icons.Filled.SkipPrevious,
+                    contentDescription = "Previous",
+                    modifier = Modifier.size(36.dp)
+                )
             }
             IconButton(
                 onClick = viewModel::togglePlayPause,
-                modifier = Modifier.size(64.dp).clip(CircleShape).background(AccentGreen)
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(AccentGreen)
             ) {
                 Icon(
                     if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -194,10 +229,19 @@ fun PlayerScreen(
                 )
             }
             IconButton(onClick = viewModel::skipToNext) {
-                Icon(Icons.Filled.SkipNext, contentDescription = "Next", modifier = Modifier.size(36.dp))
+                Icon(
+                    Icons.Filled.SkipNext,
+                    contentDescription = "Next",
+                    modifier = Modifier.size(36.dp)
+                )
             }
-            IconButton(onClick = { showQueueSheet = true }) {
-                Icon(Icons.Filled.QueueMusic, contentDescription = "Queue")
+            IconButton(onClick = {
+                showQueueSheet = true
+            }) {
+                Icon(
+                    Icons.Filled.QueueMusic,
+                    contentDescription = "Queue"
+                )
             }
         }
 
@@ -205,7 +249,9 @@ fun PlayerScreen(
     }
 
     if (showQueueSheet) {
-        QueueBottomSheet(onDismiss = { showQueueSheet = false })
+        QueueBottomSheet(onDismiss = {
+            showQueueSheet = false
+        })
     }
 
     if (showAddToPlaylistSheet && song != null) {

@@ -64,9 +64,16 @@ fun FavoritesScreen(
                         SongListItem(
                             song = song,
                             onClick = { onSongClick(song, state.songs) },
-                            onPlayClick = { playerViewModel.playSong(song, state.songs) },
+                            onPlayClick = {
+                                if (playerState.currentSong?.id == song.id) {
+                                    playerViewModel.togglePlayPause()
+                                } else {
+                                    playerViewModel.playSong(song, state.songs)
+                                }
+                            },
                             modifier = Modifier.weight(1f),
-                            isPlaying = playerState.currentSong?.id == song.id
+                            isCurrentSong = playerState.currentSong?.id == song.id,
+                            isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
                         )
                         IconButton(onClick = { viewModel.removeFavorite(song.id) }) {
                             Icon(Icons.Filled.Favorite, contentDescription = "Unlike", tint = AccentGreen)
