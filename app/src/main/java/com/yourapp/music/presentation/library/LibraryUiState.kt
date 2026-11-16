@@ -10,7 +10,7 @@ data class LibraryUiState(
     val allSongs: List<Song> = emptyList(),
     val playlists: List<Playlist> = emptyList(),
     val likedSongs: List<Song> = emptyList(),
-    val downloadedSongs: List<Song> = emptyList(), // wired once download/offline caching is built
+    val downloadedSongs: List<Song> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

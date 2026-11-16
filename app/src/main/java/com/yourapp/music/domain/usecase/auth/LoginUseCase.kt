@@ -8,10 +8,7 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(
-        email: String,
-        password: String
-    ): Resource<User> {
+    suspend operator fun invoke(email: String, password: String): Resource<User> {
         if (email.isBlank() || password.isBlank()) {
             return Resource.Error("Email and password cannot be empty")
         }

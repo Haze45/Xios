@@ -2,21 +2,57 @@ package com.yourapp.music.presentation.library.tabs
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.domain.model.Song
+import com.yourapp.music.presentation.components.SongListItem
+import com.yourapp.music.presentation.player.PlayerViewModel
 
-/** Placeholder until offline download/caching (Media3 + Room blob refs) is built. */
+/** Songs downloaded to Downloads/MusicApp, most recently downloaded first. */
 @Composable
-fun DownloadsTab(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            "Downloads coming soon.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
-        )
+fun DownloadsTab(
+    songs: List<Song>,
+    onSongClick: (Song, List<Song>) -> Unit,
+    modifier: Modifier = Modifier,
+    playerViewModel: PlayerViewModel = hiltViewModel()
+) {
+    if (songs.isEmpty()) {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                "No downloads yet — tap the download icon on the Now Playing screen to save a song.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
+            )
+        }
+        return
+    }
+
+    val playerState by playerViewModel.uiState.collectAsState()
+
+    LazyColumn(modifier = modifier) {
+        items(songs, key = { it.id }) { song ->
+            SongListItem(
+                song = song,
+                onClick = { onSongClick(song, songs) },
+                onPlayClick = {
+                    if (playerState.currentSong?.id == song.id) {
+                        playerViewModel.togglePlayPause()
+                    } else {
+                        playerViewModel.playSong(song, songs)
+                    }
+                },
+                isCurrentSong = playerState.currentSong?.id == song.id,
+                isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
+            )
+        }
     }
 }

@@ -26,4 +26,10 @@ class ProfileRepositoryImpl @Inject constructor(
     } catch (e: Exception) {
         Resource.Error(e.message ?: "Couldn't sync profile", e)
     }
+
+    override suspend fun uploadProfilePhoto(userId: String, bytes: ByteArray): Resource<String> = try {
+        Resource.Success(profileApi.uploadProfilePhoto(userId, bytes))
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Couldn't upload photo", e)
+    }
 }

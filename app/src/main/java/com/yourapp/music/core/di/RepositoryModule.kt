@@ -2,6 +2,7 @@ package com.yourapp.music.core.di
 
 import com.yourapp.music.data.repository.AuthRepositoryImpl
 import com.yourapp.music.data.repository.ArtistRepositoryImpl
+import com.yourapp.music.data.repository.DownloadRepositoryImpl
 import com.yourapp.music.data.repository.FavoriteRepositoryImpl
 import com.yourapp.music.data.repository.PlaylistRepositoryImpl
 import com.yourapp.music.data.repository.ProfileRepositoryImpl
@@ -10,6 +11,7 @@ import com.yourapp.music.data.repository.SettingsRepositoryImpl
 import com.yourapp.music.data.repository.SongRepositoryImpl
 import com.yourapp.music.domain.repository.AuthRepository
 import com.yourapp.music.domain.repository.ArtistRepository
+import com.yourapp.music.domain.repository.DownloadRepository
 import com.yourapp.music.domain.repository.FavoriteRepository
 import com.yourapp.music.domain.repository.PlaylistRepository
 import com.yourapp.music.domain.repository.ProfileRepository
@@ -62,4 +64,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSearchRepository(impl: SearchRepositoryImpl): SearchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDownloadRepository(impl: DownloadRepositoryImpl): DownloadRepository
 }

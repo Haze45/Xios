@@ -23,6 +23,7 @@ import coil.compose.AsyncImage
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.AlbumCard
 import com.yourapp.music.presentation.components.FeaturedPlaylistCard
 import com.yourapp.music.presentation.components.FilterPill
@@ -33,7 +34,7 @@ fun HomeScreen(
     onProfileClick: () -> Unit,
     onFavoritesClick: () -> Unit,
     onAlbumClick: (String) -> Unit,
-    onSongPlay: (com.yourapp.music.domain.model.Song, List<com.yourapp.music.domain.model.Song>) -> Unit,
+    onSongPlay: (Song, List<Song>) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -162,6 +163,4 @@ fun HomeScreen(
 private fun HomeFilter.label(): String = when (this) {
     HomeFilter.ALL -> "All"
     HomeFilter.NEW_RELEASE -> "New Release"
-    HomeFilter.TRENDING -> "Trending"
-    HomeFilter.TOP -> "Top"
 }

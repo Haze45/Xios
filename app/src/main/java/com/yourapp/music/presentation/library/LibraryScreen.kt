@@ -81,7 +81,11 @@ fun LibraryScreen(
                     onSongClick = onSongClick,
                     modifier = Modifier.fillMaxSize()
                 )
-                LibraryTab.DOWNLOADS -> DownloadsTab(modifier = Modifier.fillMaxSize())
+                LibraryTab.DOWNLOADS -> DownloadsTab(
+                    songs = state.downloadedSongs,
+                    onSongClick = onSongClick,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

@@ -7,7 +7,6 @@ import com.yourapp.music.domain.usecase.album.GetAlbumsUseCase
 import com.yourapp.music.domain.usecase.auth.GetCurrentUserUseCase
 import com.yourapp.music.domain.usecase.song.GetAllSongsUseCase
 import com.yourapp.music.domain.usecase.song.GetNewReleasesUseCase
-import com.yourapp.music.domain.usecase.song.GetTrendingSongsUseCase
 import com.yourapp.music.domain.usecase.song.RefreshSongsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +19,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAllSongsUseCase: GetAllSongsUseCase,
-    private val getTrendingSongsUseCase: GetTrendingSongsUseCase,
     private val getNewReleasesUseCase: GetNewReleasesUseCase,
     private val refreshSongsUseCase: RefreshSongsUseCase,
     private val getAlbumsUseCase: GetAlbumsUseCase,
@@ -78,9 +76,8 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(selectedFilter = filter) }
         viewModelScope.launch {
             when (filter) {
-                HomeFilter.TRENDING -> applyResource(getTrendingSongsUseCase())
                 HomeFilter.NEW_RELEASE -> applyResource(getNewReleasesUseCase())
-                HomeFilter.ALL, HomeFilter.TOP -> observeCachedSongs()
+                HomeFilter.ALL -> observeCachedSongs()
             }
         }
     }

@@ -9,4 +9,5 @@ object Constants {
     const val ARTISTS_TABLE = "artists"
     const val ARTIST_FOLLOWS_TABLE = "artist_follows"
     const val PROFILES_TABLE = "profiles"
+    const val PROFILE_PHOTOS_BUCKET = "profile-photos"
 }

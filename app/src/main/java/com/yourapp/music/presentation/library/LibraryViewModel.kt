@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourapp.music.core.sync.FavoriteSyncManager
 import com.yourapp.music.domain.usecase.auth.GetCurrentUserUseCase
+import com.yourapp.music.domain.usecase.download.GetDownloadedSongsUseCase
 import com.yourapp.music.domain.usecase.favorite.AddFavoriteUseCase
 import com.yourapp.music.domain.usecase.favorite.GetFavoritesUseCase
 import com.yourapp.music.domain.usecase.favorite.RemoveFavoriteUseCase
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     private val getAllSongsUseCase: GetAllSongsUseCase,
+    private val getDownloadedSongsUseCase: GetDownloadedSongsUseCase,
     private val getUserPlaylistsUseCase: GetUserPlaylistsUseCase,
     private val observeUserPlaylistsUseCase: ObserveUserPlaylistsUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
@@ -38,11 +40,21 @@ class LibraryViewModel @Inject constructor(
 
     init {
         observeAllSongs()
+        observeDownloadedSongs()
         observeLikedSongs()
         loadPlaylists()
         // Reconcile local favorites with Supabase as soon as Library is opened
         // (covers favorites added on another device since last sync).
         favoriteSyncManager.enqueueSync()
+    }
+
+    /** Live: a song appears here the moment its download finishes. */
+    private fun observeDownloadedSongs() {
+        viewModelScope.launch {
+            getDownloadedSongsUseCase().collect { songs ->
+                _uiState.update { it.copy(downloadedSongs = songs) }
+            }
+        }
     }
 
     fun onTabSelected(tab: LibraryTab) {

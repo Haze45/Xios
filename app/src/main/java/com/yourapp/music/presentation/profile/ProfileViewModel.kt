@@ -1,5 +1,6 @@
 package com.yourapp.music.presentation.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourapp.music.core.util.Resource
@@ -14,7 +15,9 @@ import com.yourapp.music.domain.usecase.playlist.ObserveUserPlaylistsUseCase
 import com.yourapp.music.domain.usecase.profile.GetUserStatsUseCase
 import com.yourapp.music.domain.usecase.profile.SyncProfileUseCase
 import com.yourapp.music.domain.usecase.profile.UpdateProfileUseCase
+import com.yourapp.music.domain.usecase.profile.UploadProfilePhotoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getUserStatsUseCase: GetUserStatsUseCase,
     private val getUserPlaylistsUseCase: GetUserPlaylistsUseCase,
@@ -35,6 +39,7 @@ class ProfileViewModel @Inject constructor(
     private val followArtistUseCase: FollowArtistUseCase,
     private val unfollowArtistUseCase: UnfollowArtistUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
+    private val uploadProfilePhotoUseCase: UploadProfilePhotoUseCase,
     private val syncProfileUseCase: SyncProfileUseCase,
     private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
@@ -132,7 +137,11 @@ class ProfileViewModel @Inject constructor(
      * Saves a new display name and/or photo from the edit-profile sheet.
      * [photoUri] should be a URI string pointing at a local, durable copy
      * of the image (see EditProfileSheet) — pass null to leave the photo
-     * unchanged. [onSaved] fires only on success, so the sheet knows when
+     * unchanged. If a photo is provided, it's uploaded to Supabase
+     * Storage first (a local file:// path only exists on the device it
+     * was picked on — Firebase's photoUrl needs to be a real public URL
+     * so every device shows the same photo, not just the one it was set
+     * from). [onSaved] fires only on success, so the sheet knows when
      * it's safe to dismiss itself.
      */
     fun updateProfile(displayName: String, photoUri: String?, onSaved: () -> Unit) {
@@ -141,9 +150,32 @@ class ProfileViewModel @Inject constructor(
             _uiState.update { it.copy(errorMessage = "Name can't be empty") }
             return
         }
+        val uid = userId
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
-            when (val result = updateProfileUseCase(trimmedName, photoUri)) {
+
+            var resolvedPhotoUrl = photoUri
+            if (photoUri != null && uid != null) {
+                val bytes = try {
+                    appContext.contentResolver.openInputStream(android.net.Uri.parse(photoUri))?.use { it.readBytes() }
+                } catch (e: Exception) {
+                    null
+                }
+                if (bytes == null) {
+                    _uiState.update { it.copy(isSaving = false, errorMessage = "Couldn't read the selected photo") }
+                    return@launch
+                }
+                when (val uploadResult = uploadProfilePhotoUseCase(uid, bytes)) {
+                    is Resource.Success -> resolvedPhotoUrl = uploadResult.data
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(isSaving = false, errorMessage = uploadResult.message) }
+                        return@launch
+                    }
+                    is Resource.Loading -> Unit
+                }
+            }
+
+            when (val result = updateProfileUseCase(trimmedName, resolvedPhotoUrl)) {
                 is Resource.Success -> {
                     _uiState.update {
                         it.copy(

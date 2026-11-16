@@ -36,4 +36,7 @@ object RoomModule {
 
     @Provides
     fun provideRecentSearchDao(db: AppDatabase) = db.recentSearchDao()
+
+    @Provides
+    fun provideDownloadDao(db: AppDatabase) = db.downloadDao()
 }

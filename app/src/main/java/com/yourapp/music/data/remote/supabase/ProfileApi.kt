@@ -5,6 +5,7 @@ import com.yourapp.music.data.remote.supabase.dto.ProfileDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,5 +35,17 @@ class ProfileApi @Inject constructor(
                 playlist_count = playlistCount
             )
         )
+    }
+
+    /**
+     * Uploads a profile photo to Storage and returns its public URL.
+     * Keyed by userId so re-uploading always overwrites the same object
+     * (upsert = true) instead of piling up orphaned old photos.
+     */
+    suspend fun uploadProfilePhoto(userId: String, bytes: ByteArray): String {
+        val bucket = supabase.storage.from(Constants.PROFILE_PHOTOS_BUCKET)
+        val path = "$userId.jpg"
+        bucket.upload(path, bytes, upsert = true)
+        return bucket.publicUrl(path)
     }
 }
