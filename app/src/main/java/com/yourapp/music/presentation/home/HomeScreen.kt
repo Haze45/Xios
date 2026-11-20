@@ -76,27 +76,44 @@ fun HomeScreen(
 
             Row {
                 IconButton(onClick = onSearchClick) {
-                    Icon(Icons.Filled.Search, contentDescription = "Search")
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = "Search"
+                    )
                 }
                 IconButton(onClick = onFavoritesClick) {
-                    Icon(Icons.Filled.FavoriteBorder, contentDescription = "Favorites")
+                    Icon(
+                        Icons.Filled.FavoriteBorder,
+                        contentDescription = "Favorites"
+                    )
                 }
             }
         }
 
         Spacer(Modifier.height(12.dp))
 
-        Text("Hi, ${state.userName}", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            "Hi, ${state.userName}",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         Spacer(Modifier.height(16.dp))
 
         // Filter chips: All / New Release / Trending / Top
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(
+                8.dp
+            )
+        ) {
             items(HomeFilter.entries.toList()) { filter ->
                 FilterPill(
                     label = filter.label(),
                     selected = state.selectedFilter == filter,
-                    onClick = { viewModel.onFilterSelected(filter) }
+                    onClick = {
+                        viewModel.onFilterSelected(
+                            filter
+                        )
+                    }
                 )
             }
         }
@@ -104,20 +121,37 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxWidth().height(150.dp), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         } else {
-            Text("Curated & trending", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Curated & trending",
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(Modifier.height(12.dp))
 
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(
+                    12.dp
+                )
+            ) {
                 items(state.songs.take(5)) { song ->
                     FeaturedPlaylistCard(
                         title = song.title,
                         description = "By ${song.artist}",
                         imageUrl = song.albumArtUrl,
-                        onPlayClick = { onSongPlay(song, state.songs.take(5)) }
+                        onPlayClick = {
+                            onSongPlay(
+                                song,
+                                state.songs.take(5)
+                            )
+                        }
                     )
                 }
             }
@@ -128,7 +162,10 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Albums", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "Albums",
+                    style = MaterialTheme.typography.titleLarge
+                )
                 TextButton(onClick = { /* navigate to full list */ }) {
                     Text("See all", color = TextSecondary)
                 }
@@ -143,9 +180,17 @@ fun HomeScreen(
                     color = TextSecondary
                 )
             } else {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(state.albums, key = { it.id }) { album ->
-                        AlbumCard(album = album, onClick = { onAlbumClick(album.id) })
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        12.dp
+                    )
+                ) {
+                    items(
+                        state.albums,
+                        key = { it.id }) { album ->
+                        AlbumCard(
+                            album = album,
+                            onClick = { onAlbumClick(album.id) })
                     }
                 }
             }
@@ -153,7 +198,11 @@ fun HomeScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(8.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(Modifier.height(16.dp))

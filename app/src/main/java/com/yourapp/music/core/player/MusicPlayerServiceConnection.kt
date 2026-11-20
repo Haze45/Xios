@@ -14,7 +14,10 @@ import com.yourapp.music.domain.repository.SongRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,18 +25,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Single connection point between the UI (PlayerViewModel) and the
- * PlaybackService. Wraps a MediaController and exposes playback state
- * as a Flow so any screen (mini-player, full player) can observe it.
- *
- * This is an app-wide @Singleton — every screen that can trigger
- * playback shares the same instance and the same underlying
- * MediaController connection. It should never be released by an
- * individual screen's ViewModel.onCleared(); it lives for as long as
- * the app process does.
- */
 @UnstableApi
 @Singleton
 class MusicPlayerServiceConnection @Inject constructor(
@@ -43,68 +36,85 @@ class MusicPlayerServiceConnection @Inject constructor(
 ) {
     private var controller: MediaController? = null
 
-    // Guards against building a second MediaController while the first
-    // connect() call is still completing asynchronously (e.g. two
-    // different screens both calling connect() from their init{} within
-    // the same frame).
     private var isConnecting = false
 
-    // If playSong() is called before the controller has finished
-    // connecting, we remember the request here and run it as soon as
-    // the connection completes, instead of silently dropping it.
-    private var pendingPlayRequest: Pair<Song, List<Song>>? = null
+    private var pendingPlayRequest: Pair<Song, List<Song>>? =
+        null
 
-    // Set once, right after a fresh process start, if we found a
-    // previously-playing song saved from last time. It only describes
-    // what to SHOW (MiniPlayer/PlayerScreen) — the real ExoPlayer queue
-    // hasn't actually been loaded with it yet. The first time the person
-    // actually taps play, we consume this and cue it into the player for
-    // real, seeking to where they left off.
-    private var restoredButNotLoaded: RestoredPlayback? = null
+    private var restoredButNotLoaded: RestoredPlayback? =
+        null
 
-    private data class RestoredPlayback(val song: Song, val queue: List<Song>, val positionMs: Long)
+    private data class RestoredPlayback(
+        val song: Song,
+        val queue: List<Song>,
+        val positionMs: Long
+    )
 
-    // Remembers the pre-shuffle queue order so toggling shuffle back off
-    // restores it exactly, rather than leaving the queue permanently
-    // scrambled. Cleared whenever a fresh playSong()/playInternal() call
-    // starts a genuinely new queue.
     private var originalQueueOrder: List<Song>? = null
 
-    // Background scope for persistence I/O — this class isn't a ViewModel
-    // and outlives any single screen, so it manages its own small scope
-    // for the lifetime of the app process.
-    private val connectionScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val connectionScope =
+        CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    private val _playerState = MutableStateFlow(PlayerState())
-    val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
+    // Smooth playback position updates on the main thread.
+    private val positionScope =
+        CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+
+    private var positionUpdateJob: Job? = null
+
+    private val _playerState =
+        MutableStateFlow(PlayerState())
+    val playerState: StateFlow<PlayerState> =
+        _playerState.asStateFlow()
 
     private val playerListener = object : Player.Listener {
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            _playerState.update { it.copy(isPlaying = isPlaying) }
 
-            // Whenever playback pauses — whether the person tapped pause,
-            // playback reached the end, or the system paused it for any
-            // other reason — save roughly where they were, so reopening
-            // the app later resumes near this point instead of from zero.
-            if (!isPlaying) {
-                val positionMs = controller?.currentPosition ?: return
-                connectionScope.launch { playbackStateStore.savePosition(positionMs) }
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            _playerState.update {
+                it.copy(isPlaying = isPlaying)
+            }
+
+            if (isPlaying) {
+                startPositionUpdates()
+            } else {
+                stopPositionUpdates()
+
+                val positionMs = controller?.currentPosition
+
+                if (positionMs != null) {
+                    _playerState.update {
+                        it.copy(
+                            positionMs = positionMs,
+                            durationMs = controller?.duration
+                                ?.coerceAtLeast(0)
+                                ?: it.durationMs
+                        )
+                    }
+
+                    connectionScope.launch {
+                        playbackStateStore.savePosition(
+                            positionMs
+                        )
+                    }
+                }
             }
         }
 
-        // Fires whenever Media3 moves to a different item in the queue —
-        // whether from seekToNextMediaItem()/seekToPreviousMediaItem()
-        // (our skip buttons), auto-advance at the end of a track, a
-        // notification/lock-screen skip, or picking a song directly from
-        // the queue sheet. Without this, currentSong would stay stuck on
-        // whatever song started playback, even though the audio itself
-        // had already moved on.
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            val newSong = _playerState.value.queue.firstOrNull { it.id == mediaItem?.mediaId }
+        override fun onMediaItemTransition(
+            mediaItem: MediaItem?,
+            reason: Int
+        ) {
+            val newSong = _playerState.value.queue
+                .firstOrNull { it.id == mediaItem?.mediaId }
+
             if (newSong != null) {
                 _playerState.update {
-                    it.copy(currentSong = newSong, currentIndex = controller?.currentMediaItemIndex ?: it.currentIndex)
+                    it.copy(
+                        currentSong = newSong,
+                        currentIndex = controller?.currentMediaItemIndex
+                            ?: it.currentIndex
+                    )
                 }
+
                 connectionScope.launch {
                     playbackStateStore.saveLastPlayed(
                         newSong.id,
@@ -115,54 +125,124 @@ class MusicPlayerServiceConnection @Inject constructor(
             }
         }
 
-        override fun onEvents(player: Player, events: Player.Events) {
+        override fun onEvents(
+            player: Player,
+            events: Player.Events
+        ) {
             _playerState.update {
                 it.copy(
                     positionMs = player.currentPosition,
-                    durationMs = player.duration.coerceAtLeast(0)
+                    durationMs = player.duration.coerceAtLeast(
+                        0
+                    )
                 )
             }
         }
     }
 
+    /**
+     * Updates playback position every 50 milliseconds.
+     * This makes the Compose slider progress smoothly.
+     */
+    private fun startPositionUpdates() {
+        if (positionUpdateJob?.isActive == true) return
+
+        positionUpdateJob = positionScope.launch {
+            while (isActive) {
+                val activeController = controller ?: break
+
+                if (!activeController.isPlaying) break
+
+                _playerState.update {
+                    it.copy(
+                        positionMs = activeController.currentPosition,
+                        durationMs = activeController.duration.coerceAtLeast(
+                            0
+                        )
+                    )
+                }
+
+                delay(50L.milliseconds)
+            }
+        }
+    }
+
+    private fun stopPositionUpdates() {
+        positionUpdateJob?.cancel()
+        positionUpdateJob = null
+    }
+
     fun connect() {
         if (controller != null || isConnecting) return
+
         isConnecting = true
 
-        val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
-        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+        val sessionToken = SessionToken(
+            context,
+            ComponentName(
+                context,
+                PlaybackService::class.java
+            )
+        )
+
+        val controllerFuture =
+            MediaController.Builder(context, sessionToken)
+                .buildAsync()
+
         controllerFuture.addListener({
+
             controller = controllerFuture.get()
             controller?.addListener(playerListener)
+
             isConnecting = false
 
-            // Run whatever playback request came in while we were still connecting.
             val pending = pendingPlayRequest
+
             if (pending != null) {
                 pendingPlayRequest = null
                 playSong(pending.first, pending.second)
+
             } else if (_playerState.value.currentSong == null) {
-                // Nothing already queued in this process — see if there's a
-                // song from a previous session worth showing in the MiniPlayer.
                 restoreLastSession()
             }
+
         }, MoreExecutors.directExecutor())
     }
 
-    /** Populates currentSong/queue/position from the last session, WITHOUT starting playback. */
+    /**
+     * Restores previous playback without automatically starting it.
+     */
     private fun restoreLastSession() {
         connectionScope.launch {
-            val last = playbackStateStore.getLastPlayed() ?: return@launch
-            val song = songRepository.getSongById(last.songId) ?: return@launch
-            val queue = last.queueSongIds.mapNotNull { songRepository.getSongById(it) }
-                .ifEmpty { listOf(song) }
 
-            restoredButNotLoaded = RestoredPlayback(song, queue, last.positionMs)
+            val last = playbackStateStore.getLastPlayed()
+                ?: return@launch
+
+            val song =
+                songRepository.getSongById(last.songId)
+                    ?: return@launch
+
+            val queue = last.queueSongIds
+                .mapNotNull {
+                    songRepository.getSongById(it)
+                }
+                .ifEmpty {
+                    listOf(song)
+                }
+
+            restoredButNotLoaded = RestoredPlayback(
+                song,
+                queue,
+                last.positionMs
+            )
+
             _playerState.update {
                 it.copy(
                     currentSong = song,
                     queue = queue,
-                    currentIndex = queue.indexOfFirst { q -> q.id == song.id }.coerceAtLeast(0),
+                    currentIndex = queue.indexOfFirst { q ->
+                        q.id == song.id
+                    }.coerceAtLeast(0),
                     positionMs = last.positionMs,
                     durationMs = song.durationMs,
                     isPlaying = false
@@ -171,22 +251,35 @@ class MusicPlayerServiceConnection @Inject constructor(
         }
     }
 
-    fun playSong(song: Song, queue: List<Song> = listOf(song)) {
+    fun playSong(
+        song: Song,
+        queue: List<Song> = listOf(song)
+    ) {
         val activeController = controller
+
         if (activeController == null) {
-            // Not connected yet — remember this request and make sure a
-            // connection attempt is in flight; connect() will replay it
-            // once ready.
             pendingPlayRequest = song to queue
             connect()
             return
         }
-        restoredButNotLoaded = null // a real, explicit play always overrides any restored placeholder
-        playInternal(activeController, song, queue, startPositionMs = 0L)
+
+        restoredButNotLoaded = null
+
+        playInternal(
+            activeController,
+            song,
+            queue,
+            startPositionMs = 0L
+        )
     }
 
-    private fun playInternal(activeController: MediaController, song: Song, queue: List<Song>, startPositionMs: Long) {
-        originalQueueOrder = null // fresh queue — any previous shuffle no longer applies
+    private fun playInternal(
+        activeController: MediaController,
+        song: Song,
+        queue: List<Song>,
+        startPositionMs: Long
+    ) {
+        originalQueueOrder = null
 
         val mediaItems = queue.map {
             MediaItem.Builder()
@@ -194,22 +287,48 @@ class MusicPlayerServiceConnection @Inject constructor(
                 .setMediaId(it.id)
                 .build()
         }
-        val startIndex = queue.indexOfFirst { it.id == song.id }.coerceAtLeast(0)
-        activeController.setMediaItems(mediaItems, startIndex, startPositionMs)
+
+        val startIndex = queue.indexOfFirst {
+            it.id == song.id
+        }.coerceAtLeast(0)
+
+        activeController.setMediaItems(
+            mediaItems,
+            startIndex,
+            startPositionMs
+        )
+
         activeController.prepare()
         activeController.play()
+
         _playerState.update {
-            it.copy(currentSong = song, queue = queue, currentIndex = startIndex, isShuffleEnabled = false)
+            it.copy(
+                currentSong = song,
+                queue = queue,
+                currentIndex = startIndex,
+                isShuffleEnabled = false
+            )
         }
 
         connectionScope.launch {
-            playbackStateStore.saveLastPlayed(song.id, queue.map { it.id }, startPositionMs)
+            playbackStateStore.saveLastPlayed(
+                song.id,
+                queue.map { it.id },
+                startPositionMs
+            )
         }
     }
 
     fun togglePlayPause() {
-        if (loadRestoredSessionIfNeeded()) return // just cued + started playing from where we left off
-        controller?.let { if (it.isPlaying) it.pause() else it.play() }
+        if (loadRestoredSessionIfNeeded()) return
+
+        controller?.let {
+            if (it.isPlaying) {
+                it.pause()
+            } else {
+                it.play()
+            }
+        }
     }
 
     fun skipToNext() {
@@ -222,131 +341,190 @@ class MusicPlayerServiceConnection @Inject constructor(
         controller?.seekToPreviousMediaItem()
     }
 
-    /**
-     * If we're still showing a restored-but-not-loaded MiniPlayer state
-     * (app was just reopened, nothing tapped yet), cues it into the
-     * player for real now. Returns true if it did so, so callers can
-     * follow up with the action the person actually asked for (e.g.
-     * skip to next, right after loading the restored song in).
-     */
     private fun loadRestoredSessionIfNeeded(): Boolean {
         val restored = restoredButNotLoaded
         val activeController = controller
-        if (restored == null || activeController == null) return false
+
+        if (restored == null || activeController == null) {
+            return false
+        }
+
         restoredButNotLoaded = null
-        playInternal(activeController, restored.song, restored.queue, startPositionMs = restored.positionMs)
+
+        playInternal(
+            activeController,
+            restored.song,
+            restored.queue,
+            startPositionMs = restored.positionMs
+        )
+
         return true
     }
 
-    fun seekTo(positionMs: Long) = controller?.seekTo(positionMs)
+    fun seekTo(positionMs: Long) {
+        controller?.seekTo(positionMs)
+    }
 
-    /** Jumps playback straight to a specific song in the current queue (tap-to-play from the queue sheet). */
     fun playQueueItem(index: Int) {
         val activeController = controller ?: return
+
         if (index !in _playerState.value.queue.indices) return
+
         restoredButNotLoaded = null
+
         activeController.seekTo(index, 0L)
         activeController.play()
+
         _playerState.update {
-            it.copy(currentSong = it.queue[index], currentIndex = index)
+            it.copy(
+                currentSong = it.queue[index],
+                currentIndex = index
+            )
         }
     }
 
-    /** Removes a song from the queue (swipe-to-remove from the queue sheet). */
     fun removeFromQueue(index: Int) {
         val activeController = controller ?: return
         val queue = _playerState.value.queue
+
         if (index !in queue.indices) return
+
         val removedSongId = queue[index].id
 
         activeController.removeMediaItem(index)
 
-        val newQueue = queue.toMutableList().apply { removeAt(index) }
-        val newIndex = activeController.currentMediaItemIndex
+        val newQueue = queue.toMutableList().apply {
+            removeAt(index)
+        }
 
-        // Keep the remembered pre-shuffle order consistent — if shuffle
-        // gets turned off later, we shouldn't resurrect a song the person
-        // deliberately removed.
-        originalQueueOrder = originalQueueOrder?.filterNot { it.id == removedSongId }
+        val newIndex =
+            activeController.currentMediaItemIndex
+
+        originalQueueOrder =
+            originalQueueOrder?.filterNot {
+                it.id == removedSongId
+            }
 
         _playerState.update {
             it.copy(
                 queue = newQueue,
                 currentIndex = newIndex,
-                currentSong = if (newQueue.isEmpty()) null else newQueue.getOrNull(newIndex) ?: it.currentSong
+                currentSong = if (newQueue.isEmpty()) {
+                    null
+                } else {
+                    newQueue.getOrNull(newIndex)
+                        ?: it.currentSong
+                }
             )
         }
     }
 
-    /**
-     * Real reordering, not just ExoPlayer's internal (invisible) shuffle
-     * mode — that only changes the hidden next()/previous() order without
-     * ever updating _playerState.queue, so the Queue sheet would keep
-     * showing the original, unshuffled order even though shuffle was "on".
-     *
-     * What already played (everything up to and including the current
-     * song) is left untouched — only the upcoming portion of the queue
-     * gets shuffled, matching how shuffle behaves in most music apps.
-     * Toggling shuffle back off restores the exact original order.
-     */
     fun toggleShuffle() {
         loadRestoredSessionIfNeeded()
+
         val activeController = controller ?: return
         val state = _playerState.value
-        val currentIndex = state.currentIndex.coerceAtLeast(0)
+        val currentIndex =
+            state.currentIndex.coerceAtLeast(0)
 
         if (!state.isShuffleEnabled) {
-            // Turning ON — remember the real order so we can restore it later.
+
             originalQueueOrder = state.queue
 
-            val played = state.queue.subList(0, (currentIndex + 1).coerceAtMost(state.queue.size))
-            val upcoming = state.queue.subList((currentIndex + 1).coerceAtMost(state.queue.size), state.queue.size)
+            val played = state.queue.subList(
+                0,
+                (currentIndex + 1).coerceAtMost(state.queue.size)
+            )
+
+            val upcoming = state.queue.subList(
+                (currentIndex + 1).coerceAtMost(state.queue.size),
+                state.queue.size
+            )
+
             val shuffledUpcoming = upcoming.shuffled()
             val newQueue = played + shuffledUpcoming
 
-            replaceUpcomingMediaItems(activeController, currentIndex, shuffledUpcoming)
-            _playerState.update { it.copy(queue = newQueue, isShuffleEnabled = true) }
+            replaceUpcomingMediaItems(
+                activeController,
+                currentIndex,
+                shuffledUpcoming
+            )
+
+            _playerState.update {
+                it.copy(
+                    queue = newQueue,
+                    isShuffleEnabled = true
+                )
+            }
+
         } else {
-            // Turning OFF — restore the exact pre-shuffle order.
+
             val original = originalQueueOrder ?: state.queue
             val currentSongId = state.currentSong?.id
-            val restoredIndex = original.indexOfFirst { it.id == currentSongId }.coerceAtLeast(0)
-            val upcomingOriginal = original.subList((restoredIndex + 1).coerceAtMost(original.size), original.size)
 
-            replaceUpcomingMediaItems(activeController, restoredIndex, upcomingOriginal)
+            val restoredIndex = original.indexOfFirst {
+                it.id == currentSongId
+            }.coerceAtLeast(0)
+
+            val upcomingOriginal = original.subList(
+                (restoredIndex + 1).coerceAtMost(original.size),
+                original.size
+            )
+
+            replaceUpcomingMediaItems(
+                activeController,
+                restoredIndex,
+                upcomingOriginal
+            )
+
             originalQueueOrder = null
-            _playerState.update { it.copy(queue = original, currentIndex = restoredIndex, isShuffleEnabled = false) }
-        }
-    }
 
-    /**
-     * Swaps out everything after `fromIndex` in the actual ExoPlayer
-     * timeline to match `newUpcoming`, without touching or interrupting
-     * whatever's currently playing at/before `fromIndex`.
-     */
-    private fun replaceUpcomingMediaItems(controller: MediaController, fromIndex: Int, newUpcoming: List<Song>) {
-        val removeFrom = fromIndex + 1
-        if (removeFrom < controller.mediaItemCount) {
-            controller.removeMediaItems(removeFrom, controller.mediaItemCount)
-        }
-        if (newUpcoming.isNotEmpty()) {
-            val newMediaItems = newUpcoming.map {
-                MediaItem.Builder().setUri(it.audioUrl).setMediaId(it.id).build()
+            _playerState.update {
+                it.copy(
+                    queue = original,
+                    currentIndex = restoredIndex,
+                    isShuffleEnabled = false
+                )
             }
-            controller.addMediaItems(removeFrom, newMediaItems)
         }
     }
 
-    /**
-     * Tears down the MediaController connection entirely. NOT meant to be
-     * called from any screen-scoped ViewModel's onCleared() — this is a
-     * process-wide teardown only (e.g. hook it into Application-level
-     * cleanup if you ever need one). Calling this from a single screen's
-     * ViewModel would kill playback control for the whole app.
-     */
+    private fun replaceUpcomingMediaItems(
+        controller: MediaController,
+        fromIndex: Int,
+        newUpcoming: List<Song>
+    ) {
+        val removeFrom = fromIndex + 1
+
+        if (removeFrom < controller.mediaItemCount) {
+            controller.removeMediaItems(
+                removeFrom,
+                controller.mediaItemCount
+            )
+        }
+
+        if (newUpcoming.isNotEmpty()) {
+
+            val newMediaItems = newUpcoming.map {
+                MediaItem.Builder()
+                    .setUri(it.audioUrl)
+                    .setMediaId(it.id)
+                    .build()
+            }
+
+            controller.addMediaItems(
+                removeFrom,
+                newMediaItems
+            )
+        }
+    }
+
     fun release() {
+        stopPositionUpdates()
+
         controller?.removeListener(playerListener)
         controller?.release()
+
         controller = null
         isConnecting = false
         pendingPlayRequest = null

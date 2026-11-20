@@ -36,6 +36,7 @@ fun FavoritesScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundBlack)
+            .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(Modifier.height(16.dp))

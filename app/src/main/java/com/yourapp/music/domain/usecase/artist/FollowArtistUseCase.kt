@@ -7,6 +7,9 @@ import javax.inject.Inject
 class FollowArtistUseCase @Inject constructor(
     private val artistRepository: ArtistRepository
 ) {
-    suspend operator fun invoke(artistId: String, userId: String): Resource<Unit> =
+    suspend operator fun invoke(
+        artistId: String,
+        userId: String
+    ): Resource<Unit> =
         artistRepository.followArtist(artistId, userId)
 }

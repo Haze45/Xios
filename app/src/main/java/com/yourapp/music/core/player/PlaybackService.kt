@@ -15,15 +15,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlaybackService : MediaSessionService() {
 
-    @Inject lateinit var exoPlayer: ExoPlayer
+    @Inject
+    lateinit var exoPlayer: ExoPlayer
     private var mediaSession: MediaSession? = null
 
     override fun onCreate() {
         super.onCreate()
-        mediaSession = MediaSession.Builder(this, exoPlayer).build()
+        mediaSession =
+            MediaSession.Builder(this, exoPlayer).build()
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
+        mediaSession
 
     override fun onDestroy() {
         mediaSession?.run {

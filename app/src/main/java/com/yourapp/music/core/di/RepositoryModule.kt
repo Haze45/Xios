@@ -24,11 +24,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * Binds domain repository interfaces to their data-layer implementations.
- * Add one @Binds pair here every time a new repository is created
- * (SongRepository, PlaylistRepository, FavoriteRepository, etc.)
- */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {

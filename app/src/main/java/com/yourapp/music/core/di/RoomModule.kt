@@ -18,7 +18,11 @@ object RoomModule {
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, Constants.DATABASE_NAME)
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            Constants.DATABASE_NAME
+        )
             .fallbackToDestructiveMigration()
             .build()
 
@@ -26,17 +30,21 @@ object RoomModule {
     fun provideSongDao(db: AppDatabase) = db.songDao()
 
     @Provides
-    fun providePlaylistDao(db: AppDatabase) = db.playlistDao()
+    fun providePlaylistDao(db: AppDatabase) =
+        db.playlistDao()
 
     @Provides
-    fun provideFavoriteDao(db: AppDatabase) = db.favoriteDao()
+    fun provideFavoriteDao(db: AppDatabase) =
+        db.favoriteDao()
 
     @Provides
     fun provideArtistDao(db: AppDatabase) = db.artistDao()
 
     @Provides
-    fun provideRecentSearchDao(db: AppDatabase) = db.recentSearchDao()
+    fun provideRecentSearchDao(db: AppDatabase) =
+        db.recentSearchDao()
 
     @Provides
-    fun provideDownloadDao(db: AppDatabase) = db.downloadDao()
+    fun provideDownloadDao(db: AppDatabase) =
+        db.downloadDao()
 }

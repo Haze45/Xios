@@ -17,14 +17,18 @@ sealed class Screen(val route: String) {
     data object Profile : Screen("profile")
     data object Favorites : Screen("favorites")
     data object Player : Screen("player")
-    data object PlaylistDetail : Screen("playlist_detail/{playlistId}") {
-        fun createRoute(playlistId: String) = "playlist_detail/$playlistId"
+    data object PlaylistDetail :
+        Screen("playlist_detail/{playlistId}") {
+        fun createRoute(playlistId: String) =
+            "playlist_detail/$playlistId"
     }
-    data object AlbumDetail : Screen("album_detail/{albumId}") {
-        // Album names can contain spaces/slashes/etc. (unlike a UUID
-        // playlistId), so they need URL-encoding to survive as a single
-        // route path segment — decoded back in AlbumDetailViewModel.
+
+    data object AlbumDetail :
+        Screen("album_detail/{albumId}") {
         fun createRoute(albumId: String) =
-            "album_detail/" + java.net.URLEncoder.encode(albumId, "UTF-8")
+            "album_detail/" + java.net.URLEncoder.encode(
+                albumId,
+                "UTF-8"
+            )
     }
 }

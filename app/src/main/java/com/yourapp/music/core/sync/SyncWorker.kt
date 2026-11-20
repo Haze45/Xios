@@ -10,11 +10,6 @@ import com.yourapp.music.domain.usecase.favorite.SyncFavoritesUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
-/**
- * Runs whenever the app schedules a favorites sync (on add/remove, on login,
- * on reconnect). Safe to retry — syncFavorites() only pushes rows still
- * marked unsynced and is idempotent on the pull side (upsert).
- */
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -24,7 +19,8 @@ class SyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val user = getCurrentUserUseCase() ?: return Result.success() // not logged in, nothing to sync
+        val user = getCurrentUserUseCase()
+            ?: return Result.success() // not logged in, nothing to sync
 
         return when (syncFavoritesUseCase(user.uid)) {
             is Resource.Success -> Result.success()

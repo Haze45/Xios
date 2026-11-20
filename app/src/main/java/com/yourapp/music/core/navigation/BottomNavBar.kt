@@ -1,6 +1,7 @@
 package com.yourapp.music.core.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.PlaylistPlay
@@ -38,7 +39,7 @@ val bottomNavItems = listOf(
     BottomNavItem(
         Screen.Playlists,
         "Playlists",
-        Icons.Filled.PlaylistPlay
+        Icons.AutoMirrored.Filled.PlaylistPlay
     ),
     BottomNavItem(
         Screen.Settings,

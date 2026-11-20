@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import com.yourapp.music.domain.model.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -20,38 +21,27 @@ import javax.inject.Singleton
 /** Name of the subfolder created inside the device's public Downloads folder. */
 private const val DOWNLOAD_SUBFOLDER = "MusicApp"
 
-/**
- * Downloads a song's audio file into the device's public Downloads
- * folder, under a "MusicApp" subfolder — created automatically the
- * first time any song is downloaded.
- *
- * Two code paths, since how you write to the public Downloads folder
- * changed significantly in Android 10 (API 29) with scoped storage:
- *  - API 29+: MediaStore's Downloads collection. No permission needed.
- *  - API 24-28: classic File API against
- *    Environment.getExternalStoragePublicDirectory(). Requires the
- *    (legacy, maxSdkVersion=28) WRITE_EXTERNAL_STORAGE permission,
- *    which the caller is responsible for having already granted.
- */
 @Singleton
 class SongDownloader @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
     /** Downloads [song]'s audio file and returns the local Uri it was saved to. */
-    suspend fun download(song: Song): String = withContext(Dispatchers.IO) {
-        val bytes = fetchBytes(song.audioUrl)
-        val fileName = buildFileName(song)
+    suspend fun download(song: Song): String =
+        withContext(Dispatchers.IO) {
+            val bytes = fetchBytes(song.audioUrl)
+            val fileName = buildFileName(song)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveViaMediaStore(fileName, bytes)
-        } else {
-            saveViaLegacyFile(fileName, bytes)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                saveViaMediaStore(fileName, bytes)
+            } else {
+                saveViaLegacyFile(fileName, bytes)
+            }
         }
-    }
 
     private fun fetchBytes(url: String): ByteArray {
-        val connection = URL(url).openConnection() as HttpURLConnection
+        val connection =
+            URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 30_000
         connection.readTimeout = 60_000
         try {
@@ -66,30 +56,55 @@ class SongDownloader @Inject constructor(
     }
 
     private fun buildFileName(song: Song): String {
-        val safeTitle = song.title.replace(Regex("[^A-Za-z0-9 ._-]"), "_").trim()
-        val safeArtist = song.artist.replace(Regex("[^A-Za-z0-9 ._-]"), "_").trim()
-        val base = if (safeArtist.isNotBlank()) "$safeArtist - $safeTitle" else safeTitle
-        val extension = song.audioUrl.substringBefore('?').substringAfterLast('.', "mp3").take(4)
+        val safeTitle = song.title.replace(
+            Regex("[^A-Za-z0-9 ._-]"),
+            "_"
+        ).trim()
+        val safeArtist = song.artist.replace(
+            Regex("[^A-Za-z0-9 ._-]"),
+            "_"
+        ).trim()
+        val base =
+            if (safeArtist.isNotBlank()) "$safeArtist - $safeTitle" else safeTitle
+        val extension = song.audioUrl.substringBefore('?')
+            .substringAfterLast('.', "mp3").take(4)
         return "$base.$extension"
     }
 
-    private fun saveViaMediaStore(fileName: String, bytes: ByteArray): String {
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun saveViaMediaStore(
+        fileName: String,
+        bytes: ByteArray
+    ): String {
         val resolver = context.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, fileName)
             put(MediaStore.Downloads.MIME_TYPE, "audio/*")
-            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$DOWNLOAD_SUBFOLDER")
+            put(
+                MediaStore.Downloads.RELATIVE_PATH,
+                "${Environment.DIRECTORY_DOWNLOADS}/$DOWNLOAD_SUBFOLDER"
+            )
         }
-        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+        val uri = resolver.insert(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            values
+        )
             ?: error("Couldn't create a file in Downloads")
-        resolver.openOutputStream(uri)?.use { it.write(bytes) }
+        resolver.openOutputStream(uri)
+            ?.use { it.write(bytes) }
             ?: error("Couldn't open an output stream for the new file")
         return uri.toString()
     }
 
-    private fun saveViaLegacyFile(fileName: String, bytes: ByteArray): String {
+    private fun saveViaLegacyFile(
+        fileName: String,
+        bytes: ByteArray
+    ): String {
         @Suppress("DEPRECATION")
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val downloadsDir =
+            Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS
+            )
         val appDir = File(downloadsDir, DOWNLOAD_SUBFOLDER)
         if (!appDir.exists()) appDir.mkdirs()
 
@@ -98,7 +113,12 @@ class SongDownloader @Inject constructor(
 
         // Index the new file so it shows up in the device's Files/Downloads
         // app right away instead of only after the next media scan.
-        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, null)
+        MediaScannerConnection.scanFile(
+            context,
+            arrayOf(file.absolutePath),
+            null,
+            null
+        )
 
         return Uri.fromFile(file).toString()
     }

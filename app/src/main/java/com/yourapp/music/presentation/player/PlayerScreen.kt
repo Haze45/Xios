@@ -22,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,39 +52,73 @@ fun PlayerScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val song = state.currentSong
-    var showQueueSheet by remember { mutableStateOf(false) }
-    var showAddToPlaylistSheet by remember { mutableStateOf(false) }
+
+    var showQueueSheet by remember {
+        mutableStateOf(false)
+    }
+
+    var showAddToPlaylistSheet by remember {
+        mutableStateOf(false)
+    }
+
+    // Local slider state prevents playback updates from
+    // interfering with the user's dragging gesture.
+    var isSeeking by remember {
+        mutableStateOf(false)
+    }
+
+    var seekPosition by remember {
+        mutableFloatStateOf(0f)
+    }
 
     val context = LocalContext.current
 
-    // Android 10+ writes to Downloads via MediaStore with no permission.
-    // Android 9 and below still needs WRITE_EXTERNAL_STORAGE at runtime.
-    val storagePermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            viewModel.downloadCurrentSong()
-        } else {
-            Toast.makeText(context, "Storage permission is needed to save downloads", Toast.LENGTH_SHORT).show()
+    // Android 10+ writes to Downloads via MediaStore.
+    // Android 9 and below needs WRITE_EXTERNAL_STORAGE.
+    val storagePermissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+
+            if (granted) {
+                viewModel.downloadCurrentSong()
+            } else {
+                Toast.makeText(
+                    context,
+                    "Storage permission is needed to save downloads",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-    }
+
     val onDownloadClick = {
-        val needsLegacyPermission = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        val needsLegacyPermission =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+
+        val hasPermission =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
         if (needsLegacyPermission && !hasPermission) {
-            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            storagePermissionLauncher.launch(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         } else {
             viewModel.downloadCurrentSong()
         }
     }
 
-    // Show the "Downloaded…" / error message once, then clear it.
+    // Show download message once.
     LaunchedEffect(state.downloadMessage) {
         state.downloadMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                it,
+                Toast.LENGTH_SHORT
+            ).show()
+
             viewModel.consumeDownloadMessage()
         }
     }
@@ -92,31 +127,55 @@ fun PlayerScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundBlack)
-            .padding(horizontal = 24.dp),
+            .systemBarsPadding()
+            .padding(horizontal = 24.dp)
     ) {
+
         Spacer(Modifier.height(16.dp))
 
+        // Top bar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
             }
-            Text("Now Playing", style = MaterialTheme.typography.titleMedium)
+
+            Text(
+                "Now Playing",
+                style = MaterialTheme.typography.titleMedium
+            )
+
             IconButton(onClick = viewModel::toggleFavorite) {
                 Icon(
-                    if (state.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    if (state.isFavorite) {
+                        Icons.Filled.Favorite
+                    } else {
+                        Icons.Filled.FavoriteBorder
+                    },
                     contentDescription = "Favorite",
-                    tint = if (state.isFavorite) AccentGreen else TextSecondary
+                    tint = if (state.isFavorite) {
+                        AccentGreen
+                    } else {
+                        TextSecondary
+                    }
                 )
             }
         }
 
         Spacer(Modifier.height(32.dp))
 
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        // Album artwork
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             AsyncImage(
                 model = song?.albumArtUrl,
                 contentDescription = song?.title,
@@ -127,23 +186,25 @@ fun PlayerScreen(
             )
         }
 
-        // Takes up all the leftover vertical space between the album art
-        // and the seek bar/controls below, and centers the title/artist
-        // inside it — so they sit in the middle of the screen instead of
-        // being pinned directly under the artwork.
+        // Song title and artist
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
                 Text(
                     song?.title.orEmpty(),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center
                 )
+
                 Spacer(Modifier.height(4.dp))
+
                 Text(
                     song?.artist.orEmpty(),
                     style = MaterialTheme.typography.bodyLarge,
@@ -153,49 +214,93 @@ fun PlayerScreen(
             }
         }
 
-        // Download + "Add to Playlist" sit just above the slider,
-        // right-aligned — quick actions tied to the current song without
-        // crowding the main transport controls below. Download is the
-        // left one of the pair.
+        // Download and playlist actions
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             IconButton(
                 onClick = onDownloadClick,
-                enabled = song != null && !state.isDownloaded && !state.isDownloading
+                enabled = song != null &&
+                        !state.isDownloaded &&
+                        !state.isDownloading
             ) {
+
                 when {
-                    state.isDownloading -> CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = AccentGreen
-                    )
-                    state.isDownloaded -> Icon(
-                        Icons.Filled.DownloadDone,
-                        contentDescription = "Downloaded",
-                        tint = AccentGreen
-                    )
-                    else -> Icon(
-                        Icons.Filled.Download,
-                        contentDescription = "Download",
-                        tint = TextSecondary
-                    )
+
+                    state.isDownloading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = AccentGreen
+                        )
+                    }
+
+                    state.isDownloaded -> {
+                        Icon(
+                            Icons.Filled.DownloadDone,
+                            contentDescription = "Downloaded",
+                            tint = AccentGreen
+                        )
+                    }
+
+                    else -> {
+                        Icon(
+                            Icons.Filled.Download,
+                            contentDescription = "Download",
+                            tint = TextSecondary
+                        )
+                    }
                 }
             }
+
             IconButton(
-                onClick = { showAddToPlaylistSheet = true },
+                onClick = {
+                    showAddToPlaylistSheet = true
+                },
                 enabled = song != null
             ) {
-                Icon(Icons.AutoMirrored.Filled.PlaylistAdd, contentDescription = "Add to Playlist", tint = TextSecondary)
+                Icon(
+                    Icons.AutoMirrored.Filled.PlaylistAdd,
+                    contentDescription = "Add to Playlist",
+                    tint = TextSecondary
+                )
             }
         }
 
+        // ----------------------------------------
+        // OPTIMIZED PLAYER SLIDER
+        // ----------------------------------------
+
+        val sliderDuration =
+            state.durationMs.takeIf { it > 0 }?.toFloat()
+                ?: 1f
+
+        val displayedPosition = if (isSeeking) {
+            seekPosition.coerceIn(0f, sliderDuration)
+        } else {
+            state.positionMs.toFloat()
+                .coerceIn(0f, sliderDuration)
+        }
+
         Slider(
-            value = state.positionMs.toFloat(),
-            onValueChange = { viewModel.seekTo(it.toLong()) },
-            valueRange = 0f..(state.durationMs.takeIf { it > 0 }?.toFloat() ?: 1f),
+            value = displayedPosition,
+
+            onValueChange = { newPosition ->
+                isSeeking = true
+                seekPosition = newPosition
+            },
+
+            // Seek only after the user releases the slider.
+            onValueChangeFinished = {
+                viewModel.seekTo(seekPosition.toLong())
+                isSeeking = false
+            },
+
+            valueRange = 0f..sliderDuration,
+
             track = { sliderState ->
                 SliderDefaults.Track(
                     sliderState = sliderState,
@@ -206,74 +311,139 @@ fun PlayerScreen(
                     )
                 )
             },
+
             thumb = {
                 SliderDefaults.Thumb(
-                    interactionSource = remember { MutableInteractionSource() },
-                    colors = SliderDefaults.colors(thumbColor = AccentGreen),
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    },
+                    colors = SliderDefaults.colors(
+                        thumbColor = AccentGreen
+                    ),
                     thumbSize = DpSize(14.dp, 14.dp)
                 )
             }
         )
 
+        // Playback timestamps
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(formatMs(state.positionMs), style = MaterialTheme.typography.labelSmall)
-            // Remaining time shown as a countdown (e.g. "-2:15"), matching the reference.
+
             Text(
-                "-" + formatMs((state.durationMs - state.positionMs).coerceAtLeast(0)),
+                formatMs(
+                    if (isSeeking) {
+                        seekPosition.toLong()
+                    } else {
+                        state.positionMs
+                    }
+                ),
+                style = MaterialTheme.typography.labelSmall
+            )
+
+            Text(
+                "-" + formatMs(
+                    (
+                            state.durationMs -
+                                    if (isSeeking) {
+                                        seekPosition.toLong()
+                                    } else {
+                                        state.positionMs
+                                    }
+                            ).coerceAtLeast(0)
+                ),
                 style = MaterialTheme.typography.labelSmall
             )
         }
 
         Spacer(Modifier.height(16.dp))
 
+        // Playback controls
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             IconButton(onClick = viewModel::toggleShuffle) {
                 Icon(
                     Icons.Filled.Shuffle,
                     contentDescription = "Shuffle",
-                    tint = if (state.isShuffleEnabled) AccentGreen else TextSecondary
+                    tint = if (state.isShuffleEnabled) {
+                        AccentGreen
+                    } else {
+                        TextSecondary
+                    }
                 )
             }
+
             IconButton(onClick = viewModel::skipToPrevious) {
-                Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous", modifier = Modifier.size(36.dp))
+                Icon(
+                    Icons.Filled.SkipPrevious,
+                    contentDescription = "Previous",
+                    modifier = Modifier.size(36.dp)
+                )
             }
+
             IconButton(
                 onClick = viewModel::togglePlayPause,
-                modifier = Modifier.size(64.dp).clip(CircleShape).background(AccentGreen)
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(AccentGreen)
             ) {
                 Icon(
-                    if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    if (state.isPlaying) {
+                        Icons.Filled.Pause
+                    } else {
+                        Icons.Filled.PlayArrow
+                    },
                     contentDescription = "Play/Pause",
                     tint = BackgroundBlack,
                     modifier = Modifier.size(32.dp)
                 )
             }
+
             IconButton(onClick = viewModel::skipToNext) {
-                Icon(Icons.Filled.SkipNext, contentDescription = "Next", modifier = Modifier.size(36.dp))
+                Icon(
+                    Icons.Filled.SkipNext,
+                    contentDescription = "Next",
+                    modifier = Modifier.size(36.dp)
+                )
             }
-            IconButton(onClick = { showQueueSheet = true }) {
-                Icon(Icons.AutoMirrored.Filled.QueueMusic, contentDescription = "Queue")
+
+            IconButton(
+                onClick = {
+                    showQueueSheet = true
+                }
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.QueueMusic,
+                    contentDescription = "Queue"
+                )
             }
         }
 
         Spacer(Modifier.height(24.dp))
     }
 
+    // Queue sheet
     if (showQueueSheet) {
-        QueueBottomSheet(onDismiss = { showQueueSheet = false })
+        QueueBottomSheet(
+            onDismiss = {
+                showQueueSheet = false
+            }
+        )
     }
 
+    // Add to playlist sheet
     if (showAddToPlaylistSheet && song != null) {
         AddToPlaylistSheet(
             songId = song.id,
-            onDismiss = { showAddToPlaylistSheet = false }
+            onDismiss = {
+                showAddToPlaylistSheet = false
+            }
         )
     }
 }
@@ -282,5 +452,6 @@ private fun formatMs(ms: Long): String {
     val totalSeconds = ms / 1000
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
+
     return "%d:%02d".format(minutes, seconds)
 }

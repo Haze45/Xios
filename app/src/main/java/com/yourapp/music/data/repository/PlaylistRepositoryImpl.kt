@@ -23,35 +23,52 @@ class PlaylistRepositoryImpl @Inject constructor(
 ) : PlaylistRepository {
 
     override fun getAllPlaylists(): Flow<List<Playlist>> =
-        playlistDao.getAllPlaylists().map { list -> list.map { it.toDomain() } }
+        playlistDao.getAllPlaylists()
+            .map { list -> list.map { it.toDomain() } }
 
     override fun observeUserPlaylists(userId: String): Flow<List<Playlist>> =
-        playlistDao.getPlaylistsByOwner(userId).map { list -> list.map { it.toDomain() } }
+        playlistDao.getPlaylistsByOwner(userId)
+            .map { list -> list.map { it.toDomain() } }
 
     override fun observePlaylistById(id: String): Flow<Playlist?> =
-        playlistDao.getPlaylistByIdFlow(id).map { it?.toDomain() }
+        playlistDao.getPlaylistByIdFlow(id)
+            .map { it?.toDomain() }
 
-    override suspend fun getTopDailyPlaylists(): Resource<List<Playlist>> = try {
-        Resource.Success(playlistApi.getTopDailyPlaylists().map { it.toDomain() })
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't load daily playlists", e)
-    }
+    override suspend fun getTopDailyPlaylists(): Resource<List<Playlist>> =
+        try {
+            Resource.Success(
+                playlistApi.getTopDailyPlaylists()
+                    .map { it.toDomain() })
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message
+                    ?: "Couldn't load daily playlists", e
+            )
+        }
 
-    override suspend fun getUserPlaylists(userId: String): Resource<List<Playlist>> = try {
-        val remote = playlistApi.getUserPlaylists(userId)
-        // Hydrate the Room cache so observeUserPlaylists(userId) has something to
-        // filter from and stays live afterward (create/add-song/delete all write
-        // straight to Room too, so once this cache exists it never goes stale).
-        playlistDao.upsertPlaylists(remote.map { it.toEntity() })
-        Resource.Success(remote.map { it.toDomain() })
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't load your playlists", e)
-    }
+    override suspend fun getUserPlaylists(userId: String): Resource<List<Playlist>> =
+        try {
+            val remote =
+                playlistApi.getUserPlaylists(userId)
+            // Hydrate the Room cache so observeUserPlaylists(userId) has something to
+            // filter from and stays live afterward (create/add-song/delete all write
+            // straight to Room too, so once this cache exists it never goes stale).
+            playlistDao.upsertPlaylists(remote.map { it.toEntity() })
+            Resource.Success(remote.map { it.toDomain() })
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message ?: "Couldn't load your playlists",
+                e
+            )
+        }
 
     override suspend fun getPlaylistById(id: String): Playlist? =
         playlistDao.getPlaylistById(id)?.toDomain()
 
-    override suspend fun createPlaylist(title: String, ownerId: String): Resource<Playlist> = try {
+    override suspend fun createPlaylist(
+        title: String,
+        ownerId: String
+    ): Resource<Playlist> = try {
         val dto = PlaylistDto(
             id = UUID.randomUUID().toString(),
             title = title,
@@ -64,42 +81,69 @@ class PlaylistRepositoryImpl @Inject constructor(
         playlistDao.upsertPlaylists(listOf(created.toEntity()))
         Resource.Success(created.toDomain())
     } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't create playlist", e)
+        Resource.Error(
+            e.message ?: "Couldn't create playlist", e
+        )
     }
 
-    override suspend fun addSongToPlaylist(playlistId: String, songId: String): Resource<Unit> {
+    override suspend fun addSongToPlaylist(
+        playlistId: String,
+        songId: String
+    ): Resource<Unit> {
         return try {
-            val remotePlaylist = playlistApi.getPlaylistById(playlistId)
-                ?: return Resource.Error("Playlist not found")
+            val remotePlaylist =
+                playlistApi.getPlaylistById(playlistId)
+                    ?: return Resource.Error("Playlist not found")
 
             if (songId in remotePlaylist.song_ids) {
                 // Already in this playlist — nothing to do, not an error.
                 return Resource.Success(Unit)
             }
 
-            val updatedSongIds = remotePlaylist.song_ids + songId
-            applyUpdatedSongIds(playlistId, remotePlaylist, updatedSongIds)
+            val updatedSongIds =
+                remotePlaylist.song_ids + songId
+            applyUpdatedSongIds(
+                playlistId,
+                remotePlaylist,
+                updatedSongIds
+            )
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Couldn't add song to playlist", e)
+            Resource.Error(
+                e.message
+                    ?: "Couldn't add song to playlist", e
+            )
         }
     }
 
-    override suspend fun removeSongFromPlaylist(playlistId: String, songId: String): Resource<Unit> {
+    override suspend fun removeSongFromPlaylist(
+        playlistId: String,
+        songId: String
+    ): Resource<Unit> {
         return try {
-            val remotePlaylist = playlistApi.getPlaylistById(playlistId)
-                ?: return Resource.Error("Playlist not found")
+            val remotePlaylist =
+                playlistApi.getPlaylistById(playlistId)
+                    ?: return Resource.Error("Playlist not found")
 
             if (songId !in remotePlaylist.song_ids) {
                 // Wasn't in there anyway — nothing to do, not an error.
                 return Resource.Success(Unit)
             }
 
-            val updatedSongIds = remotePlaylist.song_ids - songId
-            applyUpdatedSongIds(playlistId, remotePlaylist, updatedSongIds)
+            val updatedSongIds =
+                remotePlaylist.song_ids - songId
+            applyUpdatedSongIds(
+                playlistId,
+                remotePlaylist,
+                updatedSongIds
+            )
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Couldn't remove song from playlist", e)
+            Resource.Error(
+                e.message
+                    ?: "Couldn't remove song from playlist",
+                e
+            )
         }
     }
 
@@ -125,7 +169,12 @@ class PlaylistRepositoryImpl @Inject constructor(
                 ?: remotePlaylist.cover_url // last song's own art is missing — keep whatever cover it already had
         }
 
-        playlistApi.updatePlaylistSongIds(playlistId, updatedSongIds, updatedSongIds.size, newCoverUrl)
+        playlistApi.updatePlaylistSongIds(
+            playlistId,
+            updatedSongIds,
+            updatedSongIds.size,
+            newCoverUrl
+        )
 
         val updatedEntity = remotePlaylist.toEntity().copy(
             songIds = updatedSongIds,
@@ -135,31 +184,49 @@ class PlaylistRepositoryImpl @Inject constructor(
         playlistDao.upsertPlaylists(listOf(updatedEntity))
     }
 
-    override suspend fun renamePlaylist(playlistId: String, newTitle: String): Resource<Unit> = try {
+    override suspend fun renamePlaylist(
+        playlistId: String,
+        newTitle: String
+    ): Resource<Unit> = try {
         playlistApi.renamePlaylist(playlistId, newTitle)
         // Keep the Room cache in sync so the new name shows up immediately everywhere.
-        val existing = playlistDao.getPlaylistById(playlistId)
+        val existing =
+            playlistDao.getPlaylistById(playlistId)
         if (existing != null) {
-            playlistDao.upsertPlaylists(listOf(existing.copy(title = newTitle)))
+            playlistDao.upsertPlaylists(
+                listOf(
+                    existing.copy(
+                        title = newTitle
+                    )
+                )
+            )
         }
         Resource.Success(Unit)
     } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't rename playlist", e)
+        Resource.Error(
+            e.message ?: "Couldn't rename playlist", e
+        )
     }
 
-    override suspend fun deletePlaylist(playlistId: String): Resource<Unit> = try {
-        playlistApi.deletePlaylist(playlistId)
-        playlistDao.deletePlaylist(playlistId)
-        Resource.Success(Unit)
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't delete playlist", e)
-    }
+    override suspend fun deletePlaylist(playlistId: String): Resource<Unit> =
+        try {
+            playlistApi.deletePlaylist(playlistId)
+            playlistDao.deletePlaylist(playlistId)
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message ?: "Couldn't delete playlist", e
+            )
+        }
 
-    override suspend fun refreshPlaylists(): Resource<Unit> = try {
-        val remote = playlistApi.getAllPlaylists()
-        playlistDao.upsertPlaylists(remote.map { it.toEntity() })
-        Resource.Success(Unit)
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't refresh playlists", e)
-    }
+    override suspend fun refreshPlaylists(): Resource<Unit> =
+        try {
+            val remote = playlistApi.getAllPlaylists()
+            playlistDao.upsertPlaylists(remote.map { it.toEntity() })
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message ?: "Couldn't refresh playlists", e
+            )
+        }
 }

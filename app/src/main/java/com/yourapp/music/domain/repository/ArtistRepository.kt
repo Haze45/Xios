@@ -8,9 +8,15 @@ interface ArtistRepository {
     /** Room-cached list the UI observes directly. */
     fun getFollowedArtists(userId: String): Flow<List<Artist>>
 
-    suspend fun followArtist(artistId: String, userId: String): Resource<Unit>
-    suspend fun unfollowArtist(artistId: String, userId: String): Resource<Unit>
+    suspend fun followArtist(
+        artistId: String,
+        userId: String
+    ): Resource<Unit>
 
-    /** Pulls followed artists from Supabase and upserts into Room. */
+    suspend fun unfollowArtist(
+        artistId: String,
+        userId: String
+    ): Resource<Unit>
+
     suspend fun refreshFollowedArtists(userId: String): Resource<Unit>
 }

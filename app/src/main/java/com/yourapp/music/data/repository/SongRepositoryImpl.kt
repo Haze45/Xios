@@ -23,34 +23,48 @@ class SongRepositoryImpl @Inject constructor(
 ) : SongRepository {
 
     override fun getAllSongs(): Flow<List<Song>> =
-        songDao.getAllSongs().map { list -> list.map { it.toDomain() } }
+        songDao.getAllSongs()
+            .map { list -> list.map { it.toDomain() } }
 
     override fun searchSongs(query: String): Flow<List<Song>> =
-        songDao.searchSongs(query).map { list -> list.map { it.toDomain() } }
+        songDao.searchSongs(query)
+            .map { list -> list.map { it.toDomain() } }
 
     override suspend fun getSongById(id: String): Song? =
         songDao.getSongById(id)?.toDomain()
 
-    override suspend fun getTrendingSongs(): Resource<List<Song>> = try {
-        val songs = songApi.getTrendingSongs().map { it.toDomain() }
-        Resource.Success(songs)
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't load trending songs", e)
-    }
+    override suspend fun getTrendingSongs(): Resource<List<Song>> =
+        try {
+            val songs = songApi.getTrendingSongs()
+                .map { it.toDomain() }
+            Resource.Success(songs)
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message ?: "Couldn't load trending songs",
+                e
+            )
+        }
 
-    override suspend fun getNewReleases(): Resource<List<Song>> = try {
-        val songs = songApi.getNewReleases().map { it.toDomain() }
-        Resource.Success(songs)
-    } catch (e: Exception) {
-        Resource.Error(e.message ?: "Couldn't load new releases", e)
-    }
+    override suspend fun getNewReleases(): Resource<List<Song>> =
+        try {
+            val songs = songApi.getNewReleases()
+                .map { it.toDomain() }
+            Resource.Success(songs)
+        } catch (e: Exception) {
+            Resource.Error(
+                e.message ?: "Couldn't load new releases", e
+            )
+        }
 
-    override suspend fun refreshSongs(): Resource<Unit> = try {
-        val remoteSongs = songApi.getAllSongs()
-        songDao.upsertSongs(remoteSongs.map { it.toEntity() })
-        Resource.Success(Unit)
-    } catch (e: Exception) {
-        // Non-fatal: UI still has whatever is cached in Room from the last successful sync.
-        Resource.Error(e.message ?: "Couldn't refresh songs", e)
-    }
+    override suspend fun refreshSongs(): Resource<Unit> =
+        try {
+            val remoteSongs = songApi.getAllSongs()
+            songDao.upsertSongs(remoteSongs.map { it.toEntity() })
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            // Non-fatal: UI still has whatever is cached in Room from the last successful sync.
+            Resource.Error(
+                e.message ?: "Couldn't refresh songs", e
+            )
+        }
 }

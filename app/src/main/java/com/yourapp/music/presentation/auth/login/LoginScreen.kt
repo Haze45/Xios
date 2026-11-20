@@ -34,6 +34,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundBlack)
+            .systemBarsPadding()
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.Center
     ) {

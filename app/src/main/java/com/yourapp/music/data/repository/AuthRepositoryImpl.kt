@@ -10,44 +10,76 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.net.toUri
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuthService: FirebaseAuthService
 ) : AuthRepository {
 
-    override suspend fun login(email: String, password: String): Resource<User> {
+    override suspend fun login(
+        email: String,
+        password: String
+    ): Resource<User> {
         return try {
-            val user = firebaseAuthService.signIn(email, password)
+            val user =
+                firebaseAuthService.signIn(email, password)
             Resource.Success(user.toDomain())
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Login failed. Please try again.", e)
+            Resource.Error(
+                e.message
+                    ?: "Login failed. Please try again.", e
+            )
         }
     }
 
-    override suspend fun register(email: String, password: String, displayName: String): Resource<User> {
+    override suspend fun register(
+        email: String,
+        password: String,
+        displayName: String
+    ): Resource<User> {
         return try {
-            val user = firebaseAuthService.signUp(email, password, displayName)
+            val user = firebaseAuthService.signUp(
+                email,
+                password,
+                displayName
+            )
             Resource.Success(user.toDomain())
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Registration failed. Please try again.", e)
+            Resource.Error(
+                e.message
+                    ?: "Registration failed. Please try again.",
+                e
+            )
         }
     }
 
-    override suspend fun updateProfile(displayName: String?, photoUri: String?): Resource<User> {
+    override suspend fun updateProfile(
+        displayName: String?,
+        photoUri: String?
+    ): Resource<User> {
         return try {
-            val uri = photoUri?.let { Uri.parse(it) }
-            val user = firebaseAuthService.updateProfile(displayName, uri)
+            val uri = photoUri?.toUri()
+            val user = firebaseAuthService.updateProfile(
+                displayName,
+                uri
+            )
             Resource.Success(user.toDomain())
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Couldn't update your profile. Please try again.", e)
+            Resource.Error(
+                e.message
+                    ?: "Couldn't update your profile. Please try again.",
+                e
+            )
         }
     }
 
     override fun logout() = firebaseAuthService.signOut()
 
-    override fun getCurrentUser(): User? = firebaseAuthService.currentUser()?.toDomain()
+    override fun getCurrentUser(): User? =
+        firebaseAuthService.currentUser()?.toDomain()
 
     override fun observeAuthState(): Flow<User?> =
-        firebaseAuthService.authStateFlow().map { it?.toDomain() }
+        firebaseAuthService.authStateFlow()
+            .map { it?.toDomain() }
 }

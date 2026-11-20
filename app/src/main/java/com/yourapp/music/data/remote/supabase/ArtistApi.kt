@@ -15,29 +15,42 @@ class ArtistApi @Inject constructor(
 ) {
     /** artist_follows rows for this user (just the relationship, no artist details yet). */
     suspend fun getFollowedArtistIds(userId: String): List<ArtistFollowDto> =
-        supabase.from(Constants.ARTIST_FOLLOWS_TABLE).select(Columns.ALL) {
-            filter { eq("user_id", userId) }
-        }.decodeList()
+        supabase.from(Constants.ARTIST_FOLLOWS_TABLE)
+            .select(Columns.ALL) {
+                filter { eq("user_id", userId) }
+            }.decodeList()
 
     suspend fun getArtistsByIds(ids: List<String>): List<ArtistDto> {
         if (ids.isEmpty()) return emptyList()
-        return supabase.from(Constants.ARTISTS_TABLE).select(Columns.ALL) {
-            filter { isIn("id", ids) }
-        }.decodeList()
+        return supabase.from(Constants.ARTISTS_TABLE)
+            .select(Columns.ALL) {
+                filter { isIn("id", ids) }
+            }.decodeList()
     }
 
-    suspend fun followArtist(userId: String, artistId: String) {
-        supabase.from(Constants.ARTIST_FOLLOWS_TABLE).upsert(
-            ArtistFollowDto(user_id = userId, artist_id = artistId)
-        )
+    suspend fun followArtist(
+        userId: String,
+        artistId: String
+    ) {
+        supabase.from(Constants.ARTIST_FOLLOWS_TABLE)
+            .upsert(
+                ArtistFollowDto(
+                    user_id = userId,
+                    artist_id = artistId
+                )
+            )
     }
 
-    suspend fun unfollowArtist(userId: String, artistId: String) {
-        supabase.from(Constants.ARTIST_FOLLOWS_TABLE).delete {
-            filter {
-                eq("user_id", userId)
-                eq("artist_id", artistId)
+    suspend fun unfollowArtist(
+        userId: String,
+        artistId: String
+    ) {
+        supabase.from(Constants.ARTIST_FOLLOWS_TABLE)
+            .delete {
+                filter {
+                    eq("user_id", userId)
+                    eq("artist_id", artistId)
+                }
             }
-        }
     }
 }
