@@ -1,6 +1,8 @@
 package com.yourapp.music.presentation.search
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
@@ -29,6 +32,7 @@ import com.yourapp.music.presentation.components.GenreTile
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
+@OptIn(UnstableApi::class)
 @Composable
 fun SearchScreen(
     onCancelClick: () -> Unit,
@@ -48,7 +52,6 @@ fun SearchScreen(
     ) {
         Spacer(Modifier.height(16.dp))
 
-        // Search bar + Cancel
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -56,87 +59,202 @@ fun SearchScreen(
             OutlinedTextField(
                 value = state.query,
                 onValueChange = viewModel::onQueryChange,
-                placeholder = { Text("Search for artists, songs, or podcasts") },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
+                placeholder = {
+                    Text("Search songs, artists, albums...")
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = "Search"
+                    )
+                },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
                 keyboardActions = KeyboardActions(
-                    onSearch = { viewModel.onSearchSubmit(state.query) }
+                    onSearch = {
+                        viewModel.onSearchSubmit(state.query)
+                    }
                 ),
                 shape = RoundedCornerShape(50),
                 modifier = Modifier.weight(1f)
             )
+
             Spacer(Modifier.width(8.dp))
-            TextButton(onClick = { viewModel.onCancelSearch(); onCancelClick() }) {
+
+            TextButton(
+                onClick = {
+                    viewModel.onCancelSearch()
+                    onCancelClick()
+                }
+            ) {
                 Text("Cancel")
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
 
         if (state.isSearchActive) {
-            // Live search results
-            LazyColumn {
-                items(state.searchResults, key = { it.id }) { song ->
-                    SongListItem(
-                        song = song,
-                        onClick = { viewModel.onSearchSubmit(song.title); onSongClick(song, state.searchResults) },
-                        onPlayClick = {
-                            if (playerState.currentSong?.id == song.id) {
-                                playerViewModel.togglePlayPause()
-                            } else {
-                                playerViewModel.playSong(song, state.searchResults)
-                            }
-                        },
-                        isCurrentSong = playerState.currentSong?.id == song.id,
-                        isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
+            Text(
+                text = "SUGGESTED SONGS",
+                style = MaterialTheme.typography.labelMedium,
+                color = TextSecondary,
+                modifier = Modifier.padding(
+                    start = 4.dp,
+                    bottom = 8.dp
+                )
+            )
+
+            when {
+                state.isLoading && state.searchResults.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(28.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                state.searchResults.isEmpty() -> {
+                    Text(
+                        text = "No matching songs found. Try another title, artist or album.",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(12.dp)
                     )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(
+                            items = state.searchResults,
+                            key = { it.id }
+                        ) { song ->
+                            SongListItem(
+                                song = song,
+                                onClick = {
+                                    viewModel.onSearchSubmit(
+                                        song.title
+                                    )
+                                    onSongClick(
+                                        song,
+                                        state.searchResults
+                                    )
+                                },
+                                onPlayClick = {
+                                    if (playerState.currentSong?.id == song.id) {
+                                        playerViewModel.togglePlayPause()
+                                    } else {
+                                        playerViewModel.playSong(
+                                            song,
+                                            state.searchResults
+                                        )
+                                    }
+                                },
+                                isCurrentSong =
+                                    playerState.currentSong?.id == song.id,
+                                isActivelyPlaying =
+                                    playerState.currentSong?.id == song.id &&
+                                            playerState.isPlaying
+                            )
+                        }
+                    }
                 }
             }
         } else {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Recent Searches", style = MaterialTheme.typography.titleLarge)
-                    TextButton(onClick = viewModel::clearRecentSearches) {
-                        Text("Clear All", color = TextSecondary)
+                    Text(
+                        "Recent Searches",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    TextButton(
+                        onClick = viewModel::clearRecentSearches
+                    ) {
+                        Text(
+                            "Clear All",
+                            color = TextSecondary
+                        )
                     }
                 }
+
                 Spacer(Modifier.height(8.dp))
 
                 state.recentSearches.forEach { recent ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clickable {
+                                viewModel.onSearchSubmit(
+                                    recent.query
+                                )
+                            }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Filled.History, contentDescription = null, tint = TextSecondary)
+                        Icon(
+                            Icons.Filled.History,
+                            contentDescription = null,
+                            tint = TextSecondary
+                        )
+
                         Spacer(Modifier.width(12.dp))
+
                         Text(
                             recent.query,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier
-                                .weight(1f)
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                Text("Browse by Genre", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "Browse by Genre",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
                 Spacer(Modifier.height(12.dp))
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.weight(1f, fill = false)
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(
+                        10.dp
+                    ),
+                    modifier = Modifier.weight(
+                        1f,
+                        fill = false
+                    )
                 ) {
-                    gridItems(state.genres, key = { it.id }) { genre ->
-                        GenreTile(genre = genre, onClick = { viewModel.onSearchSubmit(genre.name) })
+                    gridItems(
+                        state.genres,
+                        key = { it.id }
+                    ) { genre ->
+                        GenreTile(
+                            genre = genre,
+                            onClick = {
+                                viewModel.onSearchSubmit(
+                                    genre.name
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -144,7 +262,11 @@ fun SearchScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(8.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(Modifier.height(16.dp))
