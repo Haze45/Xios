@@ -6,10 +6,13 @@ import com.yourapp.music.domain.usecase.search.ClearRecentSearchesUseCase
 import com.yourapp.music.domain.usecase.search.GetGenresUseCase
 import com.yourapp.music.domain.usecase.search.GetRecentSearchesUseCase
 import com.yourapp.music.domain.usecase.search.SaveRecentSearchUseCase
+import com.yourapp.music.domain.usecase.search.SemanticSearchSongsUseCase
 import com.yourapp.music.domain.usecase.song.SearchSongsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchSongsUseCase: SearchSongsUseCase,
+    private val semanticSearchSongsUseCase: SemanticSearchSongsUseCase,
     private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
     private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
@@ -37,6 +41,8 @@ class SearchViewModel @Inject constructor(
         _uiState.asStateFlow()
 
     private val queryFlow = MutableStateFlow("")
+
+    private var semanticSearchJob: Job? = null
 
     init {
         observeRecentSearches()
@@ -65,8 +71,8 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
-     * Live autocomplete.
-     * Debounce avoids re-ranking on every keystroke.
+     * Live local autocomplete.
+     * This does not call Gemini.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeSearchResults() {
@@ -82,18 +88,24 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 .collect { results ->
-                    _uiState.update {
-                        it.copy(
-                            searchResults = results,
-                            isLoading = false,
-                            errorMessage = null
-                        )
+                    // Do not overwrite results from an active semantic search.
+                    if (!_uiState.value.isSemanticSearch) {
+                        _uiState.update {
+                            it.copy(
+                                searchResults = results,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        }
                     }
                 }
         }
     }
 
     fun onQueryChange(value: String) {
+        semanticSearchJob?.cancel()
+        semanticSearchJob = null
+
         _uiState.update {
             it.copy(
                 query = value,
@@ -103,6 +115,7 @@ class SearchViewModel @Inject constructor(
                     it.searchResults
                 },
                 isLoading = value.isNotBlank(),
+                isSemanticSearch = false,
                 errorMessage = null
             )
         }
@@ -110,13 +123,76 @@ class SearchViewModel @Inject constructor(
         queryFlow.value = value
     }
 
-    /** Saves submitted searches without empty history entries. */
+    /**
+     * Runs semantic search only after explicit submission.
+     */
     fun onSearchSubmit(query: String) {
         val cleanedQuery = query.trim()
 
         if (cleanedQuery.isBlank()) return
 
         onQueryChange(cleanedQuery)
+
+        _uiState.update {
+            it.copy(
+                isSemanticSearch = true,
+                isLoading = true,
+                errorMessage = null
+            )
+        }
+
+        saveRecentSearch(cleanedQuery)
+
+        semanticSearchJob = viewModelScope.launch {
+            try {
+                val results = semanticSearchSongsUseCase(
+                    query = cleanedQuery,
+                    matchCount = 20
+                )
+
+                _uiState.update { current ->
+                    if (
+                        current.query == cleanedQuery &&
+                        current.isSemanticSearch
+                    ) {
+                        current.copy(
+                            searchResults = results,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    } else {
+                        current
+                    }
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                _uiState.update { current ->
+                    if (
+                        current.query == cleanedQuery &&
+                        current.isSemanticSearch
+                    ) {
+                        current.copy(
+                            isLoading = false,
+                            errorMessage =
+                                "Semantic search is unavailable. Showing local matches."
+                        )
+                    } else {
+                        current
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Saves a query without launching a semantic request.
+     * Used when the user selects a song.
+     */
+    fun saveRecentSearch(query: String) {
+        val cleanedQuery = query.trim()
+
+        if (cleanedQuery.isBlank()) return
 
         viewModelScope.launch {
             saveRecentSearchUseCase(cleanedQuery)
@@ -130,11 +206,15 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onCancelSearch() {
+        semanticSearchJob?.cancel()
+        semanticSearchJob = null
+
         _uiState.update {
             it.copy(
                 query = "",
                 searchResults = emptyList(),
                 isLoading = false,
+                isSemanticSearch = false,
                 errorMessage = null
             )
         }

@@ -10,7 +10,9 @@ data class SearchUiState(
     val recentSearches: List<RecentSearch> = emptyList(),
     val genres: List<Genre> = emptyList(),
     val isLoading: Boolean = false,
+    val isSemanticSearch: Boolean = false,
     val errorMessage: String? = null
 ) {
-    val isSearchActive: Boolean get() = query.isNotBlank()
+    val isSearchActive: Boolean
+        get() = query.isNotBlank()
 }

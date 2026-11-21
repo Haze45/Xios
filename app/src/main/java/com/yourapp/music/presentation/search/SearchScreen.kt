@@ -97,7 +97,11 @@ fun SearchScreen(
 
         if (state.isSearchActive) {
             Text(
-                text = "SUGGESTED SONGS",
+                text = if (state.isSemanticSearch) {
+                    "SEMANTIC RESULTS"
+                } else {
+                    "SUGGESTED SONGS"
+                },
                 style = MaterialTheme.typography.labelMedium,
                 color = TextSecondary,
                 modifier = Modifier.padding(
@@ -105,6 +109,13 @@ fun SearchScreen(
                     bottom = 8.dp
                 )
             )
+
+            if (state.isSemanticSearch && state.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+            }
 
             when {
                 state.isLoading && state.searchResults.isEmpty() -> {
@@ -140,16 +151,19 @@ fun SearchScreen(
                             SongListItem(
                                 song = song,
                                 onClick = {
-                                    viewModel.onSearchSubmit(
+                                    viewModel.saveRecentSearch(
                                         song.title
                                     )
+
                                     onSongClick(
                                         song,
                                         state.searchResults
                                     )
                                 },
                                 onPlayClick = {
-                                    if (playerState.currentSong?.id == song.id) {
+                                    if (
+                                        playerState.currentSong?.id == song.id
+                                    ) {
                                         playerViewModel.togglePlayPause()
                                     } else {
                                         playerViewModel.playSong(
