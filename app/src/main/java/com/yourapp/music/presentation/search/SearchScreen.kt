@@ -97,10 +97,10 @@ fun SearchScreen(
 
         if (state.isSearchActive) {
             Text(
-                text = if (state.isSemanticSearch) {
-                    "SEMANTIC RESULTS"
-                } else {
-                    "SUGGESTED SONGS"
+                text = when {
+                    state.isLocalFallback -> "LOCAL RESULTS"
+                    state.isHybridSearch -> "HYBRID RESULTS"
+                    else -> "SUGGESTED SONGS"
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = TextSecondary,
@@ -110,7 +110,7 @@ fun SearchScreen(
                 )
             )
 
-            if (state.isSemanticSearch && state.isLoading) {
+            if (state.isHybridSearch && state.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -274,10 +274,10 @@ fun SearchScreen(
             }
         }
 
-        state.errorMessage?.let {
+        state.errorMessage?.let { message ->
             Spacer(Modifier.height(8.dp))
             Text(
-                it,
+                message,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium
             )

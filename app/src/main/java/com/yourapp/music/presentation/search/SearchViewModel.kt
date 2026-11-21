@@ -6,7 +6,7 @@ import com.yourapp.music.domain.usecase.search.ClearRecentSearchesUseCase
 import com.yourapp.music.domain.usecase.search.GetGenresUseCase
 import com.yourapp.music.domain.usecase.search.GetRecentSearchesUseCase
 import com.yourapp.music.domain.usecase.search.SaveRecentSearchUseCase
-import com.yourapp.music.domain.usecase.search.SemanticSearchSongsUseCase
+import com.yourapp.music.domain.usecase.song.HybridSearchSongsUseCase
 import com.yourapp.music.domain.usecase.song.SearchSongsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchSongsUseCase: SearchSongsUseCase,
-    private val semanticSearchSongsUseCase: SemanticSearchSongsUseCase,
+    private val hybridSearchSongsUseCase: HybridSearchSongsUseCase,
     private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
     private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
@@ -42,7 +42,7 @@ class SearchViewModel @Inject constructor(
 
     private val queryFlow = MutableStateFlow("")
 
-    private var semanticSearchJob: Job? = null
+    private var hybridSearchJob: Job? = null
 
     init {
         observeRecentSearches()
@@ -72,7 +72,7 @@ class SearchViewModel @Inject constructor(
 
     /**
      * Live local autocomplete.
-     * This does not call Gemini.
+     * No Gemini request is made while the user types.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeSearchResults() {
@@ -88,8 +88,8 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 .collect { results ->
-                    // Do not overwrite results from an active semantic search.
-                    if (!_uiState.value.isSemanticSearch) {
+                    // Do not overwrite submitted hybrid results.
+                    if (!_uiState.value.isHybridSearch) {
                         _uiState.update {
                             it.copy(
                                 searchResults = results,
@@ -103,8 +103,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onQueryChange(value: String) {
-        semanticSearchJob?.cancel()
-        semanticSearchJob = null
+        hybridSearchJob?.cancel()
+        hybridSearchJob = null
 
         _uiState.update {
             it.copy(
@@ -115,7 +115,8 @@ class SearchViewModel @Inject constructor(
                     it.searchResults
                 },
                 isLoading = value.isNotBlank(),
-                isSemanticSearch = false,
+                isHybridSearch = false,
+                isLocalFallback = false,
                 errorMessage = null
             )
         }
@@ -124,7 +125,7 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
-     * Runs semantic search only after explicit submission.
+     * Submits a query for exact, fuzzy and semantic hybrid ranking.
      */
     fun onSearchSubmit(query: String) {
         val cleanedQuery = query.trim()
@@ -135,30 +136,37 @@ class SearchViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(
-                isSemanticSearch = true,
+                isHybridSearch = true,
                 isLoading = true,
+                isLocalFallback = false,
                 errorMessage = null
             )
         }
 
         saveRecentSearch(cleanedQuery)
 
-        semanticSearchJob = viewModelScope.launch {
+        hybridSearchJob = viewModelScope.launch {
             try {
-                val results = semanticSearchSongsUseCase(
-                    query = cleanedQuery,
-                    matchCount = 20
-                )
+                val result =
+                    hybridSearchSongsUseCase(cleanedQuery)
 
                 _uiState.update { current ->
                     if (
                         current.query == cleanedQuery &&
-                        current.isSemanticSearch
+                        current.isHybridSearch
                     ) {
                         current.copy(
-                            searchResults = results,
+                            searchResults = result.songs,
                             isLoading = false,
-                            errorMessage = null
+                            isLocalFallback =
+                                !result.semanticSearchSucceeded,
+                            errorMessage = if (
+                                result.semanticSearchSucceeded
+                            ) {
+                                null
+                            } else {
+                                "Semantic search is unavailable. Showing local matches."
+                            }
                         )
                     } else {
                         current
@@ -166,16 +174,17 @@ class SearchViewModel @Inject constructor(
                 }
             } catch (exception: CancellationException) {
                 throw exception
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 _uiState.update { current ->
                     if (
                         current.query == cleanedQuery &&
-                        current.isSemanticSearch
+                        current.isHybridSearch
                     ) {
                         current.copy(
                             isLoading = false,
+                            isLocalFallback = true,
                             errorMessage =
-                                "Semantic search is unavailable. Showing local matches."
+                                "Search failed. Please try again."
                         )
                     } else {
                         current
@@ -185,10 +194,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Saves a query without launching a semantic request.
-     * Used when the user selects a song.
-     */
     fun saveRecentSearch(query: String) {
         val cleanedQuery = query.trim()
 
@@ -206,15 +211,16 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onCancelSearch() {
-        semanticSearchJob?.cancel()
-        semanticSearchJob = null
+        hybridSearchJob?.cancel()
+        hybridSearchJob = null
 
         _uiState.update {
             it.copy(
                 query = "",
                 searchResults = emptyList(),
                 isLoading = false,
-                isSemanticSearch = false,
+                isHybridSearch = false,
+                isLocalFallback = false,
                 errorMessage = null
             )
         }
