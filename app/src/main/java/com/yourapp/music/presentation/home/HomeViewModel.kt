@@ -3,6 +3,8 @@ package com.yourapp.music.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourapp.music.core.util.Resource
+import com.yourapp.music.domain.model.Song
+import com.yourapp.music.domain.repository.ListeningHistoryRepository
 import com.yourapp.music.domain.usecase.album.GetAlbumsUseCase
 import com.yourapp.music.domain.usecase.auth.GetCurrentUserUseCase
 import com.yourapp.music.domain.usecase.song.GetAllSongsUseCase
@@ -15,6 +17,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +31,8 @@ class HomeViewModel @Inject constructor(
     private val getAlbumsUseCase: GetAlbumsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getPersonalizedRecommendationsUseCase:
-    GetPersonalizedRecommendationsUseCase
+    GetPersonalizedRecommendationsUseCase,
+    private val listeningHistoryRepository: ListeningHistoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -35,16 +40,15 @@ class HomeViewModel @Inject constructor(
         _uiState.asStateFlow()
 
     private var recommendationJob: Job? = null
+    private var listeningHistoryJob: Job? = null
 
     init {
         observeCurrentUser()
-        loadHome()
         observeCachedSongs()
         observeAlbums()
-        refreshPersonalizedRecommendations()
+        loadHome()
     }
 
-    /** Room is the source of truth for the song list shown in the UI. */
     private fun observeCachedSongs() {
         viewModelScope.launch {
             getAllSongsUseCase().collect { songs ->
@@ -65,14 +69,67 @@ class HomeViewModel @Inject constructor(
                                 ?: user?.email?.substringBefore(
                                     "@"
                                 ).orEmpty(),
-                            photoUrl = user?.photoUrl
+                            photoUrl = user?.photoUrl,
+                            recentlyPlayedSongs = if (user == null) {
+                                emptyList()
+                            } else {
+                                it.recentlyPlayedSongs
+                            },
+                            recommendedSongs = if (user == null) {
+                                emptyList()
+                            } else {
+                                it.recommendedSongs
+                            }
                         )
+                    }
+
+                    listeningHistoryJob?.cancel()
+
+                    if (user == null) {
+                        _uiState.update {
+                            it.copy(
+                                recentlyPlayedSongs = emptyList(),
+                                recommendedSongs = emptyList(),
+                                recommendationMessage = null
+                            )
+                        }
+                    } else {
+                        listeningHistoryJob =
+                            viewModelScope.launch {
+                                combine(
+                                    listeningHistoryRepository.observeHistory(
+                                        userId = user.uid,
+                                        limit = 30
+                                    ),
+                                    getAllSongsUseCase()
+                                ) { history, cachedSongs ->
+                                    val songsById =
+                                        cachedSongs.associateBy {
+                                            it.id
+                                        }
+
+                                    history
+                                        .mapNotNull { entry ->
+                                            songsById[entry.songId]
+                                        }
+                                        .distinctBy { it.id }
+                                        .take(10)
+                                }.collect { recentlyPlayed ->
+                                    _uiState.update {
+                                        it.copy(
+                                            recentlyPlayedSongs = recentlyPlayed
+                                        )
+                                    }
+                                }
+                            }
+
+                        // Cache-aware recommendation load for this user.
+                        loadRecommendations(forceRefresh = false)
                     }
                 }
         }
     }
 
-    /** Albums are grouped from the cached songs. */
     private fun observeAlbums() {
         viewModelScope.launch {
             getAlbumsUseCase().collect { albums ->
@@ -92,8 +149,6 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            // Refresh Room cache from Supabase.
-            // Cached data remains available if the network fails.
             when (val result = refreshSongsUseCase()) {
                 is Resource.Error -> {
                     _uiState.update {
@@ -107,13 +162,20 @@ class HomeViewModel @Inject constructor(
             _uiState.update {
                 it.copy(isLoading = false)
             }
+
+            // Room has had a chance to receive the refreshed songs.
+            loadRecommendations(forceRefresh = false)
         }
     }
 
     /**
-     * Generate personalized recommendations using the user's favorites.
+     * Manual refresh bypasses the 24-hour recommendation cache.
      */
     fun refreshPersonalizedRecommendations() {
+        loadRecommendations(forceRefresh = true)
+    }
+
+    private fun loadRecommendations(forceRefresh: Boolean) {
         recommendationJob?.cancel()
 
         recommendationJob = viewModelScope.launch {
@@ -126,7 +188,9 @@ class HomeViewModel @Inject constructor(
 
             try {
                 val recommendations =
-                    getPersonalizedRecommendationsUseCase()
+                    getPersonalizedRecommendationsUseCase(
+                        forceRefresh = forceRefresh
+                    )
 
                 _uiState.update {
                     it.copy(
@@ -134,7 +198,7 @@ class HomeViewModel @Inject constructor(
                         isRecommendationsLoading = false,
                         recommendationMessage =
                             if (recommendations.isEmpty()) {
-                                "Like a few songs to discover music you'll enjoy."
+                                "Like or listen to a few songs to get personalized recommendations."
                             } else {
                                 null
                             }
@@ -147,7 +211,7 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         isRecommendationsLoading = false,
                         recommendationMessage =
-                            "Couldn't load your recommendations. Tap Refresh to try again."
+                            "Couldn't load recommendations. Tap Refresh to try again."
                     )
                 }
             }
@@ -166,15 +230,16 @@ class HomeViewModel @Inject constructor(
                 }
 
                 HomeFilter.ALL -> {
-                    observeCachedSongs()
+                    val songs = getAllSongsUseCase().first()
+                    _uiState.update {
+                        it.copy(songs = songs)
+                    }
                 }
             }
         }
     }
 
-    private fun applyResource(
-        resource: Resource<List<com.yourapp.music.domain.model.Song>>
-    ) {
+    private fun applyResource(resource: Resource<List<Song>>) {
         when (resource) {
             is Resource.Success -> {
                 _uiState.update {

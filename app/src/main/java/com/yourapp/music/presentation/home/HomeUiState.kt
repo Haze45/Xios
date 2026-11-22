@@ -15,6 +15,9 @@ data class HomeUiState(
     val songs: List<Song> = emptyList(),
     val albums: List<Album> = emptyList(),
 
+    // Recently played songs from the signed-in user's local Room history.
+    val recentlyPlayedSongs: List<Song> = emptyList(),
+
     // Personalized recommendations
     val recommendedSongs: List<Song> = emptyList(),
     val isRecommendationsLoading: Boolean = false,

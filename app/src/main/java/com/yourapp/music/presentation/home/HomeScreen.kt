@@ -183,6 +183,41 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
+        // Recently played
+        if (state.recentlyPlayedSongs.isNotEmpty()) {
+            Text(
+                "Recently Played",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(
+                    12.dp
+                )
+            ) {
+                items(
+                    items = state.recentlyPlayedSongs,
+                    key = { it.id }
+                ) { song ->
+                    FeaturedPlaylistCard(
+                        title = song.title,
+                        description = "By ${song.artist}",
+                        imageUrl = song.albumArtUrl,
+                        onPlayClick = {
+                            onSongPlay(
+                                song,
+                                state.recentlyPlayedSongs
+                            )
+                        }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+        }
+
         // Curated and trending
         if (state.isLoading) {
             Box(
