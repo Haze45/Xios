@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
@@ -43,11 +45,12 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundBlack)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
     ) {
         Spacer(Modifier.height(16.dp))
 
-        // Top bar: profile avatar (tap -> Profile screen) + search/favorites icons
+        // Top bar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -64,7 +67,6 @@ fun HomeScreen(
                         .clickable(onClick = onProfileClick)
                 )
             } else {
-                // No profile photo set yet — still tappable, shows a plain circle placeholder.
                 Box(
                     modifier = Modifier
                         .size(44.dp)
@@ -81,6 +83,7 @@ fun HomeScreen(
                         contentDescription = "Search"
                     )
                 }
+
                 IconButton(onClick = onFavoritesClick) {
                     Icon(
                         Icons.Filled.FavoriteBorder,
@@ -99,20 +102,16 @@ fun HomeScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Filter chips: All / New Release / Trending / Top
+        // Home filters
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(
-                8.dp
-            )
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(HomeFilter.entries.toList()) { filter ->
                 FilterPill(
                     label = filter.label(),
                     selected = state.selectedFilter == filter,
                     onClick = {
-                        viewModel.onFilterSelected(
-                            filter
-                        )
+                        viewModel.onFilterSelected(filter)
                     }
                 )
             }
@@ -120,6 +119,71 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
+        // Personalized recommendations
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Picked for You",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            TextButton(
+                onClick = viewModel::refreshPersonalizedRecommendations,
+                enabled = !state.isRecommendationsLoading
+            ) {
+                Text("Refresh", color = TextSecondary)
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        when {
+            state.isRecommendationsLoading -> {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            state.recommendedSongs.isNotEmpty() -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        12.dp
+                    )
+                ) {
+                    items(
+                        items = state.recommendedSongs,
+                        key = { it.id }
+                    ) { song ->
+                        FeaturedPlaylistCard(
+                            title = song.title,
+                            description = "By ${song.artist}",
+                            imageUrl = song.albumArtUrl,
+                            onPlayClick = {
+                                onSongPlay(
+                                    song,
+                                    state.recommendedSongs
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            state.recommendationMessage != null -> {
+                Text(
+                    text = state.recommendationMessage!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // Curated and trending
         if (state.isLoading) {
             Box(
                 modifier = Modifier
@@ -134,6 +198,7 @@ fun HomeScreen(
                 "Curated & trending",
                 style = MaterialTheme.typography.titleLarge
             )
+
             Spacer(Modifier.height(12.dp))
 
             LazyRow(
@@ -141,7 +206,10 @@ fun HomeScreen(
                     12.dp
                 )
             ) {
-                items(state.songs.take(5)) { song ->
+                items(
+                    items = state.songs.take(5),
+                    key = { it.id }
+                ) { song ->
                     FeaturedPlaylistCard(
                         title = song.title,
                         description = "By ${song.artist}",
@@ -166,6 +234,7 @@ fun HomeScreen(
                     "Albums",
                     style = MaterialTheme.typography.titleLarge
                 )
+
                 TextButton(onClick = { /* navigate to full list */ }) {
                     Text("See all", color = TextSecondary)
                 }
@@ -186,26 +255,29 @@ fun HomeScreen(
                     )
                 ) {
                     items(
-                        state.albums,
-                        key = { it.id }) { album ->
+                        items = state.albums,
+                        key = { it.id }
+                    ) { album ->
                         AlbumCard(
                             album = album,
-                            onClick = { onAlbumClick(album.id) })
+                            onClick = {
+                                onAlbumClick(album.id)
+                            }
+                        )
                     }
                 }
             }
         }
 
-        state.errorMessage?.let {
+        state.errorMessage?.let { message ->
             Spacer(Modifier.height(8.dp))
             Text(
-                it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
+                message,
+                color = MaterialTheme.colorScheme.error
             )
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
     }
 }
 

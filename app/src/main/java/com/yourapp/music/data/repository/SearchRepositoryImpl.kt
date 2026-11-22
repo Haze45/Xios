@@ -7,7 +7,7 @@ import com.yourapp.music.data.mapper.toDomain
 import com.yourapp.music.data.remote.firebase.FirebaseAuthService
 import com.yourapp.music.data.remote.supabase.dto.SemanticSearchResponseDto
 import com.yourapp.music.domain.model.RecentSearch
-import com.yourapp.music.domain.model.Song
+import com.yourapp.music.domain.model.SemanticSongMatch
 import com.yourapp.music.domain.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -38,7 +37,9 @@ class SearchRepositoryImpl @Inject constructor(
 
     override fun getRecentSearches(): Flow<List<RecentSearch>> =
         recentSearchDao.getRecentSearches()
-            .map { list -> list.map { it.toDomain() } }
+            .map { list ->
+                list.map { it.toDomain() }
+            }
 
     override suspend fun saveRecentSearch(query: String) {
         recentSearchDao.upsertSearch(
@@ -55,7 +56,8 @@ class SearchRepositoryImpl @Inject constructor(
     override suspend fun semanticSearch(
         query: String,
         matchCount: Int
-    ): List<Song> {
+    ): List<SemanticSongMatch> {
+
         val cleanedQuery = query.trim()
 
         require(cleanedQuery.isNotBlank()) {
@@ -67,14 +69,19 @@ class SearchRepositoryImpl @Inject constructor(
         }
 
         val firebaseUser = firebaseAuthService.currentUser()
-            ?: throw IOException("Please sign in to search for songs.")
+            ?: throw IOException(
+                "Please sign in to search for songs."
+            )
 
         val idToken = firebaseUser.getIdToken(false)
             .await()
             .token
-            ?: throw IOException("Could not obtain Firebase authentication token.")
+            ?: throw IOException(
+                "Could not obtain Firebase authentication token."
+            )
 
         return withContext(Dispatchers.IO) {
+
             val requestBody = JSONObject()
                 .put("query", cleanedQuery)
                 .put(
@@ -103,6 +110,7 @@ class SearchRepositoryImpl @Inject constructor(
 
             httpClient.newCall(request).execute()
                 .use { response ->
+
                     val responseBody =
                         response.body?.string().orEmpty()
 
@@ -131,7 +139,8 @@ class SearchRepositoryImpl @Inject constructor(
                         )
                     }
 
-                    result.results.map { it.toDomain() }
+                    // Preserve each song's Gemini similarity score.
+                    result.results.map { it.toDomainMatch() }
                 }
         }
     }

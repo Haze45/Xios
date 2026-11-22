@@ -1,7 +1,12 @@
 package com.yourapp.music.core.sync
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -12,9 +17,7 @@ class FavoriteSyncManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val workManager by lazy {
-        WorkManager.getInstance(
-            context
-        )
+        WorkManager.getInstance(context)
     }
 
     fun enqueueSync() {
@@ -34,7 +37,7 @@ class FavoriteSyncManager @Inject constructor(
 
         workManager.enqueueUniqueWork(
             "favorite_sync",
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
             request
         )
     }

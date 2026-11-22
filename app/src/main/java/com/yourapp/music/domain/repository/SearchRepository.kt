@@ -1,7 +1,7 @@
 package com.yourapp.music.domain.repository
 
 import com.yourapp.music.domain.model.RecentSearch
-import com.yourapp.music.domain.model.Song
+import com.yourapp.music.domain.model.SemanticSongMatch
 import kotlinx.coroutines.flow.Flow
 
 interface SearchRepository {
@@ -13,9 +13,9 @@ interface SearchRepository {
 
     suspend fun clearRecentSearches()
 
-    /** Searches the remote semantic index using the signed-in Firebase user. */
+    /** Returns semantic matches with their similarity scores. */
     suspend fun semanticSearch(
         query: String,
         matchCount: Int = 20
-    ): List<Song>
+    ): List<SemanticSongMatch>
 }

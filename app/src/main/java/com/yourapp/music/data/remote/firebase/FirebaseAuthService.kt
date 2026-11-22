@@ -19,16 +19,34 @@ import javax.inject.Singleton
 class FirebaseAuthService @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) {
-    suspend fun signIn(email: String, password: String): FirebaseUser {
-        val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        return result.user ?: error("Login failed: no user returned")
+    suspend fun signIn(
+        email: String,
+        password: String
+    ): FirebaseUser {
+        val result =
+            firebaseAuth.signInWithEmailAndPassword(
+                email,
+                password
+            ).await()
+        return result.user
+            ?: error("Login failed: no user returned")
     }
 
-    suspend fun signUp(email: String, password: String, displayName: String): FirebaseUser {
-        val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-        val user = result.user ?: error("Registration failed: no user returned")
+    suspend fun signUp(
+        email: String,
+        password: String,
+        displayName: String
+    ): FirebaseUser {
+        val result =
+            firebaseAuth.createUserWithEmailAndPassword(
+                email,
+                password
+            ).await()
+        val user = result.user
+            ?: error("Registration failed: no user returned")
         user.updateProfile(
-            UserProfileChangeRequest.Builder().setDisplayName(displayName).build()
+            UserProfileChangeRequest.Builder()
+                .setDisplayName(displayName).build()
         ).await()
         return user
     }
@@ -40,12 +58,17 @@ class FirebaseAuthService @Inject constructor(
      * immediately (updateProfile() alone doesn't mutate the cached
      * FirebaseUser.displayName/photoUrl properties in place).
      */
-    suspend fun updateProfile(displayName: String?, photoUri: Uri?): FirebaseUser {
-        val user = firebaseAuth.currentUser ?: error("No signed-in user")
-        val request = UserProfileChangeRequest.Builder().apply {
-            displayName?.let { setDisplayName(it) }
-            photoUri?.let { setPhotoUri(it) }
-        }.build()
+    suspend fun updateProfile(
+        displayName: String?,
+        photoUri: Uri?
+    ): FirebaseUser {
+        val user = firebaseAuth.currentUser
+            ?: error("No signed-in user")
+        val request =
+            UserProfileChangeRequest.Builder().apply {
+                displayName?.let { setDisplayName(it) }
+                photoUri?.let { setPhotoUri(it) }
+            }.build()
         user.updateProfile(request).await()
         user.reload().await()
         return firebaseAuth.currentUser ?: user
@@ -53,14 +76,21 @@ class FirebaseAuthService @Inject constructor(
 
     fun signOut() = firebaseAuth.signOut()
 
-    fun currentUser(): FirebaseUser? = firebaseAuth.currentUser
+    fun currentUser(): FirebaseUser? =
+        firebaseAuth.currentUser
 
     /** Emits the current user whenever Firebase's auth state changes (login/logout). */
-    fun authStateFlow(): Flow<FirebaseUser?> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { auth ->
-            trySend(auth.currentUser)
+    fun authStateFlow(): Flow<FirebaseUser?> =
+        callbackFlow {
+            val listener =
+                FirebaseAuth.AuthStateListener { auth ->
+                    trySend(auth.currentUser)
+                }
+            firebaseAuth.addAuthStateListener(listener)
+            awaitClose {
+                firebaseAuth.removeAuthStateListener(
+                    listener
+                )
+            }
         }
-        firebaseAuth.addAuthStateListener(listener)
-        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
-    }
 }

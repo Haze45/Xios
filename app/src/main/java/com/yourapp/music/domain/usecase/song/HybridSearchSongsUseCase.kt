@@ -1,5 +1,6 @@
 package com.yourapp.music.domain.usecase.song
 
+import com.yourapp.music.domain.model.SemanticSongMatch
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.domain.usecase.search.SemanticSearchSongsUseCase
 import kotlinx.coroutines.CancellationException
@@ -17,7 +18,19 @@ class HybridSearchSongsUseCase @Inject constructor(
     private val semanticSearchSongsUseCase: SemanticSearchSongsUseCase
 ) {
 
-    suspend operator fun invoke(query: String): HybridSearchResult {
+    companion object {
+        private const val RRF_CONSTANT = 60.0
+
+        private const val LOCAL_RANK_WEIGHT = 1000.0
+        private const val SEMANTIC_RANK_WEIGHT = 1000.0
+
+        private const val SIMILARITY_WEIGHT = 25.0
+    }
+
+    suspend operator fun invoke(
+        query: String
+    ): HybridSearchResult {
+
         val cleanedQuery = query.trim()
 
         if (cleanedQuery.isBlank()) {
@@ -27,11 +40,11 @@ class HybridSearchSongsUseCase @Inject constructor(
             )
         }
 
-        // First obtain the local Room-backed fuzzy matches.
+        // Step 1: Get Room-backed fuzzy results.
         val localResults =
             searchSongsUseCase(cleanedQuery).first()
 
-        // Then obtain Gemini semantic matches.
+        // Step 2: Get Gemini semantic matches with similarity scores.
         val semanticResults = try {
             semanticSearchSongsUseCase(
                 query = cleanedQuery,
@@ -40,13 +53,13 @@ class HybridSearchSongsUseCase @Inject constructor(
         } catch (exception: CancellationException) {
             throw exception
         } catch (_: Exception) {
-            // Preserve local search if remote search is unavailable.
             return HybridSearchResult(
                 songs = localResults,
                 semanticSearchSucceeded = false
             )
         }
 
+        // Step 3: Merge and rank.
         return HybridSearchResult(
             songs = mergeAndRank(
                 query = cleanedQuery,
@@ -60,58 +73,79 @@ class HybridSearchSongsUseCase @Inject constructor(
     private fun mergeAndRank(
         query: String,
         localResults: List<Song>,
-        semanticResults: List<Song>
+        semanticResults: List<SemanticSongMatch>
     ): List<Song> {
 
         val normalizedQuery = normalize(query)
 
+        // Build local result positions.
         val localRanks = localResults
-            .mapIndexed { index, song -> song.id to index }
+            .mapIndexed { index, song ->
+                song.id to index
+            }
             .toMap()
 
+        // Build semantic result positions.
         val semanticRanks = semanticResults
-            .mapIndexed { index, song -> song.id to index }
+            .mapIndexed { index, match ->
+                match.song.id to index
+            }
             .toMap()
 
-        // Merge both lists and keep only one copy of each song.
-        val candidates = (localResults + semanticResults)
-            .distinctBy { it.id }
+        // Preserve the actual Gemini similarity score.
+        val similarityScores = semanticResults
+            .associate { match ->
+                match.song.id to match.similarity
+            }
 
-        return candidates
-            .sortedWith(
-                compareByDescending<Song> { song ->
+        // Merge without duplicate song IDs.
+        val candidates = (
+                localResults + semanticResults.map { it.song }
+                ).distinctBy { it.id }
 
-                    val localRank = localRanks[song.id]
-                    val semanticRank =
-                        semanticRanks[song.id]
+        return candidates.sortedWith(
+            compareByDescending<Song> { song ->
 
-                    val localScore = localRank?.let {
-                        1.0 / (60 + it + 1)
-                    } ?: 0.0
+                val localRank = localRanks[song.id]
+                val semanticRank = semanticRanks[song.id]
 
-                    val semanticScore = semanticRank?.let {
-                        1.0 / (60 + it + 1)
-                    } ?: 0.0
+                // Reciprocal-rank fusion for local fuzzy results.
+                val localRankScore = localRank?.let {
+                    LOCAL_RANK_WEIGHT /
+                            (RRF_CONSTANT + it + 1)
+                } ?: 0.0
 
-                    val combinedRankScore =
-                        (localScore + semanticScore) * 1000.0
+                // Reciprocal-rank fusion for semantic results.
+                val semanticRankScore = semanticRank?.let {
+                    SEMANTIC_RANK_WEIGHT /
+                            (RRF_CONSTANT + it + 1)
+                } ?: 0.0
 
-                    val exactMatchBoost = exactMatchScore(
-                        song = song,
-                        query = normalizedQuery
-                    )
+                // Actual Gemini similarity score.
+                val similarity = similarityScores[song.id]
+                    ?.coerceIn(0.0, 1.0)
+                    ?: 0.0
 
-                    combinedRankScore + exactMatchBoost
-                }.thenBy {
-                    it.title.lowercase(Locale.ROOT)
-                }
-            )
+                val similarityScore =
+                    similarity * SIMILARITY_WEIGHT
+
+                // Exact title and artist matches receive priority.
+                val exactBoost = exactMatchScore(
+                    song = song,
+                    query = normalizedQuery
+                )
+
+                localRankScore +
+                        semanticRankScore +
+                        similarityScore +
+                        exactBoost
+
+            }.thenBy {
+                it.title.lowercase(Locale.ROOT)
+            }
+        )
     }
 
-    /**
-     * Exact title and artist matches should outrank
-     * approximate and semantic matches.
-     */
     private fun exactMatchScore(
         song: Song,
         query: String

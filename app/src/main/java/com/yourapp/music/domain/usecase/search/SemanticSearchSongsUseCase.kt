@@ -1,6 +1,6 @@
 package com.yourapp.music.domain.usecase.search
 
-import com.yourapp.music.domain.model.Song
+import com.yourapp.music.domain.model.SemanticSongMatch
 import com.yourapp.music.domain.repository.SearchRepository
 import javax.inject.Inject
 
@@ -10,7 +10,7 @@ class SemanticSearchSongsUseCase @Inject constructor(
     suspend operator fun invoke(
         query: String,
         matchCount: Int = 20
-    ): List<Song> {
+    ): List<SemanticSongMatch> {
         return searchRepository.semanticSearch(
             query = query,
             matchCount = matchCount

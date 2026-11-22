@@ -1,5 +1,6 @@
 package com.yourapp.music.data.remote.supabase.dto
 
+import com.yourapp.music.domain.model.SemanticSongMatch
 import com.yourapp.music.domain.model.Song
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -36,16 +37,23 @@ data class SemanticSongDto(
 
     val similarity: Double? = null
 ) {
-    fun toDomain(): Song = Song(
-        id = id,
-        title = title,
-        artist = artist,
-        album = album.orEmpty(),
-        genre = genre.orEmpty(),
-        albumArtUrl = albumArtUrl,
-        audioUrl = audioUrl,
-        durationMs = durationMs,
-        isNewRelease = isNewRelease,
-        isTrending = isTrending
-    )
+    fun toDomainMatch(): SemanticSongMatch {
+        val song = Song(
+            id = id,
+            title = title,
+            artist = artist,
+            album = album.orEmpty(),
+            genre = genre.orEmpty(),
+            albumArtUrl = albumArtUrl,
+            audioUrl = audioUrl,
+            durationMs = durationMs,
+            isNewRelease = isNewRelease,
+            isTrending = isTrending
+        )
+
+        return SemanticSongMatch(
+            song = song,
+            similarity = similarity
+        )
+    }
 }
