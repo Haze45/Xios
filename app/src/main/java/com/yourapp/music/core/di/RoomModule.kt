@@ -25,7 +25,11 @@ object RoomModule {
             AppDatabase::class.java,
             Constants.DATABASE_NAME
         )
-            .addMigrations(AppDatabase.MIGRATION_6_7)
+            .addMigrations(
+                AppDatabase.MIGRATION_6_7,
+                AppDatabase.MIGRATION_7_8,
+                AppDatabase.MIGRATION_8_9
+            )
             .fallbackToDestructiveMigration()
             .build()
 

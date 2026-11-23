@@ -30,7 +30,7 @@ import com.yourapp.music.data.local.entity.SongEntity
         DownloadedSongEntity::class,
         ListeningHistoryEntity::class
     ],
-    version = 7,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -53,10 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
 
         val MIGRATION_6_7 = object : Migration(6, 7) {
-
-            override fun migrate(
-                db: SupportSQLiteDatabase
-            ) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS listening_history (
@@ -92,6 +89,21 @@ abstract class AppDatabase : RoomDatabase() {
                     ON listening_history(songId)
                     """.trimIndent()
                 )
+            }
+        }
+
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Remove records for the previous public, unencrypted downloads.
+                db.execSQL("DELETE FROM downloaded_songs")
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Previous encrypted files used the single-block format.
+                // They must be downloaded again using chunked encryption.
+                db.execSQL("DELETE FROM downloaded_songs")
             }
         }
     }

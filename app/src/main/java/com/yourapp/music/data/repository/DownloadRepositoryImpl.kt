@@ -26,32 +26,36 @@ class DownloadRepositoryImpl @Inject constructor(
     private val songRepository: SongRepository
 ) : DownloadRepository {
 
-    // Downloads are owned by this singleton, not by whichever screen's
-    // ViewModel kicked them off — otherwise leaving the Player screen
-    // mid-download would clear that ViewModel and cancel the download.
-    private val downloadScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val downloadScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val downloadingIds = MutableStateFlow<Set<String>>(emptySet())
+    private val downloadingIds =
+        MutableStateFlow<Set<String>>(emptySet())
 
-    /**
-     * Resolves each downloaded song's id against the cached song catalog,
-     * keeping most-recently-downloaded first. Live: updates the moment a
-     * download finishes, or if the underlying catalog changes.
-     */
     override fun getDownloadedSongs(): Flow<List<Song>> =
-        combine(downloadDao.getAllDownloads(), songRepository.getAllSongs()) { downloads, allSongs ->
+        combine(
+            downloadDao.getAllDownloads(),
+            songRepository.getAllSongs()
+        ) { downloads, allSongs ->
+
             val songsById = allSongs.associateBy { it.id }
-            downloads.mapNotNull { songsById[it.songId] }
+
+            downloads.mapNotNull { download ->
+                songsById[download.songId]?.copy(
+                    audioUrl = download.localUri
+                )
+            }
         }
 
-    override fun isDownloaded(songId: String): Flow<Boolean> = downloadDao.isDownloaded(songId)
+    override fun isDownloaded(songId: String): Flow<Boolean> =
+        downloadDao.isDownloaded(songId)
 
     override fun isDownloading(songId: String): Flow<Boolean> =
         downloadingIds.map { songId in it }
 
     override suspend fun downloadSong(song: Song): Resource<Unit> {
-        // Guard against a second tap (or a second screen instance) starting a duplicate file.
         var alreadyRunning = false
+
         downloadingIds.update { current ->
             if (song.id in current) {
                 alreadyRunning = true
@@ -60,24 +64,29 @@ class DownloadRepositoryImpl @Inject constructor(
                 current + song.id
             }
         }
-        // Already in flight elsewhere — nothing for this caller to report.
+
         if (alreadyRunning) return Resource.Loading
 
-        // async in our own scope: if the caller gets cancelled (screen left),
-        // only its await() is cancelled — the download itself keeps going.
-        return downloadScope.async<Resource<Unit>> {
+        return downloadScope.async {
             try {
-                val localUri = songDownloader.download(song)
+                val encryptedUri =
+                    songDownloader.download(song)
+
                 downloadDao.upsertDownload(
                     DownloadedSongEntity(
                         songId = song.id,
-                        localUri = localUri,
+                        localUri = encryptedUri,
                         downloadedAt = System.currentTimeMillis()
                     )
                 )
+
                 Resource.Success(Unit)
-            } catch (e: Exception) {
-                Resource.Error(e.message ?: "Couldn't download this song", e)
+            } catch (exception: Exception) {
+                Resource.Error(
+                    exception.message
+                        ?: "Couldn't download this song",
+                    exception
+                )
             } finally {
                 downloadingIds.update { it - song.id }
             }
