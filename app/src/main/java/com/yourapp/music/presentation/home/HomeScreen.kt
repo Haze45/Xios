@@ -29,6 +29,8 @@ import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.AlbumCard
 import com.yourapp.music.presentation.components.FeaturedPlaylistCard
 import com.yourapp.music.presentation.components.FilterPill
+import com.yourapp.music.presentation.components.ShimmerAlbumCard
+import com.yourapp.music.presentation.components.ShimmerSongCard
 
 @Composable
 fun HomeScreen(
@@ -36,6 +38,8 @@ fun HomeScreen(
     onProfileClick: () -> Unit,
     onFavoritesClick: () -> Unit,
     onAlbumClick: (String) -> Unit,
+    currentlyPlayingSongId: String?,
+    isPlaying: Boolean,
     onSongPlay: (Song, List<Song>) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -119,7 +123,7 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Personalized recommendations
+        // Picked for You
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -142,9 +146,16 @@ fun HomeScreen(
 
         when {
             state.isRecommendationsLoading -> {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        12.dp
+                    ),
+                    userScrollEnabled = false
+                ) {
+                    items(3) {
+                        ShimmerSongCard()
+                    }
+                }
             }
 
             state.recommendedSongs.isNotEmpty() -> {
@@ -161,7 +172,9 @@ fun HomeScreen(
                             title = song.title,
                             description = "By ${song.artist}",
                             imageUrl = song.albumArtUrl,
-                            onPlayClick = {
+                            isPlaying = currentlyPlayingSongId == song.id &&
+                                    isPlaying,
+                            onClick = {
                                 onSongPlay(
                                     song,
                                     state.recommendedSongs
@@ -183,7 +196,7 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Recently played
+        // Recently Played
         if (state.recentlyPlayedSongs.isNotEmpty()) {
             Text(
                 "Recently Played",
@@ -205,7 +218,9 @@ fun HomeScreen(
                         title = song.title,
                         description = "By ${song.artist}",
                         imageUrl = song.albumArtUrl,
-                        onPlayClick = {
+                        isPlaying = currentlyPlayingSongId == song.id &&
+                                isPlaying,
+                        onClick = {
                             onSongPlay(
                                 song,
                                 state.recentlyPlayedSongs
@@ -218,72 +233,48 @@ fun HomeScreen(
             Spacer(Modifier.height(24.dp))
         }
 
-        // Curated and trending
+        // Albums
         if (state.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp),
+                    .height(80.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
-        } else {
-            Text(
-                "Curated & trending",
-                style = MaterialTheme.typography.titleLarge
-            )
+        }
 
-            Spacer(Modifier.height(12.dp))
+        Text(
+            "Albums",
+            style = MaterialTheme.typography.titleLarge
+        )
 
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(
-                    12.dp
-                )
-            ) {
-                items(
-                    items = state.songs.take(5),
-                    key = { it.id }
-                ) { song ->
-                    FeaturedPlaylistCard(
-                        title = song.title,
-                        description = "By ${song.artist}",
-                        imageUrl = song.albumArtUrl,
-                        onPlayClick = {
-                            onSongPlay(
-                                song,
-                                state.songs.take(5)
-                            )
-                        }
-                    )
+        Spacer(Modifier.height(12.dp))
+
+        when {
+            state.isLoading -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        12.dp
+                    ),
+                    userScrollEnabled = false
+                ) {
+                    items(3) {
+                        ShimmerAlbumCard()
+                    }
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Albums",
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                TextButton(onClick = { /* navigate to full list */ }) {
-                    Text("See all", color = TextSecondary)
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            if (state.albums.isEmpty()) {
+            state.albums.isEmpty() -> {
                 Text(
                     "No albums yet — songs need an album tag to show up here.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
-            } else {
+            }
+
+            else -> {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(
                         12.dp
@@ -303,6 +294,8 @@ fun HomeScreen(
                 }
             }
         }
+
+        Spacer(Modifier.height(24.dp))
 
         state.errorMessage?.let { message ->
             Spacer(Modifier.height(8.dp))

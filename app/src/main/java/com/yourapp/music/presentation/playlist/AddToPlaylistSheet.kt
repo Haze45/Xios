@@ -25,14 +25,8 @@ import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.SurfaceDark
 import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.presentation.components.ShimmerPlaylistRow
 
-/**
- * Modal bottom sheet letting the person pick which of their playlists to
- * add `songId` to. Triggered from the Player screen's "add to playlist"
- * button. Shows a checkmark next to any playlist the song was just added
- * to in this sheet session, and lets them create a brand new playlist
- * on the fly if they don't have the right one yet.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToPlaylistSheet(
@@ -41,18 +35,30 @@ fun AddToPlaylistSheet(
     viewModel: AddToPlaylistViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = SurfaceDark
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.PlaylistAdd, contentDescription = null, tint = TextSecondary)
+                Icon(
+                    Icons.Filled.PlaylistAdd,
+                    contentDescription = null,
+                    tint = TextSecondary
+                )
                 Spacer(Modifier.width(8.dp))
-                Text("Add to Playlist", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Add to Playlist",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Spacer(Modifier.height(12.dp))
@@ -60,7 +66,9 @@ fun AddToPlaylistSheet(
             // "+ New Playlist" row — expands into a name field inline.
             if (state.isCreatingNew) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
@@ -71,7 +79,11 @@ fun AddToPlaylistSheet(
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
-                    TextButton(onClick = { viewModel.createPlaylistAndAddSong(songId) }) {
+                    TextButton(onClick = {
+                        viewModel.createPlaylistAndAddSong(
+                            songId
+                        )
+                    }) {
                         Text("Create", color = AccentGreen)
                     }
                 }
@@ -79,7 +91,11 @@ fun AddToPlaylistSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { viewModel.onShowCreateNew(true) }
+                        .clickable {
+                            viewModel.onShowCreateNew(
+                                true
+                            )
+                        }
                         .padding(vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -90,23 +106,37 @@ fun AddToPlaylistSheet(
                             .background(SurfaceElevated),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Filled.Add, contentDescription = "New playlist", tint = AccentGreen)
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "New playlist",
+                            tint = AccentGreen
+                        )
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text("New Playlist", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "New Playlist",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
             when {
-                state.isLoading -> Box(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+                state.isLoading -> {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 400.dp)
+                    ) {
+                        items(4) {
+                            ShimmerPlaylistRow()
+                        }
+                    }
+                }
 
                 state.playlists.isEmpty() -> Box(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -116,15 +146,25 @@ fun AddToPlaylistSheet(
                     )
                 }
 
-                else -> LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
-                    items(state.playlists, key = { it.id }) { playlist ->
-                        val alreadyAdded = playlist.id in state.addedTo || songId in playlist.songIds
+                else -> LazyColumn(
+                    modifier = Modifier.heightIn(
+                        max = 400.dp
+                    )
+                ) {
+                    items(
+                        state.playlists,
+                        key = { it.id }) { playlist ->
+                        val alreadyAdded =
+                            playlist.id in state.addedTo || songId in playlist.songIds
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(enabled = !alreadyAdded) {
-                                    viewModel.addSongTo(playlist.id, songId)
+                                    viewModel.addSongTo(
+                                        playlist.id,
+                                        songId
+                                    )
                                 }
                                 .padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -135,11 +175,23 @@ fun AddToPlaylistSheet(
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(
+                                        RoundedCornerShape(
+                                            12.dp
+                                        )
+                                    )
                             )
                             Spacer(Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(playlist.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                            Column(
+                                modifier = Modifier.weight(
+                                    1f
+                                )
+                            ) {
+                                Text(
+                                    playlist.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1
+                                )
                                 Text(
                                     "${playlist.songCount} Songs",
                                     style = MaterialTheme.typography.bodyMedium,
@@ -147,7 +199,11 @@ fun AddToPlaylistSheet(
                                 )
                             }
                             if (alreadyAdded) {
-                                Icon(Icons.Filled.Check, contentDescription = "Added", tint = AccentGreen)
+                                Icon(
+                                    Icons.Filled.Check,
+                                    contentDescription = "Added",
+                                    tint = AccentGreen
+                                )
                             }
                         }
                     }
@@ -156,7 +212,11 @@ fun AddToPlaylistSheet(
 
             state.errorMessage?.let {
                 Spacer(Modifier.height(8.dp))
-                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             Spacer(Modifier.height(24.dp))

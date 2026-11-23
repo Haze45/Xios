@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,9 @@ fun MainShell(
     val bottomNavController = rememberNavController()
     var showQueueSheet by remember { mutableStateOf(false) }
 
+    val playerViewModel: PlayerViewModel = hiltViewModel()
+    val playerState by playerViewModel.uiState.collectAsState()
+
     Scaffold(
         bottomBar = {
             Column {
@@ -48,9 +52,12 @@ fun MainShell(
                         vertical = 8.dp
                     )
                 )
+
                 MusicBottomNavBar(
                     navController = bottomNavController,
-                    onQueueClick = { showQueueSheet = true }
+                    onQueueClick = {
+                        showQueueSheet = true
+                    }
                 )
             }
         }
@@ -61,47 +68,46 @@ fun MainShell(
             modifier = Modifier.padding(padding)
         ) {
             composable(Screen.Home.route) {
-                val playerViewModel: PlayerViewModel =
-                    hiltViewModel()
                 HomeScreen(
                     onSearchClick = onNavigateToSearch,
                     onProfileClick = onNavigateToProfile,
                     onFavoritesClick = onNavigateToFavorites,
                     onAlbumClick = onNavigateToAlbumDetail,
+                    currentlyPlayingSongId = playerState.currentSong?.id,
+                    isPlaying = playerState.isPlaying,
                     onSongPlay = { song, queue ->
                         playerViewModel.playSong(
                             song,
                             queue
-                        ); onNavigateToPlayer()
+                        )
+                        onNavigateToPlayer()
                     }
                 )
             }
+
             composable(Screen.Library.route) {
-                val playerViewModel: PlayerViewModel =
-                    hiltViewModel()
                 LibraryScreen(
                     onSongClick = { song, queue ->
                         playerViewModel.playSong(
                             song,
                             queue
-                        ); onNavigateToPlayer()
+                        )
+                        onNavigateToPlayer()
                     },
                     onPlaylistClick = { playlist ->
-                        onNavigateToPlaylistDetail(
-                            playlist.id
-                        )
+                        onNavigateToPlaylistDetail(playlist.id)
                     }
                 )
             }
+
             composable(Screen.Playlists.route) {
                 PlaylistScreen(
                     onPlaylistClick = { playlist ->
-                        onNavigateToPlaylistDetail(
-                            playlist.id
-                        )
+                        onNavigateToPlaylistDetail(playlist.id)
                     }
                 )
             }
+
             composable(Screen.Settings.route) {
                 SettingsScreen(onLogout = onLogout)
             }
@@ -109,8 +115,10 @@ fun MainShell(
     }
 
     if (showQueueSheet) {
-        QueueBottomSheet(onDismiss = {
-            showQueueSheet = false
-        })
+        QueueBottomSheet(
+            onDismiss = {
+                showQueueSheet = false
+            }
+        )
     }
 }

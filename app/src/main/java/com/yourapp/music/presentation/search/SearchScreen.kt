@@ -29,6 +29,7 @@ import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.GenreTile
+import com.yourapp.music.presentation.components.ShimmerSongRow
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
@@ -110,24 +111,14 @@ fun SearchScreen(
                 )
             )
 
-            if (state.isHybridSearch && state.isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-
             when {
                 state.isLoading && state.searchResults.isEmpty() -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(28.dp),
-                        contentAlignment = Alignment.Center
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        items(6) {
+                            ShimmerSongRow()
+                        }
                     }
                 }
 
@@ -178,6 +169,11 @@ fun SearchScreen(
                                     playerState.currentSong?.id == song.id &&
                                             playerState.isPlaying
                             )
+                        }
+                        if (state.isLoading) {
+                            items(3) {
+                                ShimmerSongRow()
+                            }
                         }
                     }
                 }

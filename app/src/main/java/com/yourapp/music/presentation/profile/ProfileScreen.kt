@@ -31,6 +31,7 @@ import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.ArtistAvatarItem
 import com.yourapp.music.presentation.components.PlaylistGridItem
+import com.yourapp.music.presentation.components.ShimmerStatsRow
 
 @Composable
 fun ProfileScreen(
@@ -57,11 +58,20 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                Icon(
+                    Icons.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
             }
-            Text("My Profile", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "My Profile",
+                style = MaterialTheme.typography.titleLarge
+            )
             IconButton(onClick = onSettingsClick) {
-                Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                Icon(
+                    Icons.Filled.Settings,
+                    contentDescription = "Settings"
+                )
             }
         }
 
@@ -88,7 +98,11 @@ fun ProfileScreen(
                         .size(28.dp)
                         .clip(CircleShape)
                         .background(AccentGreen)
-                        .border(2.dp, BackgroundBlack, CircleShape)
+                        .border(
+                            2.dp,
+                            BackgroundBlack,
+                            CircleShape
+                        )
                         .clickable { showEditSheet = true },
                     contentAlignment = Alignment.Center
                 ) {
@@ -101,25 +115,37 @@ fun ProfileScreen(
                 }
             }
             Spacer(Modifier.height(12.dp))
-            Text(state.displayName, style = MaterialTheme.typography.headlineMedium)
+            Text(
+                state.displayName,
+                style = MaterialTheme.typography.headlineMedium
+            )
         }
 
         Spacer(Modifier.height(20.dp))
 
         // Stats row: Following / Followers / Playlists
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            // Both derived from live local lists (already Room/Flow-backed
-            // and shown below in "My Playlists" / "My Favorite Artists")
-            // rather than read back from Supabase's profiles table — this
-            // app pushes these counts TO that table for external/admin use,
-            // but always displays from the data it already has on-device,
-            // which is instant and can never drift out of sync with itself.
-            StatItem(value = state.favoriteArtists.size.toString(), label = "Following")
-            StatItem(value = formatCount(state.stats.followersCount), label = "Followers")
-            StatItem(value = state.playlists.size.toString(), label = "Playlists")
+        if (state.isLoading) {
+            ShimmerStatsRow()
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatItem(
+                    value = state.favoriteArtists.size.toString(),
+                    label = "Following"
+                )
+
+                StatItem(
+                    value = formatCount(state.stats.followersCount),
+                    label = "Followers"
+                )
+
+                StatItem(
+                    value = state.playlists.size.toString(),
+                    label = "Playlists"
+                )
+            }
         }
 
         Spacer(Modifier.height(28.dp))
@@ -128,36 +154,65 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("My Playlists", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "My Playlists",
+                style = MaterialTheme.typography.titleLarge
+            )
             TextButton(onClick = { /* navigate to full playlists list */ }) {
                 Text("See All", color = TextSecondary)
             }
         }
         Spacer(Modifier.height(12.dp))
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(state.playlists, key = { it.id }) { playlist ->
-                PlaylistGridItem(playlist = playlist, onClick = { onPlaylistClick(playlist) })
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(
+                12.dp
+            )
+        ) {
+            items(
+                state.playlists,
+                key = { it.id }) { playlist ->
+                PlaylistGridItem(
+                    playlist = playlist,
+                    onClick = { onPlaylistClick(playlist) })
             }
         }
 
         Spacer(Modifier.height(28.dp))
 
-        Text("My Favorite Artists", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "My Favorite Artists",
+            style = MaterialTheme.typography.titleLarge
+        )
         Spacer(Modifier.height(12.dp))
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(state.favoriteArtists, key = { it.id }) { artist ->
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(
+                16.dp
+            )
+        ) {
+            items(
+                state.favoriteArtists,
+                key = { it.id }) { artist ->
                 ArtistAvatarItem(
                     artist = artist,
-                    onFollowToggle = { viewModel.toggleFollow(artist.id, artist.isFollowing) }
+                    onFollowToggle = {
+                        viewModel.toggleFollow(
+                            artist.id,
+                            artist.isFollowing
+                        )
+                    }
                 )
             }
         }
 
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(Modifier.height(24.dp))
@@ -174,8 +229,16 @@ fun ProfileScreen(
 @Composable
 private fun StatItem(value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, style = MaterialTheme.typography.titleLarge, color = AccentGreen)
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+        Text(
+            value,
+            style = MaterialTheme.typography.titleLarge,
+            color = AccentGreen
+        )
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextSecondary
+        )
     }
 }
 

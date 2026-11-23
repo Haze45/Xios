@@ -1,5 +1,6 @@
 package com.yourapp.music.presentation.playlist
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,14 +20,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
+import com.yourapp.music.presentation.components.ShimmerDetailScreen
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
+@OptIn(UnstableApi::class)
 @Composable
 fun PlaylistDetailScreen(
     onBackClick: () -> Unit,
@@ -56,9 +60,9 @@ fun PlaylistDetailScreen(
         }
 
         if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            ShimmerDetailScreen(
+                modifier = Modifier.padding(top = 16.dp)
+            )
         } else if (playlist == null) {
             Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                 Text(

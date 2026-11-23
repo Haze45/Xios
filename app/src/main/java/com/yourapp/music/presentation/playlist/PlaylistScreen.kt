@@ -20,6 +20,7 @@ import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.PlaylistRowItem
+import com.yourapp.music.presentation.components.ShimmerPlaylistList
 
 @Composable
 fun PlaylistScreen(
@@ -28,20 +29,33 @@ fun PlaylistScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize().background(BackgroundBlack)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundBlack)
+    ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
             Spacer(Modifier.height(16.dp))
-            Text("Playlists", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                "Playlists",
+                style = MaterialTheme.typography.headlineMedium
+            )
             Spacer(Modifier.height(16.dp))
 
             when {
-                state.isLoading -> Box(
-                    modifier = Modifier.fillMaxWidth().height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+                state.isLoading -> {
+                    ShimmerPlaylistList(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 80.dp),
+                        count = 5
+                    )
+                }
 
                 state.playlists.isEmpty() -> Box(
-                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -51,19 +65,37 @@ fun PlaylistScreen(
                     )
                 }
 
-                else -> LazyColumn(modifier = Modifier.padding(bottom = 80.dp)) {
-                    items(state.playlists, key = { it.id }) { playlist ->
+                else -> LazyColumn(
+                    modifier = Modifier.padding(
+                        bottom = 80.dp
+                    )
+                ) {
+                    items(
+                        state.playlists,
+                        key = { it.id }) { playlist ->
                         PlaylistRowItem(
                             playlist = playlist,
-                            onClick = { onPlaylistClick(playlist) },
-                            onMenuClick = { viewModel.onShowOptions(playlist) }
+                            onClick = {
+                                onPlaylistClick(
+                                    playlist
+                                )
+                            },
+                            onMenuClick = {
+                                viewModel.onShowOptions(
+                                    playlist
+                                )
+                            }
                         )
                     }
                 }
             }
 
             state.errorMessage?.let {
-                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
 
@@ -75,13 +107,20 @@ fun PlaylistScreen(
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Create playlist")
+            Icon(
+                Icons.Filled.Add,
+                contentDescription = "Create playlist"
+            )
         }
     }
 
     if (state.showCreateDialog) {
         AlertDialog(
-            onDismissRequest = { viewModel.onShowCreateDialog(false) },
+            onDismissRequest = {
+                viewModel.onShowCreateDialog(
+                    false
+                )
+            },
             title = { Text("New Playlist") },
             text = {
                 OutlinedTextField(
@@ -92,10 +131,19 @@ fun PlaylistScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = viewModel::createPlaylist) { Text("Create", color = AccentGreen) }
+                TextButton(onClick = viewModel::createPlaylist) {
+                    Text(
+                        "Create",
+                        color = AccentGreen
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.onShowCreateDialog(false) }) { Text("Cancel") }
+                TextButton(onClick = {
+                    viewModel.onShowCreateDialog(
+                        false
+                    )
+                }) { Text("Cancel") }
             }
         )
     }
@@ -123,10 +171,19 @@ fun PlaylistScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = viewModel::confirmRename) { Text("Save", color = AccentGreen) }
+                TextButton(onClick = viewModel::confirmRename) {
+                    Text(
+                        "Save",
+                        color = AccentGreen
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = viewModel::onCancelRename) { Text("Cancel") }
+                TextButton(onClick = viewModel::onCancelRename) {
+                    Text(
+                        "Cancel"
+                    )
+                }
             }
         )
     }
@@ -142,7 +199,11 @@ fun PlaylistScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = viewModel::onCancelDelete) { Text("Cancel") }
+                TextButton(onClick = viewModel::onCancelDelete) {
+                    Text(
+                        "Cancel"
+                    )
+                }
             }
         )
     }

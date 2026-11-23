@@ -37,7 +37,11 @@ fun PlaylistGridItem(
                 .clickable(onClick = onClick)
         )
         Spacer(Modifier.height(6.dp))
-        Text(playlist.title, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+        Text(
+            playlist.title,
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1
+        )
     }
 }
 
@@ -66,7 +70,10 @@ fun PlaylistRowItem(
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(playlist.title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                playlist.title,
+                style = MaterialTheme.typography.titleMedium
+            )
             Text(
                 "By ${playlist.ownerName} • ${playlist.songCount} Songs",
                 style = MaterialTheme.typography.bodyMedium,
@@ -78,19 +85,24 @@ fun PlaylistRowItem(
         // showing this row without it, unaffected.
         if (onMenuClick != null) {
             IconButton(onClick = onMenuClick) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "Playlist options")
+                Icon(
+                    Icons.Filled.MoreVert,
+                    contentDescription = "Playlist options"
+                )
             }
         }
     }
 }
 
-/** Wide featured card, used for "Discover weekly" style banners on Home. */
+
+/** Wide featured song card used on Home. The entire card is clickable. */
 @Composable
 fun FeaturedPlaylistCard(
     title: String,
     description: String,
     imageUrl: String,
-    onPlayClick: () -> Unit,
+    onClick: () -> Unit,
+    isPlaying: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -98,6 +110,7 @@ fun FeaturedPlaylistCard(
             .width(260.dp)
             .height(150.dp)
             .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
     ) {
         AsyncImage(
             model = imageUrl,
@@ -105,25 +118,33 @@ fun FeaturedPlaylistCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Bottom
         ) {
-            Column {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(4.dp))
-                Text(description, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
-            }
-            IconButton(
-                onClick = onPlayClick,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(50))
-            ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = "Play", tint = BackgroundBlack)
-            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (isPlaying) {
+                    com.yourapp.music.core.theme.AccentGreen
+                } else {
+                    com.yourapp.music.core.theme.TextPrimary
+                },
+                maxLines = 1
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = com.yourapp.music.core.theme.TextSecondary,
+                maxLines = 2
+            )
         }
     }
 }
+
