@@ -17,7 +17,6 @@ import com.yourapp.music.presentation.favorites.FavoritesScreen
 import com.yourapp.music.presentation.player.PlayerScreen
 import com.yourapp.music.presentation.player.PlayerViewModel
 import com.yourapp.music.presentation.playlist.PlaylistDetailScreen
-import com.yourapp.music.presentation.profile.ProfileScreen
 import com.yourapp.music.presentation.search.SearchScreen
 import com.yourapp.music.presentation.settings.SettingsScreen
 
@@ -75,11 +74,6 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                         Screen.Search.route
                     )
                 },
-                onNavigateToProfile = {
-                    navController.navigate(
-                        Screen.Profile.route
-                    )
-                },
                 onNavigateToFavorites = {
                     navController.navigate(
                         Screen.Favorites.route
@@ -126,24 +120,6 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        composable(Screen.Profile.route) {
-            ProfileScreen(
-                onBackClick = { navController.popBackStack() },
-                onSettingsClick = {
-                    navController.navigate(
-                        Screen.Settings.route
-                    )
-                },
-                onPlaylistClick = { playlist ->
-                    navController.navigate(
-                        Screen.PlaylistDetail.createRoute(
-                            playlist.id
-                        )
-                    )
-                }
-            )
-        }
-
         composable(
             route = Screen.PlaylistDetail.route,
             arguments = listOf(navArgument("playlistId") {
@@ -156,7 +132,6 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                 onBackClick = { navController.popBackStack() },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
-                    navController.navigate(Screen.Player.route)
                 },
                 onPlayAll = { songs ->
                     if (songs.isNotEmpty()) {
@@ -166,6 +141,9 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                         )
                         navController.navigate(Screen.Player.route)
                     }
+                },
+                onExpandPlayer = {
+                    navController.navigate(Screen.Player.route)
                 }
             )
         }
@@ -203,13 +181,12 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                 onBackClick = { navController.popBackStack() },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
+                },
+                onExpandPlayer = {
                     navController.navigate(Screen.Player.route)
                 }
             )
         }
 
-        composable(Screen.Settings.route) {
-            SettingsScreen(onLogout = onLogout)
-        }
     }
 }

@@ -1,5 +1,11 @@
 package com.yourapp.music.presentation.queue
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,8 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Equalizer
-import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,11 +33,6 @@ import com.yourapp.music.core.theme.SurfaceDark
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 
-/**
- * Modal bottom sheet showing the current playback queue.
- * - Tap a song row → jumps playback to it and starts playing
- * - The currently playing song is highlighted with an equalizer glyph
- */
 @UnstableApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +41,9 @@ fun QueueBottomSheet(
     viewModel: QueueViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -49,15 +51,28 @@ fun QueueBottomSheet(
         containerColor = SurfaceDark
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(
+                        horizontal = 20.dp,
+                        vertical = 8.dp
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.QueueMusic, contentDescription = null, tint = TextSecondary)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.QueueMusic,
+                    contentDescription = null,
+                    tint = TextSecondary
+                )
+
                 Spacer(Modifier.width(8.dp))
-                Text("Playing Queue", style = MaterialTheme.typography.titleMedium)
+
+                Text(
+                    text = "Playing Queue",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -69,24 +84,38 @@ fun QueueBottomSheet(
                         .padding(vertical = 48.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Queue is empty", color = TextSecondary)
+                    Text(
+                        text = "Queue is empty",
+                        color = TextSecondary
+                    )
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 480.dp)
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        )
                 ) {
                     itemsIndexed(
                         items = state.queue,
                         key = { index, song -> "$index-${song.id}" }
                     ) { index, song ->
+
+                        val isCurrent =
+                            index == state.currentIndex
+                        val isActivelyPlaying =
+                            isCurrent && state.isPlaying
+
                         QueueRow(
                             song = song,
-                            isCurrent = index == state.currentIndex,
-                            isPlaying = state.isPlaying,
-                            onClick = { viewModel.playAt(index) }
+                            isCurrent = isCurrent,
+                            isActivelyPlaying = isActivelyPlaying,
+                            onClick = {
+                                viewModel.playAt(index)
+                            }
                         )
                     }
                 }
@@ -101,52 +130,132 @@ fun QueueBottomSheet(
 private fun QueueRow(
     song: Song,
     isCurrent: Boolean,
-    isPlaying: Boolean,
+    isActivelyPlaying: Boolean,
     onClick: () -> Unit
 ) {
-    val isActivelyPlaying = isCurrent && isPlaying
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(if (isCurrent) CardDark else Color.Transparent)
+            .background(
+                if (isCurrent) CardDark else Color.Transparent
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            AsyncImage(
-                model = song.albumArtUrl,
-                contentDescription = song.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
-            if (isActivelyPlaying) {
-                Icon(
-                    Icons.Filled.Equalizer,
-                    contentDescription = "Now playing",
-                    tint = AccentGreen,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
+        AsyncImage(
+            model = song.albumArtUrl,
+            contentDescription = song.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+
         Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
-                song.title,
+                text = song.title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (isCurrent) AccentGreen else Color.Unspecified,
+                color = if (isCurrent) {
+                    AccentGreen
+                } else {
+                    Color.Unspecified
+                },
                 maxLines = 1
             )
+
             Text(
-                song.artist,
+                text = song.artist,
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary,
                 maxLines = 1
             )
         }
+
+        // The animated bars appear only while this queue item is playing.
+        if (isActivelyPlaying) {
+            Spacer(Modifier.width(12.dp))
+            PlayingBars()
+        }
     }
+}
+
+@Composable
+private fun PlayingBars(
+    modifier: Modifier = Modifier
+) {
+    val transition = rememberInfiniteTransition(
+        label = "playing_bars"
+    )
+
+    val bar1 by transition.animateFloat(
+        initialValue = 6f,
+        targetValue = 21f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 430,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "playing_bar_1"
+    )
+
+    val bar2 by transition.animateFloat(
+        initialValue = 18f,
+        targetValue = 7f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 520,
+                easing = LinearEasing,
+                delayMillis = 100
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "playing_bar_2"
+    )
+
+    val bar3 by transition.animateFloat(
+        initialValue = 8f,
+        targetValue = 23f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 470,
+                easing = LinearEasing,
+                delayMillis = 180
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "playing_bar_3"
+    )
+
+    Row(
+        modifier = modifier
+            .width(24.dp)
+            .height(28.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PlayingBar(height = bar1)
+        PlayingBar(height = bar2)
+        PlayingBar(height = bar3)
+    }
+}
+
+@Composable
+private fun PlayingBar(
+    height: Float
+) {
+    Box(
+        modifier = Modifier
+            .width(4.dp)
+            .height(height.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(AccentGreen)
+    )
 }

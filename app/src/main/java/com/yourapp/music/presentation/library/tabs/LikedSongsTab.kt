@@ -1,5 +1,6 @@
 package com.yourapp.music.presentation.library.tabs
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,11 +13,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
+@OptIn(UnstableApi::class)
 @Composable
 fun LikedSongsTab(
     songs: List<Song>,
@@ -25,7 +28,10 @@ fun LikedSongsTab(
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     if (songs.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
                 "No liked songs yet — tap the heart on any song to save it here.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -46,11 +52,16 @@ fun LikedSongsTab(
                     if (playerState.currentSong?.id == song.id) {
                         playerViewModel.togglePlayPause()
                     } else {
-                        playerViewModel.playSong(song, songs)
+                        playerViewModel.playSong(
+                            song,
+                            songs
+                        )
                     }
                 },
                 isCurrentSong = playerState.currentSong?.id == song.id,
-                isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
+                isActivelyPlaying = playerState.currentSong?.id == song.id &&
+                        playerState.isPlaying,
+                showPlayButton = false
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.yourapp.music.presentation.library.tabs
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,12 +13,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.PlayerViewModel
 
-/** Songs downloaded to Downloads/MusicApp, most recently downloaded first. */
+@OptIn(UnstableApi::class)
 @Composable
 fun DownloadsTab(
     songs: List<Song>,
@@ -26,7 +28,10 @@ fun DownloadsTab(
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     if (songs.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
                 "No downloads yet — tap the download icon on the Now Playing screen to save a song.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -47,11 +52,16 @@ fun DownloadsTab(
                     if (playerState.currentSong?.id == song.id) {
                         playerViewModel.togglePlayPause()
                     } else {
-                        playerViewModel.playSong(song, songs)
+                        playerViewModel.playSong(
+                            song,
+                            songs
+                        )
                     }
                 },
                 isCurrentSong = playerState.currentSong?.id == song.id,
-                isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
+                isActivelyPlaying = playerState.currentSong?.id == song.id &&
+                        playerState.isPlaying,
+                showPlayButton = false
             )
         }
     }

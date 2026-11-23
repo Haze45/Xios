@@ -234,16 +234,16 @@ fun HomeScreen(
         }
 
         // Albums
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+//        if (state.isLoading) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(80.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator()
+//            }
+//        }
 
         Text(
             "Albums",

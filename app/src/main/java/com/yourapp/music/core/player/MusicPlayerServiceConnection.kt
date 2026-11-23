@@ -277,7 +277,8 @@ class MusicPlayerServiceConnection @Inject constructor(
         activeController: MediaController,
         song: Song,
         queue: List<Song>,
-        startPositionMs: Long
+        startPositionMs: Long,
+        shouldPlay: Boolean = true
     ) {
         originalQueueOrder = null
 
@@ -299,13 +300,19 @@ class MusicPlayerServiceConnection @Inject constructor(
         )
 
         activeController.prepare()
-        activeController.play()
+
+        if (shouldPlay) {
+            activeController.play()
+        } else {
+            activeController.pause()
+        }
 
         _playerState.update {
             it.copy(
                 currentSong = song,
                 queue = queue,
                 currentIndex = startIndex,
+                isPlaying = shouldPlay,
                 isShuffleEnabled = false
             )
         }
@@ -332,8 +339,15 @@ class MusicPlayerServiceConnection @Inject constructor(
     }
 
     fun skipToNext() {
-        loadRestoredSessionIfNeeded()
-        controller?.seekToNextMediaItem()
+        val activeController = controller ?: return
+
+        // Restore the queue if it hasn't been loaded into ExoPlayer.
+        loadRestoredSessionIfNeeded(shouldPlay = true)
+
+        if (activeController.mediaItemCount == 0) return
+
+        activeController.seekToNextMediaItem()
+        activeController.play()
     }
 
     fun skipToPrevious() {
@@ -341,7 +355,9 @@ class MusicPlayerServiceConnection @Inject constructor(
         controller?.seekToPreviousMediaItem()
     }
 
-    private fun loadRestoredSessionIfNeeded(): Boolean {
+    private fun loadRestoredSessionIfNeeded(
+        shouldPlay: Boolean = true
+    ): Boolean {
         val restored = restoredButNotLoaded
         val activeController = controller
 
@@ -355,7 +371,8 @@ class MusicPlayerServiceConnection @Inject constructor(
             activeController,
             restored.song,
             restored.queue,
-            startPositionMs = restored.positionMs
+            startPositionMs = restored.positionMs,
+            shouldPlay = shouldPlay
         )
 
         return true
@@ -366,19 +383,31 @@ class MusicPlayerServiceConnection @Inject constructor(
     }
 
     fun playQueueItem(index: Int) {
-        val activeController = controller ?: return
-
+        // Validate against the queue shown by the app.
         if (index !in _playerState.value.queue.indices) return
 
-        restoredButNotLoaded = null
+        val activeController = controller ?: run {
+            connect()
+            return
+        }
+        // A restored queue may be visible in the UI but not yet loaded
+        // into ExoPlayer. Load it before seeking to the tapped item.
+        loadRestoredSessionIfNeeded()
 
-        activeController.seekTo(index, 0L)
+        // Make sure the requested item now exists in the player timeline.
+        if (index !in 0 until activeController.mediaItemCount) return
+
+        activeController.seekToDefaultPosition(index)
         activeController.play()
 
-        _playerState.update {
-            it.copy(
-                currentSong = it.queue[index],
-                currentIndex = index
+        // Update the UI immediately; the media transition listener will
+        // also reconcile the state with ExoPlayer.
+        _playerState.update { state ->
+            state.copy(
+                currentSong = state.queue[index],
+                currentIndex = index,
+                isPlaying = true,
+                positionMs = 0L
             )
         }
     }

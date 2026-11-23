@@ -22,6 +22,7 @@ import com.yourapp.music.presentation.library.LibraryScreen
 import com.yourapp.music.presentation.player.MiniPlayer
 import com.yourapp.music.presentation.player.PlayerViewModel
 import com.yourapp.music.presentation.playlist.PlaylistScreen
+import com.yourapp.music.presentation.profile.ProfileScreen
 import com.yourapp.music.presentation.queue.QueueBottomSheet
 import com.yourapp.music.presentation.settings.SettingsScreen
 
@@ -29,7 +30,6 @@ import com.yourapp.music.presentation.settings.SettingsScreen
 @Composable
 fun MainShell(
     onNavigateToSearch: () -> Unit,
-    onNavigateToProfile: () -> Unit,
     onNavigateToFavorites: () -> Unit,
     onNavigateToPlayer: () -> Unit,
     onNavigateToPlaylistDetail: (String) -> Unit,
@@ -70,7 +70,11 @@ fun MainShell(
             composable(Screen.Home.route) {
                 HomeScreen(
                     onSearchClick = onNavigateToSearch,
-                    onProfileClick = onNavigateToProfile,
+                    onProfileClick = {
+                        bottomNavController.navigate(Screen.Profile.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     onFavoritesClick = onNavigateToFavorites,
                     onAlbumClick = onNavigateToAlbumDetail,
                     currentlyPlayingSongId = playerState.currentSong?.id,
@@ -80,7 +84,6 @@ fun MainShell(
                             song,
                             queue
                         )
-                        onNavigateToPlayer()
                     }
                 )
             }
@@ -92,7 +95,6 @@ fun MainShell(
                             song,
                             queue
                         )
-                        onNavigateToPlayer()
                     },
                     onPlaylistClick = { playlist ->
                         onNavigateToPlaylistDetail(playlist.id)
@@ -108,8 +110,32 @@ fun MainShell(
                 )
             }
 
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onBackClick = {
+                        if (!bottomNavController.popBackStack()) {
+                            bottomNavController.navigate(
+                                Screen.Home.route
+                            ) {
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+                    onSettingsClick = {
+                        bottomNavController.navigate(Screen.Settings.route) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onPlaylistClick = { playlist ->
+                        onNavigateToPlaylistDetail(playlist.id)
+                    }
+                )
+            }
+
             composable(Screen.Settings.route) {
-                SettingsScreen(onLogout = onLogout)
+                SettingsScreen(
+                    onLogout = onLogout
+                )
             }
         }
     }
