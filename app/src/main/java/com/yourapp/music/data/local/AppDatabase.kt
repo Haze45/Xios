@@ -7,12 +7,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.yourapp.music.data.local.dao.ArtistDao
 import com.yourapp.music.data.local.dao.DownloadDao
+import com.yourapp.music.data.local.dao.DownloadTaskDao
 import com.yourapp.music.data.local.dao.FavoriteDao
 import com.yourapp.music.data.local.dao.ListeningHistoryDao
 import com.yourapp.music.data.local.dao.PlaylistDao
 import com.yourapp.music.data.local.dao.RecentSearchDao
 import com.yourapp.music.data.local.dao.SongDao
 import com.yourapp.music.data.local.entity.ArtistEntity
+import com.yourapp.music.data.local.entity.DownloadTaskEntity
 import com.yourapp.music.data.local.entity.DownloadedSongEntity
 import com.yourapp.music.data.local.entity.FavoriteEntity
 import com.yourapp.music.data.local.entity.ListeningHistoryEntity
@@ -28,9 +30,10 @@ import com.yourapp.music.data.local.entity.SongEntity
         ArtistEntity::class,
         RecentSearchEntity::class,
         DownloadedSongEntity::class,
-        ListeningHistoryEntity::class
+        ListeningHistoryEntity::class,
+        DownloadTaskEntity::class
     ],
-    version = 9,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -49,6 +52,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao
 
     abstract fun listeningHistoryDao(): ListeningHistoryDao
+
+    abstract fun downloadTaskDao(): DownloadTaskDao
 
     companion object {
 
@@ -104,6 +109,66 @@ abstract class AppDatabase : RoomDatabase() {
                 // Previous encrypted files used the single-block format.
                 // They must be downloaded again using chunked encryption.
                 db.execSQL("DELETE FROM downloaded_songs")
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS download_tasks (
+                songId TEXT NOT NULL,
+                temporaryFilePath TEXT NOT NULL,
+                downloadedBytes INTEGER NOT NULL,
+                totalBytes INTEGER,
+                status TEXT NOT NULL,
+                updatedAt INTEGER NOT NULL,
+                PRIMARY KEY(songId)
+            )
+            """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+            CREATE INDEX IF NOT EXISTS
+            index_download_tasks_status
+            ON download_tasks(status)
+            """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+            CREATE INDEX IF NOT EXISTS
+            index_download_tasks_updatedAt
+            ON download_tasks(updatedAt)
+            """.trimIndent()
+                )
+            }
+        }
+
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE download_tasks ADD COLUMN sourceETag TEXT"
+                )
+                db.execSQL(
+                    "ALTER TABLE download_tasks ADD COLUMN sourceLastModified TEXT"
+                )
+                db.execSQL(
+                    "ALTER TABLE download_tasks ADD COLUMN sourceLength INTEGER"
+                )
+                db.execSQL(
+                    "ALTER TABLE download_tasks ADD COLUMN sourceUrlHash TEXT"
+                )
+                db.execSQL(
+                    "ALTER TABLE download_tasks ADD COLUMN encryptionSalt TEXT"
+                )
+                db.execSQL(
+                    """
+            ALTER TABLE download_tasks
+            ADD COLUMN chunkCount INTEGER NOT NULL DEFAULT 0
+            """.trimIndent()
+                )
             }
         }
     }

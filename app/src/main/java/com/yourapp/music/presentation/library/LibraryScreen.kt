@@ -107,7 +107,12 @@ fun LibraryScreen(
 
                     LibraryTab.DOWNLOADS -> DownloadsTab(
                         songs = state.downloadedSongs,
+                        downloadingSongs = state.downloadingSongs,
                         onSongClick = onSongClick,
+                        onPauseDownload = viewModel::pauseDownload,
+                        onResumeDownload = viewModel::resumeDownload,
+                        onCancelDownload = viewModel::cancelDownload,
+                        onDeleteDownloadedSong = viewModel::deleteDownloadedSong,
                         modifier = Modifier.fillMaxSize()
                     )
                 }

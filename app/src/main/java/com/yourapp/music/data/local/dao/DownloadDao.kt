@@ -17,4 +17,7 @@ interface DownloadDao {
 
     @Query("DELETE FROM downloaded_songs WHERE songId = :songId")
     suspend fun deleteDownload(songId: String)
+
+    @Query("SELECT * FROM downloaded_songs WHERE songId = :songId LIMIT 1")
+    suspend fun getDownload(songId: String): DownloadedSongEntity?
 }

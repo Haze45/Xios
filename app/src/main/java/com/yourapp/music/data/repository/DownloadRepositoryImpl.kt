@@ -1,36 +1,25 @@
 package com.yourapp.music.data.repository
 
-import com.yourapp.music.core.download.SongDownloader
-import com.yourapp.music.core.util.Resource
+import com.yourapp.music.core.download.DownloadWorkManager
 import com.yourapp.music.data.local.dao.DownloadDao
-import com.yourapp.music.data.local.entity.DownloadedSongEntity
+import com.yourapp.music.data.local.dao.DownloadTaskDao
+import com.yourapp.music.domain.model.DownloadProgress
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.domain.repository.DownloadRepository
 import com.yourapp.music.domain.repository.SongRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
+import com.yourapp.music.core.util.Resource
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 @Singleton
 class DownloadRepositoryImpl @Inject constructor(
-    private val songDownloader: SongDownloader,
+    private val downloadWorkManager: DownloadWorkManager,
     private val downloadDao: DownloadDao,
+    private val downloadTaskDao: DownloadTaskDao,
     private val songRepository: SongRepository
 ) : DownloadRepository {
-
-    private val downloadScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    private val downloadingIds =
-        MutableStateFlow<Set<String>>(emptySet())
 
     override fun getDownloadedSongs(): Flow<List<Song>> =
         combine(
@@ -51,45 +40,77 @@ class DownloadRepositoryImpl @Inject constructor(
         downloadDao.isDownloaded(songId)
 
     override fun isDownloading(songId: String): Flow<Boolean> =
-        downloadingIds.map { songId in it }
+        downloadTaskDao.observeTasks()
+            .let { tasksFlow ->
+                tasksFlow.combine(
+                    kotlinx.coroutines.flow.flowOf(Unit)
+                ) { tasks, _ ->
+                    tasks.any { task ->
+                        task.songId == songId &&
+                                (
+                                        task.status ==
+                                                DownloadWorkManager.STATUS_QUEUED ||
+                                                task.status ==
+                                                DownloadWorkManager.STATUS_RUNNING
+                                        )
+                    }
+                }
+            }
 
-    override suspend fun downloadSong(song: Song): Resource<Unit> {
-        var alreadyRunning = false
+    override fun observeDownloadProgress(): Flow<List<DownloadProgress>> =
+        combine(
+            downloadTaskDao.observeTasks(),
+            songRepository.getAllSongs()
+        ) { tasks, songs ->
 
-        downloadingIds.update { current ->
-            if (song.id in current) {
-                alreadyRunning = true
-                current
-            } else {
-                current + song.id
+            val songsById = songs.associateBy { it.id }
+
+            tasks.mapNotNull { task ->
+
+                // Completed downloads are displayed in the
+                // downloaded songs section instead.
+                if (
+                    task.status ==
+                    DownloadWorkManager.STATUS_COMPLETED
+                ) {
+                    return@mapNotNull null
+                }
+
+                if (
+                    task.status !in setOf(
+                        DownloadWorkManager.STATUS_QUEUED,
+                        DownloadWorkManager.STATUS_RUNNING,
+                        DownloadWorkManager.STATUS_PAUSED,
+                        DownloadWorkManager.STATUS_FAILED
+                    )
+                ) {
+                    return@mapNotNull null
+                }
+
+                val song = songsById[task.songId]
+                    ?: return@mapNotNull null
+
+                DownloadProgress(
+                    song = song,
+                    downloadedBytes = task.downloadedBytes,
+                    totalBytes = task.totalBytes,
+                    status = task.status
+                )
             }
         }
 
-        if (alreadyRunning) return Resource.Loading
-
-        return downloadScope.async {
-            try {
-                val encryptedUri =
-                    songDownloader.download(song)
-
-                downloadDao.upsertDownload(
-                    DownloadedSongEntity(
-                        songId = song.id,
-                        localUri = encryptedUri,
-                        downloadedAt = System.currentTimeMillis()
-                    )
-                )
-
-                Resource.Success(Unit)
-            } catch (exception: Exception) {
-                Resource.Error(
-                    exception.message
-                        ?: "Couldn't download this song",
-                    exception
-                )
-            } finally {
-                downloadingIds.update { it - song.id }
-            }
-        }.await()
+    override suspend fun downloadSong(
+        song: Song
+    ): Resource<Unit> {
+        return try {
+            downloadWorkManager.enqueueDownload(song.id)
+            Resource.Success(Unit)
+        } catch (exception: Exception) {
+            Resource.Error(
+                exception.message
+                    ?: "Couldn't schedule download",
+                exception
+            )
+        }
     }
 }

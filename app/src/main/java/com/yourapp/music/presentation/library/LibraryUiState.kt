@@ -1,9 +1,15 @@
 package com.yourapp.music.presentation.library
 
+import com.yourapp.music.domain.model.DownloadProgress
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.domain.model.Song
 
-enum class LibraryTab { ALL, PLAYLISTS, LIKED_SONGS, DOWNLOADS }
+enum class LibraryTab {
+    ALL,
+    PLAYLISTS,
+    LIKED_SONGS,
+    DOWNLOADS
+}
 
 data class LibraryUiState(
     val selectedTab: LibraryTab = LibraryTab.ALL,
@@ -11,6 +17,7 @@ data class LibraryUiState(
     val playlists: List<Playlist> = emptyList(),
     val likedSongs: List<Song> = emptyList(),
     val downloadedSongs: List<Song> = emptyList(),
+    val downloadingSongs: List<DownloadProgress> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

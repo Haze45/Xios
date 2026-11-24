@@ -3,6 +3,9 @@ package com.yourapp.music.core.download
 import android.content.Context
 import android.net.Uri
 import android.system.Os
+import android.util.Base64
+import com.yourapp.music.data.local.dao.DownloadTaskDao
+import com.yourapp.music.data.local.entity.DownloadTaskEntity
 import com.yourapp.music.domain.model.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -10,8 +13,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -19,171 +20,402 @@ import kotlinx.coroutines.withContext
 
 private const val ENCRYPTED_SCHEME = "xios-encrypted"
 
-private const val STALE_PART_FILE_AGE_MS =
-    24L * 60L * 60L * 1000L
-
 @Singleton
 class SongDownloader @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val encryptionManager: SongEncryptionManager
+    @param:ApplicationContext private val context: Context,
+    private val downloadTaskDao: DownloadTaskDao
 ) {
 
-    private val activeTemporaryFiles =
-        ConcurrentHashMap.newKeySet<String>()
+    suspend fun download(
+        song: Song,
+        onProgress: suspend (
+            downloadedBytes: Long,
+            totalBytes: Long?
+        ) -> Unit = { _, _ -> }
+    ): String = withContext(Dispatchers.IO) {
 
-    suspend fun download(song: Song): String =
-        withContext(Dispatchers.IO) {
+        val directory = File(
+            context.noBackupFilesDir,
+            "encrypted_downloads"
+        )
 
-            val downloadDirectory = File(
-                context.noBackupFilesDir,
-                "encrypted_downloads"
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw IOException(
+                "Couldn't create encrypted downloads folder."
             )
-
-            if (
-                !downloadDirectory.exists() &&
-                !downloadDirectory.mkdirs()
-            ) {
-                throw IOException(
-                    "Couldn't create the encrypted downloads folder."
-                )
-            }
-
-            // Remove abandoned temporary files from previous downloads.
-            cleanupAbandonedTemporaryFiles(downloadDirectory)
-
-            val fileName = createFileName(song.id)
-
-            val destination = File(
-                downloadDirectory,
-                fileName
-            )
-
-            // Every download gets its own temporary file.
-            val temporaryFile = File(
-                downloadDirectory,
-                "$fileName.${UUID.randomUUID()}.part"
-            )
-
-            if (!temporaryFile.createNewFile()) {
-                throw IOException(
-                    "Couldn't create the temporary download file."
-                )
-            }
-
-            activeTemporaryFiles.add(
-                temporaryFile.absolutePath
-            )
-
-            val connection =
-                URL(song.audioUrl).openConnection()
-                        as HttpURLConnection
-
-            connection.connectTimeout = 30_000
-            connection.readTimeout = 60_000
-            connection.instanceFollowRedirects = true
-
-            try {
-                connection.connect()
-
-                if (connection.responseCode !in 200..299) {
-                    throw IOException(
-                        "Download failed: HTTP ${connection.responseCode}"
-                    )
-                }
-
-                connection.inputStream.use { input ->
-
-                    // Stream, encrypt and write one chunk at a time.
-                    encryptionManager.encrypt(
-                        input = input,
-                        destination = temporaryFile
-                    )
-                }
-
-                if (!temporaryFile.exists() ||
-                    temporaryFile.length() == 0L
-                ) {
-                    throw IOException(
-                        "Encrypted download file is empty."
-                    )
-                }
-
-                /*
-                 * Atomically replaces the previous download.
-                 *
-                 * Both files are in the same directory, so the rename
-                 * happens on the same filesystem. The old destination
-                 * remains intact if the rename operation fails.
-                 */
-                Os.rename(
-                    temporaryFile.absolutePath,
-                    destination.absolutePath
-                )
-
-                Uri.Builder()
-                    .scheme(ENCRYPTED_SCHEME)
-                    .path(destination.absolutePath)
-                    .build()
-                    .toString()
-
-            } catch (exception: Exception) {
-
-                // Keep the previous successful download untouched.
-                temporaryFile.delete()
-
-                throw exception
-
-            } finally {
-
-                connection.disconnect()
-
-                activeTemporaryFiles.remove(
-                    temporaryFile.absolutePath
-                )
-            }
         }
 
-    /**
-     * Deletes abandoned .part files older than 24 hours.
-     *
-     * Files belonging to currently active downloads are never deleted.
-     */
-    private fun cleanupAbandonedTemporaryFiles(
-        downloadDirectory: File
-    ) {
-        val cutoffTime =
-            System.currentTimeMillis() - STALE_PART_FILE_AGE_MS
+        val fileName = createFileName(song.id)
+        val destination = File(directory, fileName)
+        val temporaryFile =
+            File(directory, "$fileName.part")
 
-        val temporaryFiles =
-            downloadDirectory.listFiles()
-                ?: return
+        val sourceUrlHash = sha256(song.audioUrl)
 
-        temporaryFiles.forEach { file ->
+        var task = downloadTaskDao.getTask(song.id)
 
-            if (!file.isFile) return@forEach
+        // A changed URL must never be appended to an old partial file.
+        if (
+            task != null &&
+            task.sourceUrlHash != null &&
+            task.sourceUrlHash != sourceUrlHash
+        ) {
+            temporaryFile.delete()
+            task = null
+        }
 
-            if (!file.name.endsWith(".part")) {
-                return@forEach
+        val expectedSalt = task?.encryptionSalt?.let {
+            Base64.decode(it, Base64.NO_WRAP)
+        }
+
+        val writer = ResumableSongEncryption.openOrCreate(
+            destination = temporaryFile,
+            expectedSalt = expectedSalt
+        )
+
+        expectedSalt?.fill(0)
+
+        val salt = writer.salt.copyOf()
+        val resumeOffset = writer.resumeOffsetBytes
+
+        val connection = openConnection(
+            song.audioUrl,
+            resumeOffset
+        )
+
+        try {
+            connection.connect()
+
+            val responseCode = connection.responseCode
+
+            val etag = connection.getHeaderField("ETag")
+            val lastModified =
+                connection.getHeaderField("Last-Modified")
+
+            val responseTotal = getResponseTotalLength(
+                connection,
+                responseCode
+            )
+
+            val sourceChanged =
+                task != null &&
+                        (
+                                task.sourceUrlHash != sourceUrlHash ||
+                                        (
+                                                task.sourceETag != null &&
+                                                        etag != null &&
+                                                        task.sourceETag != etag
+                                                ) ||
+                                        (
+                                                task.sourceLastModified != null &&
+                                                        lastModified != null &&
+                                                        task.sourceLastModified != lastModified
+                                                ) ||
+                                        (
+                                                task.sourceLength != null &&
+                                                        responseTotal != null &&
+                                                        task.sourceLength != responseTotal
+                                                )
+                                )
+
+            val rangeAccepted =
+                resumeOffset == 0L ||
+                        (
+                                responseCode == HttpURLConnection.HTTP_PARTIAL &&
+                                        getRangeStart(
+                                            connection.getHeaderField(
+                                                "Content-Range"
+                                            )
+                                        ) == resumeOffset
+                                )
+
+            if (sourceChanged || !rangeAccepted) {
+                writer.close()
+                connection.disconnect()
+
+                temporaryFile.delete()
+
+                downloadTaskDao.upsertTask(
+                    DownloadTaskEntity(
+                        songId = song.id,
+                        temporaryFilePath = temporaryFile.absolutePath,
+                        sourceUrlHash = sourceUrlHash,
+                        status = DownloadWorkManager.STATUS_RUNNING
+                    )
+                )
+
+                return@withContext downloadFromStart(
+                    song = song,
+                    temporaryFile = temporaryFile,
+                    destination = destination,
+                    sourceUrlHash = sourceUrlHash,
+                    onProgress = onProgress
+                )
             }
 
-            if (file.absolutePath in activeTemporaryFiles) {
-                return@forEach
+            if (
+                responseCode != HttpURLConnection.HTTP_OK &&
+                responseCode != HttpURLConnection.HTTP_PARTIAL
+            ) {
+                throw IOException(
+                    "Download failed: HTTP $responseCode"
+                )
             }
 
-            if (file.lastModified() < cutoffTime) {
-                file.delete()
+            if (
+                resumeOffset > 0L &&
+                responseTotal != null &&
+                resumeOffset > responseTotal
+            ) {
+                throw IOException(
+                    "Invalid resume offset."
+                )
             }
+
+            // Persist enough metadata to reopen this partial file.
+            downloadTaskDao.upsertTask(
+                DownloadTaskEntity(
+                    songId = song.id,
+                    temporaryFilePath = temporaryFile.absolutePath,
+                    downloadedBytes = resumeOffset,
+                    totalBytes = responseTotal,
+                    status = DownloadWorkManager.STATUS_RUNNING,
+                    sourceETag = etag,
+                    sourceLastModified = lastModified,
+                    sourceLength = responseTotal,
+                    sourceUrlHash = sourceUrlHash,
+                    encryptionSalt = Base64.encodeToString(
+                        salt,
+                        Base64.NO_WRAP
+                    ),
+                    chunkCount = writer.chunkCount
+                )
+            )
+
+            val finalLength =
+                connection.inputStream.use { input ->
+                    writer.append(input) { committedBytes ->
+                        onProgress(
+                            committedBytes,
+                            responseTotal
+                        )
+                    }
+                }
+
+            writer.close()
+
+            if (
+                responseTotal != null &&
+                finalLength != responseTotal
+            ) {
+                throw IOException(
+                    "Downloaded length doesn't match source length."
+                )
+            }
+
+            if (
+                !temporaryFile.exists() ||
+                temporaryFile.length() == 0L
+            ) {
+                throw IOException(
+                    "Encrypted download file is empty."
+                )
+            }
+
+            // The completed encrypted file replaces the previous copy.
+            Os.rename(
+                temporaryFile.absolutePath,
+                destination.absolutePath
+            )
+
+            downloadTaskDao.updateProgress(
+                songId = song.id,
+                downloadedBytes = finalLength,
+                totalBytes = responseTotal
+            )
+
+            Uri.Builder()
+                .scheme(ENCRYPTED_SCHEME)
+                .path(destination.absolutePath)
+                .build()
+                .toString()
+
+        } catch (exception: Exception) {
+            writer.close()
+            throw exception
+
+        } finally {
+            connection.disconnect()
+            salt.fill(0)
         }
     }
 
-    private fun createFileName(songId: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-            .digest(songId.toByteArray(Charsets.UTF_8))
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun downloadFromStart(
+        song: Song,
+        temporaryFile: File,
+        destination: File,
+        sourceUrlHash: String,
+        onProgress: suspend (
+            downloadedBytes: Long,
+            totalBytes: Long?
+        ) -> Unit
+    ): String {
+        temporaryFile.delete()
 
-        val safeId = digest.joinToString("") {
-            "%02x".format(it)
+        val writer = ResumableSongEncryption.openOrCreate(
+            destination = temporaryFile
+        )
+
+        val salt = writer.salt.copyOf()
+        val connection = openConnection(song.audioUrl, 0L)
+
+        try {
+            connection.connect()
+
+            val responseCode = connection.responseCode
+
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw IOException(
+                    "Fresh download failed: HTTP $responseCode"
+                )
+            }
+
+            val responseTotal =
+                connection.contentLengthLong.takeIf { it >= 0L }
+
+            val etag = connection.getHeaderField("ETag")
+            val lastModified =
+                connection.getHeaderField("Last-Modified")
+
+            downloadTaskDao.upsertTask(
+                DownloadTaskEntity(
+                    songId = song.id,
+                    temporaryFilePath = temporaryFile.absolutePath,
+                    downloadedBytes = 0L,
+                    totalBytes = responseTotal,
+                    status = DownloadWorkManager.STATUS_RUNNING,
+                    sourceETag = etag,
+                    sourceLastModified = lastModified,
+                    sourceLength = responseTotal,
+                    sourceUrlHash = sourceUrlHash,
+                    encryptionSalt = Base64.encodeToString(
+                        salt,
+                        Base64.NO_WRAP
+                    ),
+                    chunkCount = 0
+                )
+            )
+
+            val finalLength =
+                connection.inputStream.use { input ->
+                    writer.append(input) { committedBytes ->
+                        onProgress(
+                            committedBytes,
+                            responseTotal
+                        )
+                    }
+                }
+
+            writer.close()
+
+            if (
+                responseTotal != null &&
+                finalLength != responseTotal
+            ) {
+                throw IOException(
+                    "Downloaded length doesn't match source length."
+                )
+            }
+
+            Os.rename(
+                temporaryFile.absolutePath,
+                destination.absolutePath
+            )
+
+            downloadTaskDao.updateProgress(
+                songId = song.id,
+                downloadedBytes = finalLength,
+                totalBytes = responseTotal
+            )
+
+            return Uri.Builder()
+                .scheme(ENCRYPTED_SCHEME)
+                .path(destination.absolutePath)
+                .build()
+                .toString()
+
+        } catch (exception: Exception) {
+            writer.close()
+            throw exception
+
+        } finally {
+            connection.disconnect()
+            salt.fill(0)
+        }
+    }
+
+    private fun openConnection(
+        audioUrl: String,
+        resumeOffset: Long
+    ): HttpURLConnection {
+        val connection =
+            URL(audioUrl).openConnection() as HttpURLConnection
+
+        connection.connectTimeout = 30_000
+        connection.readTimeout = 60_000
+        connection.instanceFollowRedirects = true
+
+        if (resumeOffset > 0L) {
+            connection.setRequestProperty(
+                "Range",
+                "bytes=$resumeOffset-"
+            )
         }
 
-        return "$safeId.xenc"
+        return connection
+    }
+
+    private fun getResponseTotalLength(
+        connection: HttpURLConnection,
+        responseCode: Int
+    ): Long? {
+        if (responseCode == HttpURLConnection.HTTP_PARTIAL) {
+            val range =
+                connection.getHeaderField("Content-Range")
+                    ?: return null
+
+            return range.substringAfterLast("/")
+                .takeIf { it != "*" }
+                ?.toLongOrNull()
+        }
+
+        return connection.contentLengthLong.takeIf {
+            it >= 0L
+        }
+    }
+
+    private fun getRangeStart(
+        contentRange: String?
+    ): Long? {
+        if (contentRange == null) return null
+
+        return contentRange
+            .substringAfter("bytes ", "")
+            .substringBefore("-")
+            .toLongOrNull()
+    }
+
+    private fun createFileName(songId: String): String {
+        return sha256(songId) + ".xenc"
+    }
+
+    private fun sha256(value: String): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+            .digest(value.toByteArray(Charsets.UTF_8))
+
+        return digest.joinToString("") {
+            "%02x".format(it)
+        }
     }
 }

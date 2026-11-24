@@ -221,21 +221,39 @@ fun PlayerScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+
             IconButton(
                 onClick = onDownloadClick,
                 enabled = song != null &&
                         !state.isDownloaded &&
                         !state.isDownloading
             ) {
-
                 when {
-
                     state.isDownloading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = AccentGreen
-                        )
+
+                        val progress =
+                            state.downloadProgressFraction
+
+                        if (progress != null) {
+                            CircularProgressIndicator(
+                                progress = { progress },
+                                modifier = Modifier.size(26.dp),
+                                strokeWidth = 3.dp,
+                                color = AccentGreen,
+                                trackColor = TextSecondary.copy(
+                                    alpha = 0.25f
+                                )
+                            )
+                        } else {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(26.dp),
+                                strokeWidth = 3.dp,
+                                color = AccentGreen,
+                                trackColor = TextSecondary.copy(
+                                    alpha = 0.25f
+                                )
+                            )
+                        }
                     }
 
                     state.isDownloaded -> {
@@ -255,6 +273,7 @@ fun PlayerScreen(
                     }
                 }
             }
+
 
             IconButton(
                 onClick = {
