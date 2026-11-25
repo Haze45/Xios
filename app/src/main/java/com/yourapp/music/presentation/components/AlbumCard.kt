@@ -11,7 +11,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Album
 
 /** Square card used in Home's Albums row — cover art is always the album's last-added song. */
@@ -39,7 +38,7 @@ fun AlbumCard(
         Text(
             "${album.artistName} • ${album.songCount} Songs",
             style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1
         )
     }

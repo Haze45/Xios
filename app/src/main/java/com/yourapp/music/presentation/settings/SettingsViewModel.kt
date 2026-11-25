@@ -2,8 +2,9 @@ package com.yourapp.music.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yourapp.music.core.sync.FavoriteSyncManager
+import com.yourapp.music.domain.model.AppTheme
 import com.yourapp.music.domain.model.StreamingQuality
+import com.yourapp.music.domain.model.UserSettings
 import com.yourapp.music.domain.usecase.auth.LogoutUseCase
 import com.yourapp.music.domain.usecase.settings.GetUserSettingsUseCase
 import com.yourapp.music.domain.usecase.settings.UpdateSettingsUseCase
@@ -22,37 +23,63 @@ class SettingsViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(SettingsUiState())
+    val uiState: StateFlow<SettingsUiState> =
+        _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             getUserSettingsUseCase().collect { settings ->
-                _uiState.update { it.copy(settings = settings, isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        settings = settings,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
-    fun onStreamingQualityChange(quality: StreamingQuality) = persist { it.copy(streamingQuality = quality) }
-
-    fun onVolumeNormalizationToggle(enabled: Boolean) =
-        persist { it.copy(volumeNormalizationEnabled = enabled) }
-
-    fun onPlaybackNotificationsToggle(enabled: Boolean) =
-        persist { it.copy(playbackNotificationsEnabled = enabled) }
-
-    fun onGeneralNotificationsToggle(enabled: Boolean) =
-        persist { it.copy(generalNotificationsEnabled = enabled) }
-
-    fun onGranularNotificationsToggle(enabled: Boolean) =
-        persist { it.copy(granularNotificationsEnabled = enabled) }
-
-    private fun persist(transform: (com.yourapp.music.domain.model.UserSettings) -> com.yourapp.music.domain.model.UserSettings) {
-        val updated = transform(_uiState.value.settings)
-        _uiState.update { it.copy(settings = updated) } // optimistic UI update
-        viewModelScope.launch { updateSettingsUseCase(updated) }
+    fun onStreamingQualityChange(quality: StreamingQuality) {
+        persist {
+            it.copy(streamingQuality = quality)
+        }
     }
 
-    fun logout() = logoutUseCase()
+    fun onPlaybackNotificationsToggle(enabled: Boolean) {
+        persist {
+            it.copy(playbackNotificationsEnabled = enabled)
+        }
+    }
+
+    fun onThemeChange(theme: AppTheme) {
+        persist {
+            it.copy(theme = theme)
+        }
+    }
+
+    fun onLanguageChange(languageCode: String) {
+        persist {
+            it.copy(language = languageCode)
+        }
+    }
+
+    private fun persist(
+        transform: (UserSettings) -> UserSettings
+    ) {
+        val updated = transform(_uiState.value.settings)
+
+        _uiState.update {
+            it.copy(settings = updated)
+        }
+
+        viewModelScope.launch {
+            updateSettingsUseCase(updated)
+        }
+    }
+
+    fun logout() {
+        logoutUseCase()
+    }
 }

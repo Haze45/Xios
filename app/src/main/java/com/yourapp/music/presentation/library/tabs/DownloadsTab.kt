@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -198,7 +199,7 @@ fun DownloadsTab(
                         .fillMaxWidth()
                         .padding(vertical = 2.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(AccentGreen)
+                        .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Row(
                         modifier = Modifier
@@ -212,14 +213,14 @@ fun DownloadsTab(
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Delete downloaded song",
-                            tint = BackgroundBlack
+                            tint = Color(0xFF191B13)
                         )
 
                         Spacer(Modifier.width(6.dp))
 
                         Text(
                             text = "Remove",
-                            color = BackgroundBlack,
+                            color = Color(0xFF191B13),
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -233,7 +234,7 @@ fun DownloadsTab(
                                     0
                                 )
                             }
-                            .background(BackgroundBlack)
+                            .background(MaterialTheme.colorScheme.surface)
                             .pointerInput(song.id) {
                                 detectHorizontalDragGestures(
                                     onHorizontalDrag = { change, amount ->
@@ -342,7 +343,7 @@ private fun DownloadProgressRow(
                 Text(
                     text = progress.song.artist,
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1
                 )
 
@@ -353,7 +354,7 @@ private fun DownloadProgressRow(
                     Text(
                         text = statusText,
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Text(
@@ -363,20 +364,20 @@ private fun DownloadProgressRow(
                             progress.downloadedBytes
                         ),
                         style = MaterialTheme.typography.labelSmall,
-                        color = AccentGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 if (fraction == null) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
-                        color = AccentGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 } else {
                     LinearProgressIndicator(
                         progress = { fraction },
                         modifier = Modifier.fillMaxWidth(),
-                        color = AccentGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 

@@ -19,13 +19,6 @@ import com.yourapp.music.core.theme.SurfaceDark
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 
-/**
- * Bottom sheet opened from a playlist's kebab (⋮) menu — shows the
- * playlist's cover art + name up top, then Rename and Delete actions.
- * Each action just closes this sheet and hands off to the caller; the
- * actual rename/delete confirmation UI lives in PlaylistScreen so this
- * sheet stays a simple menu.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistOptionsSheet(
@@ -39,7 +32,7 @@ fun PlaylistOptionsSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = SurfaceDark
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
@@ -58,13 +51,13 @@ fun PlaylistOptionsSheet(
                     Text(
                         "${playlist.songCount} Songs",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-            HorizontalDivider(color = TextSecondary.copy(alpha = 0.2f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
             Spacer(Modifier.height(8.dp))
 
             Row(
@@ -74,7 +67,7 @@ fun PlaylistOptionsSheet(
                     .padding(vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = null, tint = TextSecondary)
+                Icon(Icons.Filled.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.width(16.dp))
                 Text("Rename", style = MaterialTheme.typography.bodyLarge)
             }

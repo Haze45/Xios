@@ -35,7 +35,7 @@ fun LibraryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp)
     ) {
         Spacer(Modifier.height(16.dp))

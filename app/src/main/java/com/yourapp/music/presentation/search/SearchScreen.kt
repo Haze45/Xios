@@ -47,7 +47,7 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
@@ -104,7 +104,7 @@ fun SearchScreen(
                     else -> "SUGGESTED SONGS"
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(
                     start = 4.dp,
                     bottom = 8.dp
@@ -125,7 +125,7 @@ fun SearchScreen(
                 state.searchResults.isEmpty() -> {
                     Text(
                         text = "No matching songs found. Try another title, artist or album.",
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(12.dp)
                     )
@@ -196,7 +196,7 @@ fun SearchScreen(
                     ) {
                         Text(
                             "Clear All",
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -218,7 +218,7 @@ fun SearchScreen(
                         Icon(
                             Icons.Filled.History,
                             contentDescription = null,
-                            tint = TextSecondary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(Modifier.width(12.dp))

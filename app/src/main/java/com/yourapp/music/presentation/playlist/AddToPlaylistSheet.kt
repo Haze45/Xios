@@ -41,7 +41,7 @@ fun AddToPlaylistSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = SurfaceDark
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -52,7 +52,7 @@ fun AddToPlaylistSheet(
                 Icon(
                     Icons.Filled.PlaylistAdd,
                     contentDescription = null,
-                    tint = TextSecondary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -84,7 +84,10 @@ fun AddToPlaylistSheet(
                             songId
                         )
                     }) {
-                        Text("Create", color = AccentGreen)
+                        Text(
+                            "Create",
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             } else {
@@ -103,13 +106,13 @@ fun AddToPlaylistSheet(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(SurfaceElevated),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Filled.Add,
                             contentDescription = "New playlist",
-                            tint = AccentGreen
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     Spacer(Modifier.width(12.dp))
@@ -141,7 +144,7 @@ fun AddToPlaylistSheet(
                 ) {
                     Text(
                         "You don't have any playlists yet — create one above.",
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -195,14 +198,14 @@ fun AddToPlaylistSheet(
                                 Text(
                                     "${playlist.songCount} Songs",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             if (alreadyAdded) {
                                 Icon(
                                     Icons.Filled.Check,
                                     contentDescription = "Added",
-                                    tint = AccentGreen
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }

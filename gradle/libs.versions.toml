@@ -26,6 +26,7 @@ media3 = "1.4.0"
 ktor = "2.3.12"
 supabaseBom = "2.5.4"
 serialization = "1.7.3"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -91,6 +92,8 @@ media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "medi
 
 # Kotlin Serialization
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

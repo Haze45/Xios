@@ -18,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.MiniPlayer
@@ -40,7 +38,7 @@ fun FavoritesScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
@@ -70,7 +68,7 @@ fun FavoritesScreen(
                     Text(
                         "No liked songs yet — tap the heart on any song to save it here.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -114,7 +112,7 @@ fun FavoritesScreen(
                                 Icon(
                                     imageVector = Icons.Filled.Favorite,
                                     contentDescription = "Unlike ${song.title}",
-                                    tint = AccentGreen
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }

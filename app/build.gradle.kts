@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
+
 }
 
 val localProperties = Properties().apply {
@@ -145,4 +146,5 @@ dependencies {
     implementation(libs.ktor.client.android)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.appcompat)
 }

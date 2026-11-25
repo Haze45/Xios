@@ -45,7 +45,7 @@ fun AlbumDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
@@ -77,7 +77,7 @@ fun AlbumDetailScreen(
             ) {
                 Text(
                     state.errorMessage ?: "Album not found",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -103,7 +103,7 @@ fun AlbumDetailScreen(
                     Text(
                         "${album.artistName} • ${album.songCount} Songs",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -114,8 +114,8 @@ fun AlbumDetailScreen(
                 onClick = { onPlayAll(state.songs) },
                 enabled = state.songs.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentGreen,
-                    contentColor = BackgroundBlack
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {

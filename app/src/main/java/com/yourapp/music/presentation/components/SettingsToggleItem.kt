@@ -31,13 +31,13 @@ fun SettingsToggleItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(label, style = MaterialTheme.typography.bodyLarge)
             subtitle?.let {
-                Text(it, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(checkedTrackColor = AccentGreen)
+            colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary)
         )
     }
 }

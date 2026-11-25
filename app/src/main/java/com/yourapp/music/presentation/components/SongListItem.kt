@@ -63,7 +63,7 @@ fun SongListItem(
                 text = song.title,
                 style = MaterialTheme.typography.titleMedium,
                 color = if (isCurrentSong) {
-                    AccentGreen
+                    MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.typography.titleMedium.color
                 },
@@ -73,7 +73,7 @@ fun SongListItem(
             Text(
                 text = "By ${song.artist}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
         }
@@ -158,6 +158,6 @@ private fun PlayingBar(height: Float) {
             .width(4.dp)
             .height(height.dp)
             .clip(RoundedCornerShape(2.dp))
-            .background(AccentGreen)
+            .background(MaterialTheme.colorScheme.primary)
     )
 }

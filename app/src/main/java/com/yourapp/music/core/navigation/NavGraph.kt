@@ -18,8 +18,6 @@ import com.yourapp.music.presentation.player.PlayerScreen
 import com.yourapp.music.presentation.player.PlayerViewModel
 import com.yourapp.music.presentation.playlist.PlaylistDetailScreen
 import com.yourapp.music.presentation.search.SearchScreen
-import com.yourapp.music.presentation.settings.SettingsScreen
-
 @OptIn(UnstableApi::class)
 @Composable
 fun NavGraph(navController: NavHostController = rememberNavController()) {

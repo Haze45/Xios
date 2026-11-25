@@ -28,9 +28,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.CardDark
-import com.yourapp.music.core.theme.SurfaceDark
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 
 @UnstableApi
@@ -48,7 +45,7 @@ fun QueueBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = SurfaceDark
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -64,7 +61,7 @@ fun QueueBottomSheet(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.QueueMusic,
                     contentDescription = null,
-                    tint = TextSecondary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(Modifier.width(8.dp))
@@ -86,7 +83,7 @@ fun QueueBottomSheet(
                 ) {
                     Text(
                         text = "Queue is empty",
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -138,7 +135,7 @@ private fun QueueRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(
-                if (isCurrent) CardDark else Color.Transparent
+                if (isCurrent) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent
             )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -162,7 +159,7 @@ private fun QueueRow(
                 text = song.title,
                 style = MaterialTheme.typography.bodyLarge,
                 color = if (isCurrent) {
-                    AccentGreen
+                    MaterialTheme.colorScheme.primary
                 } else {
                     Color.Unspecified
                 },
@@ -172,7 +169,7 @@ private fun QueueRow(
             Text(
                 text = song.artist,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
         }
@@ -256,6 +253,6 @@ private fun PlayingBar(
             .width(4.dp)
             .height(height.dp)
             .clip(RoundedCornerShape(2.dp))
-            .background(AccentGreen)
+            .background(MaterialTheme.colorScheme.primary)
     )
 }

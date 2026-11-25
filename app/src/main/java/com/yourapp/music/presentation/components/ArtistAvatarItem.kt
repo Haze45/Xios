@@ -46,7 +46,7 @@ fun ArtistAvatarItem(
         Surface(
             onClick = onFollowToggle,
             shape = RoundedCornerShape(50),
-            color = if (artist.isFollowing) SurfaceElevated else AccentGreen,
+            color = if (artist.isFollowing) SurfaceElevated else MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
         ) {

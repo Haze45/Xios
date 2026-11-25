@@ -77,7 +77,7 @@ fun LoginScreen(
         Button(
             onClick = viewModel::login,
             enabled = !state.isLoading,
-            colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = BackgroundBlack),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
             modifier = Modifier.fillMaxWidth().height(52.dp)
         ) {
             if (state.isLoading) {
@@ -96,7 +96,7 @@ fun LoginScreen(
         ) {
             Text("Don't have an account?", color = TextSecondary)
             TextButton(onClick = onNavigateToRegister) {
-                Text("Sign Up", color = AccentGreen)
+                Text("Sign Up", color = MaterialTheme.colorScheme.primary)
             }
         }
     }

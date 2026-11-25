@@ -77,7 +77,7 @@ fun PlaylistRowItem(
             Text(
                 "By ${playlist.ownerName} • ${playlist.songCount} Songs",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         // Only rendered where the caller actually wants a menu available
@@ -129,7 +129,7 @@ fun FeaturedPlaylistCard(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = if (isPlaying) {
-                    com.yourapp.music.core.theme.AccentGreen
+                    MaterialTheme.colorScheme.primary
                 } else {
                     com.yourapp.music.core.theme.TextPrimary
                 },
@@ -141,7 +141,7 @@ fun FeaturedPlaylistCard(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = com.yourapp.music.core.theme.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2
             )
         }

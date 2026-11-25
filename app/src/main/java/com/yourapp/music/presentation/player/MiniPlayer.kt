@@ -1,5 +1,6 @@
 package com.yourapp.music.presentation.player
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,15 +24,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.CardDark
 
-/**
- * Docked mini-player shown above the bottom nav / at the bottom of Library.
- * Tapping the row (outside the controls) should navigate to the full PlayerScreen.
- */
+@OptIn(UnstableApi::class)
 @Composable
 fun MiniPlayer(
     onExpandClick: () -> Unit,
@@ -39,13 +36,13 @@ fun MiniPlayer(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val song = state.currentSong ?: return // nothing playing yet, don't show the bar
+    val song = state.currentSong ?: return
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(CardDark)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onExpandClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -58,26 +55,59 @@ fun MiniPlayer(
                 .size(44.dp)
                 .clip(RoundedCornerShape(10.dp))
         )
+
         Spacer(Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
-            Text("By ${song.artist}", style = MaterialTheme.typography.bodyMedium, maxLines = 1)
-        }
-        IconButton(onClick = viewModel::toggleShuffle) {
-            Icon(Icons.Filled.Shuffle, contentDescription = "Shuffle")
-        }
-        IconButton(
-            onClick = viewModel::togglePlayPause,
-            modifier = Modifier.size(40.dp).clip(CircleShape).background(AccentGreen)
+
+        Column(
+            modifier = Modifier.weight(1f)
         ) {
-            Icon(
-                if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                contentDescription = "Play/Pause",
-                tint = BackgroundBlack
+            Text(
+                text = song.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1
+            )
+
+            Text(
+                text = "By ${song.artist}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
             )
         }
+
+        IconButton(onClick = viewModel::toggleShuffle) {
+            Icon(
+                Icons.Filled.Shuffle,
+                contentDescription = "Shuffle",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        IconButton(
+            onClick = viewModel::togglePlayPause,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        ) {
+            Icon(
+                imageVector = if (state.isPlaying) {
+                    Icons.Filled.Pause
+                } else {
+                    Icons.Filled.PlayArrow
+                },
+                contentDescription = "Play/Pause",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+
         IconButton(onClick = viewModel::skipToNext) {
-            Icon(Icons.Filled.SkipNext, contentDescription = "Next")
+            Icon(
+                Icons.Filled.SkipNext,
+                contentDescription = "Next",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

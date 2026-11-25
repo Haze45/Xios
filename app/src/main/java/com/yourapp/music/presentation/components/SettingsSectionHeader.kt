@@ -13,7 +13,7 @@ fun SettingsSectionHeader(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleMedium,
-        color = TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.padding(top = 20.dp, bottom = 8.dp)
     )
 }

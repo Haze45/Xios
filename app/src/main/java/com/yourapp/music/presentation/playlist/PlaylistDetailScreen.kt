@@ -1,4 +1,3 @@
-
 package com.yourapp.music.presentation.playlist
 
 import androidx.annotation.OptIn
@@ -76,7 +75,7 @@ fun PlaylistDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
@@ -90,7 +89,10 @@ fun PlaylistDetailScreen(
                         contentDescription = "Back"
                     )
                 }
-                Text("Playlist", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Playlist",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             if (state.isLoading) {
@@ -105,8 +107,9 @@ fun PlaylistDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        state.errorMessage ?: "Playlist not found",
-                        color = TextSecondary
+                        state.errorMessage
+                            ?: "Playlist not found",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -133,14 +136,14 @@ fun PlaylistDetailScreen(
                         Text(
                             "By ${playlist.ownerName} • ${playlist.songCount} Songs",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         playlist.description?.let {
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 it,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -152,12 +155,15 @@ fun PlaylistDetailScreen(
                     onClick = { onPlayAll(state.songs) },
                     enabled = state.songs.isNotEmpty(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
+                        containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = BackgroundBlack
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = null
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text("Play All")
                 }
@@ -173,19 +179,30 @@ fun PlaylistDetailScreen(
                     ) {
                         Text(
                             "No songs in this playlist yet.",
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 } else {
                     LazyColumn {
-                        items(state.songs, key = { it.id }) { song ->
+                        items(
+                            state.songs,
+                            key = { it.id }) { song ->
                             SwipeToRemoveSong(
                                 song = song,
                                 isCurrentSong = playerState.currentSong?.id == song.id,
                                 isActivelyPlaying = playerState.currentSong?.id == song.id &&
                                         playerState.isPlaying,
-                                onClick = { onSongClick(song, state.songs) },
-                                onRemove = { viewModel.removeSong(song.id) }
+                                onClick = {
+                                    onSongClick(
+                                        song,
+                                        state.songs
+                                    )
+                                },
+                                onRemove = {
+                                    viewModel.removeSong(
+                                        song.id
+                                    )
+                                }
                             )
                         }
                     }
@@ -208,7 +225,11 @@ private fun SwipeToRemoveSong(
     onClick: () -> Unit,
     onRemove: () -> Unit
 ) {
-    var dragOffset by remember(song.id) { mutableFloatStateOf(0f) }
+    var dragOffset by remember(song.id) {
+        mutableFloatStateOf(
+            0f
+        )
+    }
     val density = LocalDensity.current
     val revealWidth = with(density) { 112.dp.toPx() }
 
@@ -217,7 +238,7 @@ private fun SwipeToRemoveSong(
             .fillMaxWidth()
             .padding(vertical = 2.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(AccentGreen)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Row(
             modifier = Modifier
@@ -231,7 +252,7 @@ private fun SwipeToRemoveSong(
             Icon(
                 Icons.Filled.Delete,
                 contentDescription = "Remove song",
-                tint = BackgroundBlack
+                tint = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(Modifier.width(6.dp))
             Text(
@@ -244,14 +265,23 @@ private fun SwipeToRemoveSong(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .offset { IntOffset(dragOffset.roundToInt(), 0) }
-                .background(BackgroundBlack)
+                .offset {
+                    IntOffset(
+                        dragOffset.roundToInt(),
+                        0
+                    )
+                }
+                .background(MaterialTheme.colorScheme.background)
                 .pointerInput(song.id) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { change, amount ->
                             change.consume()
-                            dragOffset = (dragOffset + amount)
-                                .coerceIn(0f, revealWidth)
+                            dragOffset =
+                                (dragOffset + amount)
+                                    .coerceIn(
+                                        0f,
+                                        revealWidth
+                                    )
                         },
                         onDragEnd = {
                             if (dragOffset >= revealWidth * 0.65f) {

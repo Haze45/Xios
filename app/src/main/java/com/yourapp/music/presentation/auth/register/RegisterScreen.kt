@@ -38,9 +38,16 @@ fun RegisterScreen(
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Create Account", style = MaterialTheme.typography.headlineLarge)
+        Text(
+            "Create Account",
+            style = MaterialTheme.typography.headlineLarge
+        )
         Spacer(Modifier.height(8.dp))
-        Text("Join and start listening", style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+        Text(
+            "Join and start listening",
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextSecondary
+        )
         Spacer(Modifier.height(32.dp))
 
         OutlinedTextField(
@@ -85,7 +92,11 @@ fun RegisterScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(Modifier.height(24.dp))
@@ -93,11 +104,20 @@ fun RegisterScreen(
         Button(
             onClick = viewModel::register,
             enabled = !state.isLoading,
-            colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = BackgroundBlack),
-            modifier = Modifier.fillMaxWidth().height(52.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = BackgroundBlack)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(
+                        20.dp
+                    ), color = BackgroundBlack
+                )
             } else {
                 Text("Sign Up")
             }
@@ -110,9 +130,12 @@ fun RegisterScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Already have an account?", color = TextSecondary)
+            Text(
+                "Already have an account?",
+                color = TextSecondary
+            )
             TextButton(onClick = onNavigateToLogin) {
-                Text("Log In", color = AccentGreen)
+                Text("Log In", color = MaterialTheme.colorScheme.primary)
             }
         }
     }

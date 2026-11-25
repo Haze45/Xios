@@ -1,8 +1,10 @@
 package com.yourapp.music.core.navigation
 
 import androidx.annotation.OptIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,8 +45,14 @@ fun MainShell(
     val playerState by playerViewModel.uiState.collectAsState()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
-            Column {
+            Column(
+                modifier = Modifier.background(
+                    MaterialTheme.colorScheme.surface
+                )
+            ) {
                 MiniPlayer(
                     onExpandClick = onNavigateToPlayer,
                     modifier = Modifier.padding(

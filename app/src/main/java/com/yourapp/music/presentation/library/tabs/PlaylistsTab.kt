@@ -3,6 +3,7 @@ package com.yourapp.music.presentation.library.tabs
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,7 +37,11 @@ fun PlaylistsTab(
             PlaylistRowItem(
                 playlist = playlist,
                 onClick = { onPlaylistClick(playlist) },
-                onMenuClick = { playlistViewModel.onShowOptions(playlist) }
+                onMenuClick = {
+                    playlistViewModel.onShowOptions(
+                        playlist
+                    )
+                }
             )
         }
     }
@@ -63,10 +68,19 @@ fun PlaylistsTab(
                 )
             },
             confirmButton = {
-                TextButton(onClick = playlistViewModel::confirmRename) { Text("Save", color = AccentGreen) }
+                TextButton(onClick = playlistViewModel::confirmRename) {
+                    Text(
+                        "Save",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = playlistViewModel::onCancelRename) { Text("Cancel") }
+                TextButton(onClick = playlistViewModel::onCancelRename) {
+                    Text(
+                        "Cancel"
+                    )
+                }
             }
         )
     }
@@ -82,7 +96,11 @@ fun PlaylistsTab(
                 }
             },
             dismissButton = {
-                TextButton(onClick = playlistViewModel::onCancelDelete) { Text("Cancel") }
+                TextButton(onClick = playlistViewModel::onCancelDelete) {
+                    Text(
+                        "Cancel"
+                    )
+                }
             }
         )
     }

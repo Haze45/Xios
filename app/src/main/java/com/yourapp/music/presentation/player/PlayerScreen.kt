@@ -126,7 +126,7 @@ fun PlayerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(horizontal = 24.dp)
     ) {
@@ -161,9 +161,9 @@ fun PlayerScreen(
                     },
                     contentDescription = "Favorite",
                     tint = if (state.isFavorite) {
-                        AccentGreen
+                        MaterialTheme.colorScheme.primary
                     } else {
-                        TextSecondary
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 )
             }
@@ -208,7 +208,7 @@ fun PlayerScreen(
                 Text(
                     song?.artist.orEmpty(),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
@@ -239,8 +239,8 @@ fun PlayerScreen(
                                 progress = { progress },
                                 modifier = Modifier.size(26.dp),
                                 strokeWidth = 3.dp,
-                                color = AccentGreen,
-                                trackColor = TextSecondary.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                                     alpha = 0.25f
                                 )
                             )
@@ -248,8 +248,8 @@ fun PlayerScreen(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(26.dp),
                                 strokeWidth = 3.dp,
-                                color = AccentGreen,
-                                trackColor = TextSecondary.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                                     alpha = 0.25f
                                 )
                             )
@@ -260,7 +260,7 @@ fun PlayerScreen(
                         Icon(
                             Icons.Filled.DownloadDone,
                             contentDescription = "Downloaded",
-                            tint = AccentGreen
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -268,7 +268,7 @@ fun PlayerScreen(
                         Icon(
                             Icons.Filled.Download,
                             contentDescription = "Download",
-                            tint = TextSecondary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -284,7 +284,7 @@ fun PlayerScreen(
                 Icon(
                     Icons.AutoMirrored.Filled.PlaylistAdd,
                     contentDescription = "Add to Playlist",
-                    tint = TextSecondary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -325,8 +325,8 @@ fun PlayerScreen(
                     sliderState = sliderState,
                     modifier = Modifier.height(4.dp),
                     colors = SliderDefaults.colors(
-                        activeTrackColor = AccentGreen,
-                        inactiveTrackColor = SurfaceElevated
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 )
             },
@@ -337,7 +337,7 @@ fun PlayerScreen(
                         MutableInteractionSource()
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = AccentGreen
+                        thumbColor = MaterialTheme.colorScheme.primary
                     ),
                     thumbSize = DpSize(14.dp, 14.dp)
                 )
@@ -390,9 +390,9 @@ fun PlayerScreen(
                     Icons.Filled.Shuffle,
                     contentDescription = "Shuffle",
                     tint = if (state.isShuffleEnabled) {
-                        AccentGreen
+                        MaterialTheme.colorScheme.primary
                     } else {
-                        TextSecondary
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 )
             }
@@ -410,7 +410,7 @@ fun PlayerScreen(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(AccentGreen)
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
                     if (state.isPlaying) {
@@ -419,7 +419,7 @@ fun PlayerScreen(
                         Icons.Filled.PlayArrow
                     },
                     contentDescription = "Play/Pause",
-                    tint = BackgroundBlack,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }

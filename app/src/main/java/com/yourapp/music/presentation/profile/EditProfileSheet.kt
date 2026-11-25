@@ -112,7 +112,7 @@ fun EditProfileSheet(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(AccentGreen)
+                        .background(MaterialTheme.colorScheme.primary)
                         .border(3.dp, SurfaceDark, CircleShape)
                         .clickable {
                             photoPickerLauncher.launch(
@@ -168,7 +168,7 @@ fun EditProfileSheet(
                         )
                     },
                     enabled = !state.isSaving,
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = BackgroundBlack),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                     modifier = Modifier.weight(1f)
                 ) {
                     if (state.isSaving) {

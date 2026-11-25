@@ -32,7 +32,7 @@ fun PlaylistScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
             Spacer(Modifier.height(16.dp))
@@ -61,7 +61,7 @@ fun PlaylistScreen(
                     Text(
                         "No playlists yet — tap + to create your first one.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -101,8 +101,8 @@ fun PlaylistScreen(
 
         FloatingActionButton(
             onClick = { viewModel.onShowCreateDialog(true) },
-            containerColor = AccentGreen,
-            contentColor = BackgroundBlack,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -134,7 +134,7 @@ fun PlaylistScreen(
                 TextButton(onClick = viewModel::createPlaylist) {
                     Text(
                         "Create",
-                        color = AccentGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             },
@@ -174,7 +174,7 @@ fun PlaylistScreen(
                 TextButton(onClick = viewModel::confirmRename) {
                     Text(
                         "Save",
-                        color = AccentGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             },

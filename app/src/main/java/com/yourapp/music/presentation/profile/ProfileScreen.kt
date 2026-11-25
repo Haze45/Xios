@@ -46,7 +46,7 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlack)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp)
     ) {
         Row(
@@ -94,10 +94,10 @@ fun ProfileScreen(
                     modifier = Modifier
                         .size(28.dp)
                         .clip(CircleShape)
-                        .background(AccentGreen)
+                        .background(MaterialTheme.colorScheme.primary)
                         .border(
                             2.dp,
-                            BackgroundBlack,
+                            MaterialTheme.colorScheme.background,
                             CircleShape
                         )
                         .clickable { showEditSheet = true },
@@ -106,7 +106,7 @@ fun ProfileScreen(
                     Icon(
                         Icons.Filled.Add,
                         contentDescription = "Edit profile",
-                        tint = BackgroundBlack,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -156,7 +156,7 @@ fun ProfileScreen(
                 style = MaterialTheme.typography.titleLarge
             )
             TextButton(onClick = { /* navigate to full playlists list */ }) {
-                Text("See All", color = TextSecondary)
+                Text("See All", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -229,12 +229,12 @@ private fun StatItem(value: String, label: String) {
         Text(
             value,
             style = MaterialTheme.typography.titleLarge,
-            color = AccentGreen
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             label,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
