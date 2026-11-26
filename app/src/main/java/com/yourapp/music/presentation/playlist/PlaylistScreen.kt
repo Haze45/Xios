@@ -14,10 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.ErrorRed
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.PlaylistRowItem
 import com.yourapp.music.presentation.components.ShimmerPlaylistList
@@ -33,13 +30,20 @@ fun PlaylistScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+
     ) {
-        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+        ) {
             Spacer(Modifier.height(16.dp))
+
             Text(
                 "Playlists",
                 style = MaterialTheme.typography.headlineMedium
             )
+
             Spacer(Modifier.height(16.dp))
 
             when {
@@ -52,40 +56,41 @@ fun PlaylistScreen(
                     )
                 }
 
-                state.playlists.isEmpty() -> Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "No playlists yet — tap + to create your first one.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                state.playlists.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No playlists yet — tap + to create your first one.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
-                else -> LazyColumn(
-                    modifier = Modifier.padding(
-                        bottom = 80.dp
-                    )
-                ) {
-                    items(
-                        state.playlists,
-                        key = { it.id }) { playlist ->
-                        PlaylistRowItem(
-                            playlist = playlist,
-                            onClick = {
-                                onPlaylistClick(
-                                    playlist
-                                )
-                            },
-                            onMenuClick = {
-                                viewModel.onShowOptions(
-                                    playlist
-                                )
-                            }
-                        )
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.padding(bottom = 80.dp)
+                    ) {
+                        items(
+                            state.playlists,
+                            key = { it.id }
+                        ) { playlist ->
+                            PlaylistRowItem(
+                                playlist = playlist,
+                                onClick = {
+                                    onPlaylistClick(playlist)
+                                },
+                                onMenuClick = {
+                                    viewModel.onShowOptions(
+                                        playlist
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -100,12 +105,17 @@ fun PlaylistScreen(
         }
 
         FloatingActionButton(
-            onClick = { viewModel.onShowCreateDialog(true) },
+            onClick = {
+                viewModel.onShowCreateDialog(true)
+            },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp)
+                .padding(
+                    end = 20.dp,
+                    bottom = 200.dp
+                )
         ) {
             Icon(
                 Icons.Filled.Add,
@@ -117,16 +127,18 @@ fun PlaylistScreen(
     if (state.showCreateDialog) {
         AlertDialog(
             onDismissRequest = {
-                viewModel.onShowCreateDialog(
-                    false
-                )
+                viewModel.onShowCreateDialog(false)
             },
-            title = { Text("New Playlist") },
+            title = {
+                Text("New Playlist")
+            },
             text = {
                 OutlinedTextField(
                     value = state.newPlaylistTitle,
                     onValueChange = viewModel::onNewPlaylistTitleChange,
-                    placeholder = { Text("Playlist name") },
+                    placeholder = {
+                        Text("Playlist name")
+                    },
                     singleLine = true
                 )
             },
@@ -139,16 +151,17 @@ fun PlaylistScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    viewModel.onShowCreateDialog(
-                        false
-                    )
-                }) { Text("Cancel") }
+                TextButton(
+                    onClick = {
+                        viewModel.onShowCreateDialog(false)
+                    }
+                ) {
+                    Text("Cancel")
+                }
             }
         )
     }
 
-    // Kebab menu — cover art + name, then Rename / Delete.
     state.playlistForOptions?.let { playlist ->
         PlaylistOptionsSheet(
             playlist = playlist,
@@ -161,12 +174,16 @@ fun PlaylistScreen(
     state.playlistBeingRenamed?.let {
         AlertDialog(
             onDismissRequest = viewModel::onCancelRename,
-            title = { Text("Rename Playlist") },
+            title = {
+                Text("Rename Playlist")
+            },
             text = {
                 OutlinedTextField(
                     value = state.renameTitle,
                     onValueChange = viewModel::onRenameTitleChange,
-                    placeholder = { Text("Playlist name") },
+                    placeholder = {
+                        Text("Playlist name")
+                    },
                     singleLine = true
                 )
             },
@@ -180,9 +197,7 @@ fun PlaylistScreen(
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onCancelRename) {
-                    Text(
-                        "Cancel"
-                    )
+                    Text("Cancel")
                 }
             }
         )
@@ -191,8 +206,12 @@ fun PlaylistScreen(
     state.playlistPendingDelete?.let { playlist ->
         AlertDialog(
             onDismissRequest = viewModel::onCancelDelete,
-            title = { Text("Delete Playlist") },
-            text = { Text("Delete \"${playlist.title}\"? This can't be undone.") },
+            title = {
+                Text("Delete Playlist")
+            },
+            text = {
+                Text("Delete \"${playlist.title}\"? This can't be undone.")
+            },
             confirmButton = {
                 TextButton(onClick = viewModel::confirmDelete) {
                     Text("Delete", color = ErrorRed)
@@ -200,9 +219,7 @@ fun PlaylistScreen(
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onCancelDelete) {
-                    Text(
-                        "Cancel"
-                    )
+                    Text("Cancel")
                 }
             }
         )

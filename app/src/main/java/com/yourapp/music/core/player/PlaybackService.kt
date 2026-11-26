@@ -1,11 +1,14 @@
 package com.yourapp.music.core.player
 
+import android.app.PendingIntent
+import android.content.Intent
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.yourapp.music.MainActivity
 import com.yourapp.music.domain.repository.SongRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -66,9 +69,7 @@ class PlaybackService : MediaSessionService() {
                 }
             }
 
-            override fun onIsPlayingChanged(
-                isPlaying: Boolean
-            ) {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
                 listeningHistoryTracker.onPlaybackChanged(
                     isPlaying = isPlaying,
                     positionMs = exoPlayer.currentPosition,
@@ -96,10 +97,35 @@ class PlaybackService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
 
+        val playerActivityIntent = Intent(
+            this,
+            MainActivity::class.java
+        ).apply {
+            putExtra(
+                MainActivity.EXTRA_OPEN_PLAYER,
+                true
+            )
+
+            flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        val sessionActivityPendingIntent =
+            PendingIntent.getActivity(
+                this,
+                1001,
+                playerActivityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or
+                        PendingIntent.FLAG_IMMUTABLE
+            )
+
         mediaSession = MediaSession.Builder(
             this,
             exoPlayer
-        ).build()
+        )
+            .setSessionActivity(sessionActivityPendingIntent)
+            .build()
 
         exoPlayer.addListener(historyPlayerListener)
     }

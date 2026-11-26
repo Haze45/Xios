@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -41,7 +40,7 @@ fun MiniPlayer(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onExpandClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -53,7 +52,7 @@ fun MiniPlayer(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(44.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(8.dp))
         )
 
         Spacer(Modifier.width(10.dp))
@@ -78,7 +77,7 @@ fun MiniPlayer(
 
         IconButton(onClick = viewModel::toggleShuffle) {
             Icon(
-                Icons.Filled.Shuffle,
+                imageVector = Icons.Filled.Shuffle,
                 contentDescription = "Shuffle",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -104,7 +103,7 @@ fun MiniPlayer(
 
         IconButton(onClick = viewModel::skipToNext) {
             Icon(
-                Icons.Filled.SkipNext,
+                imageVector = Icons.Filled.SkipNext,
                 contentDescription = "Next",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

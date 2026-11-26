@@ -27,6 +27,7 @@ ktor = "2.3.12"
 supabaseBom = "2.5.4"
 serialization = "1.7.3"
 appcompat = "1.7.0"
+splashScreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -94,6 +95,7 @@ media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "medi
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashScreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -21,8 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.layout.statusBarsPadding
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
@@ -51,6 +51,8 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
+            // Keep content scrollable above the floating bottom controls.
+            .padding(bottom = 160.dp)
     ) {
         Spacer(Modifier.height(16.dp))
 
@@ -234,17 +236,6 @@ fun HomeScreen(
         }
 
         // Albums
-//        if (state.isLoading) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(80.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                CircularProgressIndicator()
-//            }
-//        }
-
         Text(
             "Albums",
             style = MaterialTheme.typography.titleLarge
@@ -298,14 +289,11 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         state.errorMessage?.let { message ->
-            Spacer(Modifier.height(8.dp))
             Text(
                 message,
                 color = MaterialTheme.colorScheme.error
             )
         }
-
-        Spacer(Modifier.height(24.dp))
     }
 }
 

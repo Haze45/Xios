@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,12 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.ShimmerDetailScreen
 import com.yourapp.music.presentation.components.SongListItem
+import com.yourapp.music.presentation.player.MiniPlayer
 import com.yourapp.music.presentation.player.PlayerViewModel
 
 @OptIn(UnstableApi::class)
@@ -35,6 +33,7 @@ fun AlbumDetailScreen(
     onBackClick: () -> Unit,
     onSongClick: (Song, List<Song>) -> Unit,
     onPlayAll: (List<Song>) -> Unit,
+    onExpandPlayer: () -> Unit,
     viewModel: AlbumDetailViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
@@ -49,113 +48,120 @@ fun AlbumDetailScreen(
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    Icons.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
-            Text(
-                "Album",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        if (state.isLoading) {
-            ShimmerDetailScreen(
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        } else if (album == null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    state.errorMessage ?: "Album not found",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        } else {
-            Spacer(Modifier.height(12.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = album.coverUrl,
-                    contentDescription = album.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                )
-                Spacer(Modifier.width(16.dp))
-                Column {
-                    Text(
-                        album.title,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "${album.artistName} • ${album.songCount} Songs",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            Button(
-                onClick = { onPlayAll(state.songs) },
-                enabled = state.songs.isNotEmpty(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    Icons.Filled.PlayArrow,
-                    contentDescription = null
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Play All")
-            }
-
+        Column(modifier = Modifier.weight(1f)) {
             Spacer(Modifier.height(16.dp))
 
-            LazyColumn {
-                items(
-                    state.songs,
-                    key = { it.id }) { song ->
-                    SongListItem(
-                        song = song,
-                        onClick = {
-                            onSongClick(
-                                song,
-                                state.songs
-                            )
-                        },
-                        onPlayClick = {
-                            if (playerState.currentSong?.id == song.id) {
-                                playerViewModel.togglePlayPause()
-                            } else {
-                                playerViewModel.playSong(
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+                Text(
+                    "Album",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            if (state.isLoading) {
+                ShimmerDetailScreen(
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            } else if (album == null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        state.errorMessage
+                            ?: "Album not found",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(12.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = album.coverUrl,
+                        contentDescription = album.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+
+                    Spacer(Modifier.width(16.dp))
+
+                    Column {
+                        Text(
+                            album.title,
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "${album.artistName} • ${album.songCount} Songs",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                Button(
+                    onClick = { onPlayAll(state.songs) },
+                    enabled = state.songs.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Play All")
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 12.dp)
+                ) {
+                    items(
+                        state.songs,
+                        key = { it.id }) { song ->
+                        SongListItem(
+                            song = song,
+                            onClick = {
+                                onSongClick(
                                     song,
                                     state.songs
                                 )
-                            }
-                        },
-                        isCurrentSong = playerState.currentSong?.id == song.id,
-                        isActivelyPlaying = playerState.currentSong?.id == song.id && playerState.isPlaying
-                    )
+                            },
+                            onPlayClick = {},
+                            isCurrentSong = playerState.currentSong?.id == song.id,
+                            isActivelyPlaying =
+                                playerState.currentSong?.id == song.id &&
+                                        playerState.isPlaying,
+                            showPlayButton = false
+                        )
+                    }
                 }
             }
         }
+
+        MiniPlayer(
+            onExpandClick = onExpandPlayer,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
     }
 }

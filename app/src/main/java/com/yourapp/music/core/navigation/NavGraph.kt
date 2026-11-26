@@ -2,6 +2,7 @@ package com.yourapp.music.core.navigation
 
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
@@ -18,15 +19,30 @@ import com.yourapp.music.presentation.player.PlayerScreen
 import com.yourapp.music.presentation.player.PlayerViewModel
 import com.yourapp.music.presentation.playlist.PlaylistDetailScreen
 import com.yourapp.music.presentation.search.SearchScreen
+
 @OptIn(UnstableApi::class)
 @Composable
-fun NavGraph(navController: NavHostController = rememberNavController()) {
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    openPlayerFromNotification: Boolean = false,
+    onPlayerNavigationHandled: () -> Unit = {}
+) {
     val appStartViewModel: AppStartViewModel =
         hiltViewModel()
 
+    LaunchedEffect(openPlayerFromNotification) {
+        if (openPlayerFromNotification) {
+            navController.navigate(Screen.Player.route) {
+                launchSingleTop = true
+            }
+
+            onPlayerNavigationHandled()
+        }
+    }
+
     val onLogout: () -> Unit = {
         navController.navigate(Screen.Login.route) {
-            popUpTo(0) // clear the entire back stack, including "main"
+            popUpTo(0)
         }
     }
 
@@ -45,9 +61,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                     }
                 },
                 onNavigateToRegister = {
-                    navController.navigate(
-                        Screen.Register.route
-                    )
+                    navController.navigate(Screen.Register.route)
                 }
             )
         }
@@ -61,32 +75,26 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                         }
                     }
                 },
-                onNavigateToLogin = { navController.popBackStack() }
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable("main") {
             MainShell(
                 onNavigateToSearch = {
-                    navController.navigate(
-                        Screen.Search.route
-                    )
+                    navController.navigate(Screen.Search.route)
                 },
                 onNavigateToFavorites = {
-                    navController.navigate(
-                        Screen.Favorites.route
-                    )
+                    navController.navigate(Screen.Favorites.route)
                 },
                 onNavigateToPlayer = {
-                    navController.navigate(
-                        Screen.Player.route
-                    )
+                    navController.navigate(Screen.Player.route)
                 },
                 onNavigateToPlaylistDetail = { id ->
                     navController.navigate(
-                        Screen.PlaylistDetail.createRoute(
-                            id
-                        )
+                        Screen.PlaylistDetail.createRoute(id)
                     )
                 },
                 onNavigateToAlbumDetail = { albumId ->
@@ -102,15 +110,20 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(Screen.Player.route) {
             PlayerScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(Screen.Search.route) {
             val playerViewModel: PlayerViewModel =
                 hiltViewModel()
+
             SearchScreen(
-                onCancelClick = { navController.popBackStack() },
+                onCancelClick = {
+                    navController.popBackStack()
+                },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
                     navController.navigate(Screen.Player.route)
@@ -120,14 +133,19 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(
             route = Screen.PlaylistDetail.route,
-            arguments = listOf(navArgument("playlistId") {
-                type = NavType.StringType
-            })
+            arguments = listOf(
+                navArgument("playlistId") {
+                    type = NavType.StringType
+                }
+            )
         ) {
             val playerViewModel: PlayerViewModel =
                 hiltViewModel()
+
             PlaylistDetailScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
                 },
@@ -148,17 +166,21 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(
             route = Screen.AlbumDetail.route,
-            arguments = listOf(navArgument("albumId") {
-                type = NavType.StringType
-            })
+            arguments = listOf(
+                navArgument("albumId") {
+                    type = NavType.StringType
+                }
+            )
         ) {
             val playerViewModel: PlayerViewModel =
                 hiltViewModel()
+
             AlbumDetailScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
-                    navController.navigate(Screen.Player.route)
                 },
                 onPlayAll = { songs ->
                     if (songs.isNotEmpty()) {
@@ -168,6 +190,9 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                         )
                         navController.navigate(Screen.Player.route)
                     }
+                },
+                onExpandPlayer = {
+                    navController.navigate(Screen.Player.route)
                 }
             )
         }
@@ -175,8 +200,11 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.Favorites.route) {
             val playerViewModel: PlayerViewModel =
                 hiltViewModel()
+
             FavoritesScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onSongClick = { song, queue ->
                     playerViewModel.playSong(song, queue)
                 },
@@ -185,6 +213,5 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
                 }
             )
         }
-
     }
 }

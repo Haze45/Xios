@@ -6,16 +6,17 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 data class BottomNavItem(
@@ -25,7 +26,11 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Screen.Home, "Home", Icons.Filled.Home),
+    BottomNavItem(
+        Screen.Home,
+        "Home",
+        Icons.Filled.Home
+    ),
     BottomNavItem(
         Screen.Library,
         "Library",
@@ -59,10 +64,12 @@ fun MusicBottomNavBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        tonalElevation = 0.dp
     ) {
         bottomNavItems.forEach { item ->
+
             val selected = currentRoute == item.screen.route
 
             NavigationBarItem(
@@ -71,14 +78,16 @@ fun MusicBottomNavBar(
                     if (item.screen == Screen.Queue) {
                         onQueueClick()
                     } else {
-                        navController.navigate(item.screen.route) {
-                            popUpTo(
-                                navController.graph.findStartDestination().id
-                            ) {
-                                saveState = true
+                        val returnedToExistingDestination =
+                            navController.popBackStack(
+                                item.screen.route,
+                                inclusive = false
+                            )
+
+                        if (!returnedToExistingDestination) {
+                            navController.navigate(item.screen.route) {
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 },
@@ -100,8 +109,7 @@ fun MusicBottomNavBar(
                         MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor =
                         MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor =
-                        MaterialTheme.colorScheme.secondaryContainer
+                    indicatorColor = Color.Transparent
                 )
             )
         }

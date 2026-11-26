@@ -1,5 +1,6 @@
 package com.yourapp.music
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,8 +11,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.os.LocaleListCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -23,9 +28,26 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_OPEN_PLAYER =
+            "open_player_from_notification"
+    }
+
+    private var openPlayerFromNotification by mutableStateOf(
+        false
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        openPlayerFromNotification =
+            intent?.getBooleanExtra(
+                EXTRA_OPEN_PLAYER,
+                false
+            ) == true
+
+        enableEdgeToEdge()
 
         setContent {
             val appSettingsViewModel: AppSettingsViewModel =
@@ -34,19 +56,38 @@ class MainActivity : AppCompatActivity() {
             val settings by appSettingsViewModel.settings
                 .collectAsStateWithLifecycle()
 
+            var localeReady by remember {
+                mutableStateOf(false)
+            }
+
             LaunchedEffect(settings.language) {
-                val locales =
+                val desiredLocales =
                     if (settings.language == "system") {
-                        LocaleListCompat.getEmptyLocaleList()
+                        ""
                     } else {
-                        LocaleListCompat.forLanguageTags(
-                            settings.language
-                        )
+                        settings.language
                     }
 
-                AppCompatDelegate.setApplicationLocales(
-                    locales
-                )
+                val currentLocales =
+                    AppCompatDelegate.getApplicationLocales()
+                        .toLanguageTags()
+
+                if (currentLocales != desiredLocales) {
+                    val locales =
+                        if (settings.language == "system") {
+                            LocaleListCompat.getEmptyLocaleList()
+                        } else {
+                            LocaleListCompat.forLanguageTags(
+                                settings.language
+                            )
+                        }
+
+                    AppCompatDelegate.setApplicationLocales(
+                        locales
+                    )
+                } else {
+                    localeReady = true
+                }
             }
 
             MusicAppTheme(
@@ -57,14 +98,38 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
-                    val navController =
-                        rememberNavController()
+                    if (localeReady) {
+                        val navController =
+                            rememberNavController()
 
-                    NavGraph(
-                        navController = navController
-                    )
+                        NavGraph(
+                            navController = navController,
+                            openPlayerFromNotification =
+                                openPlayerFromNotification,
+                            onPlayerNavigationHandled = {
+                                openPlayerFromNotification =
+                                    false
+
+                                val updatedIntent =
+                                    Intent(intent)
+                                updatedIntent.removeExtra(
+                                    EXTRA_OPEN_PLAYER
+                                )
+                                intent = updatedIntent
+                            }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        setIntent(intent)
+
+        openPlayerFromNotification =
+            intent.getBooleanExtra(EXTRA_OPEN_PLAYER, false)
     }
 }
