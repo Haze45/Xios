@@ -22,12 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.ArtistAvatarItem
 import com.yourapp.music.presentation.components.PlaylistGridItem
@@ -57,17 +56,17 @@ fun ProfileScreen(
             IconButton(onClick = onBackClick) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
             Text(
-                "My Profile",
+                stringResource(R.string.my_profile),
                 style = MaterialTheme.typography.titleLarge
             )
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     Icons.Filled.Settings,
-                    contentDescription = "Settings"
+                    contentDescription = stringResource(R.string.settings_title)
                 )
             }
         }
@@ -105,7 +104,9 @@ fun ProfileScreen(
                 ) {
                     Icon(
                         Icons.Filled.Add,
-                        contentDescription = "Edit profile",
+                        contentDescription = stringResource(
+                            R.string.edit_profile
+                        ),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(16.dp)
                     )
@@ -130,17 +131,17 @@ fun ProfileScreen(
             ) {
                 StatItem(
                     value = state.favoriteArtists.size.toString(),
-                    label = "Following"
+                    label = stringResource(R.string.following)
                 )
 
                 StatItem(
                     value = formatCount(state.stats.followersCount),
-                    label = "Followers"
+                    label = stringResource(R.string.followers)
                 )
 
                 StatItem(
                     value = state.playlists.size.toString(),
-                    label = "Playlists"
+                    label = stringResource(R.string.playlists)
                 )
             }
         }
@@ -152,11 +153,14 @@ fun ProfileScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                "My Playlists",
+                stringResource(R.string.my_playlists),
                 style = MaterialTheme.typography.titleLarge
             )
             TextButton(onClick = { /* navigate to full playlists list */ }) {
-                Text("See All", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.see_all),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -178,7 +182,7 @@ fun ProfileScreen(
         Spacer(Modifier.height(28.dp))
 
         Text(
-            "My Favorite Artists",
+            stringResource(R.string.my_favorite_artists),
             style = MaterialTheme.typography.titleLarge
         )
         Spacer(Modifier.height(12.dp))

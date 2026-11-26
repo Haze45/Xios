@@ -12,9 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yourapp.music.core.theme.BackgroundBlack
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.FilterPill
@@ -46,13 +47,14 @@ fun LibraryScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "My Music",
+                stringResource(R.string.my_music),
                 style = MaterialTheme.typography.titleLarge
             )
+
             IconButton(onClick = { /* overflow menu */ }) {
                 Icon(
                     Icons.Filled.MoreVert,
-                    contentDescription = "More"
+                    contentDescription = stringResource(R.string.more)
                 )
             }
         }
@@ -60,13 +62,11 @@ fun LibraryScreen(
         Spacer(Modifier.height(12.dp))
 
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(
-                8.dp
-            )
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(LibraryTab.entries.toList()) { tab ->
                 FilterPill(
-                    label = tab.label(),
+                    label = tab.localizedLabel(),
                     selected = state.selectedTab == tab,
                     onClick = { viewModel.onTabSelected(tab) }
                 )
@@ -76,7 +76,6 @@ fun LibraryScreen(
         Spacer(Modifier.height(12.dp))
 
         Box(modifier = Modifier.weight(1f)) {
-
             if (
                 state.isLoading &&
                 state.selectedTab == LibraryTab.PLAYLISTS
@@ -117,14 +116,17 @@ fun LibraryScreen(
                     )
                 }
             }
-
         }
     }
 }
 
-private fun LibraryTab.label(): String = when (this) {
-    LibraryTab.ALL -> "All"
-    LibraryTab.PLAYLISTS -> "Playlists"
-    LibraryTab.LIKED_SONGS -> "Liked Songs"
-    LibraryTab.DOWNLOADS -> "Downloads"
-}
+@Composable
+private fun LibraryTab.localizedLabel(): String =
+    stringResource(
+        when (this) {
+            LibraryTab.ALL -> R.string.filter_all
+            LibraryTab.PLAYLISTS -> R.string.playlists
+            LibraryTab.LIKED_SONGS -> R.string.liked_songs
+            LibraryTab.DOWNLOADS -> R.string.downloads
+        }
+    )

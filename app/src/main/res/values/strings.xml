@@ -1,4 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Xios</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="playback_section">Playback</string>
+    <string name="streaming_quality">Streaming quality</string>
+    <string name="preferred_audio_quality">Preferred audio quality</string>
+
+    <string name="notifications_section">Notifications</string>
+    <string name="playback_notification">Playback notification</string>
+    <string name="playback_notification_description">Show the currently playing song in notifications</string>
+
+    <string name="appearance_section">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="choose_app_appearance">Choose your app appearance</string>
+
+    <string name="language_section">Language</string>
+    <string name="app_language">App language</string>
+    <string name="choose_preferred_language">Choose your preferred language</string>
+    <string name="language_system_default">System default</string>
+
+    <string name="logout">Log out</string>
+    <string name="logout_confirmation_title">Log out?</string>
+    <string name="logout_confirmation_message">Are you sure you want to log out of your account?</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="quality_low">Low</string>
+    <string name="quality_normal">Normal</string>
+    <string name="quality_high">High</string>
+
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+
+    <string name="my_profile">My Profile</string>
+    <string name="search">Search</string>
+    <string name="favorites">Favorites</string>
+    <string name="home_greeting">Hi, %1$s</string>
+    <string name="filter_all">All</string>
+    <string name="filter_new_release">New Release</string>
+    <string name="picked_for_you">Picked for You</string>
+    <string name="refresh">Refresh</string>
+    <string name="by_artist">By %1$s</string>
+    <string name="recently_played">Recently Played</string>
+    <string name="albums">Albums</string>
+    <string name="no_albums_yet">No albums yet — songs need an album tag to show up here.</string>
+    <string name="my_music">My Music</string>
+    <string name="more">More</string>
+    <string name="playlists">Playlists</string>
+    <string name="liked_songs">Liked Songs</string>
+    <string name="downloads">Downloads</string>
+
+
+    <string name="back">Back</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
+    <string name="my_playlists">My Playlists</string>
+    <string name="see_all">See All</string>
+    <string name="my_favorite_artists">My Favorite Artists</string>
+    <string name="profile_photo">Profile photo</string>
+    <string name="change_photo">Change photo</string>
+    <string name="name">Name</string>
+    <string name="save">Save</string>
+
+    <string name="create_playlist">Create playlist</string>
+    <string name="no_playlists_yet">No playlists yet — tap + to create your first one.</string>
+    <string name="new_playlist">New Playlist</string>
+    <string name="playlist_name">Playlist name</string>
+    <string name="create">Create</string>
+    <string name="rename_playlist">Rename Playlist</string>
+    <string name="delete_playlist">Delete Playlist</string>
+    <string name="delete">Delete</string>
+    <string name="song_count">%1$d Songs</string>
+    <string name="delete_playlist_confirmation">Delete "%1$s"? This can\'t be undone.</string>
+
+    <string name="search_hint">Search songs, artists, albums...</string>
+    <string name="local_results">LOCAL RESULTS</string>
+    <string name="hybrid_results">HYBRID RESULTS</string>
+    <string name="suggested_songs">SUGGESTED SONGS</string>
+    <string name="no_search_results">No matching songs found. Try another title, artist or album.</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="clear_all">Clear All</string>
+    <string name="browse_by_genre">Browse by Genre</string>
+
+
+    <string name="playlist">Playlist</string>
+    <string name="playlist_not_found">Playlist not found</string>
+    <string name="playlist_owner_and_song_count">By %1$s • %2$d Songs</string>
+    <string name="play_all">Play All</string>
+    <string name="no_songs_in_playlist">No songs in this playlist yet.</string>
+    <string name="remove_song">Remove song</string>
+    <string name="remove">Remove</string>
+    <string name="storage_permission_download">Storage permission is needed to save downloads</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="favorite">Favorite</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="download">Download</string>
+    <string name="add_to_playlist">Add to Playlist</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="previous">Previous</string>
+    <string name="play_pause">Play/Pause</string>
+    <string name="next">Next</string>
+    <string name="queue">Queue</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_queue">Queue</string>
+    <string name="nav_playlists">Playlists</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="playing_queue">Playing Queue</string>
+    <string name="queue_is_empty">Queue is empty</string>
+    <string name="queue_song_artwork">Artwork for %1$s</string>
+    <string name="no_playlists_for_song">You don\'t have any playlists yet — create one above.</string>
+    <string name="added_to_playlist">Added</string>
+
+    <string name="album">Album</string>
+    <string name="album_not_found">Album not found</string>
+    <string name="album_artist_song_count">%1$s • %2$d Songs</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="login_subtitle">Log in to keep listening</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log In</string>
+    <string name="no_account_prompt">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_account">Create Account</string>
+    <string name="register_subtitle">Join and start listening</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="have_account_prompt">Already have an account?</string>
+    <string name="no_liked_songs">No liked songs yet — tap the heart on any song to save it here.</string>
+    <string name="remove_favorite">Remove favourite</string>
+    <string name="delete_downloaded_song_title">Delete downloaded song?</string>
+    <string name="delete_downloaded_song_message">"%1$s" will be removed from your offline downloads and from this device. You can download it again later.</string>
+    <string name="keep_song">Keep song</string>
+    <string name="no_downloads_yet">No downloads yet — tap the download icon on the Now Playing screen to save a song.</string>
+    <string name="delete_downloaded_song">Delete downloaded song</string>
+    <string name="paused">Paused</string>
+    <string name="download_failed">Download failed</string>
+    <string name="downloading">Downloading...</string>
+    <string name="resume">Resume</string>
+    <string name="retry">Retry</string>
+    <string name="pause">Pause</string>
+    <string name="follow">Follow</string>
+    <string name="playlist_owner_song_count">By %1$s • %2$d Songs</string>
+    <string name="playlist_options">Playlist options</string>
+
+    <string name="play">Play</string>
+    <string name="open">Open</string>
 </resources>

@@ -12,8 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
@@ -33,7 +35,7 @@ fun LikedSongsTab(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "No liked songs yet — tap the heart on any song to save it here.",
+                stringResource(R.string.no_liked_songs),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )

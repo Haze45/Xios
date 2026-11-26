@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -48,8 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.DownloadProgress
 import com.yourapp.music.domain.model.Song
@@ -85,13 +85,11 @@ fun DownloadsTab(
                 songPendingDeletion = null
             },
             title = {
-                Text("Delete downloaded song?")
+                Text(stringResource(R.string.delete_downloaded_song_title))
             },
             text = {
                 Text(
-                    "\"${song.title}\" will be removed from your " +
-                            "offline downloads and from this device. " +
-                            "You can download it again later."
+                    stringResource(R.string.delete_downloaded_song_message, song.title)
                 )
             },
             confirmButton = {
@@ -102,7 +100,7 @@ fun DownloadsTab(
                     }
                 ) {
                     Text(
-                        "Delete",
+                        stringResource(R.string.delete),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -113,7 +111,7 @@ fun DownloadsTab(
                         songPendingDeletion = null
                     }
                 ) {
-                    Text("Keep song")
+                    Text(stringResource(R.string.keep_song))
                 }
             }
         )
@@ -125,7 +123,7 @@ fun DownloadsTab(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "No downloads yet — tap the download icon on the Now Playing screen to save a song.",
+                stringResource(R.string.no_downloads_yet),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )
@@ -140,7 +138,7 @@ fun DownloadsTab(
         if (downloadingSongs.isNotEmpty()) {
             item {
                 Text(
-                    text = "Downloads",
+                    text = stringResource(R.string.downloads),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(
                         top = 8.dp,
@@ -171,7 +169,7 @@ fun DownloadsTab(
         if (songs.isNotEmpty()) {
             item {
                 Text(
-                    text = "Downloaded",
+                    text = stringResource(R.string.downloaded),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(
                         top = 12.dp,
@@ -212,14 +210,14 @@ fun DownloadsTab(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete downloaded song",
+                            contentDescription = stringResource(R.string.delete_downloaded_song),
                             tint = Color(0xFF191B13)
                         )
 
                         Spacer(Modifier.width(6.dp))
 
                         Text(
-                            text = "Remove",
+                            text = stringResource(R.string.remove),
                             color = Color(0xFF191B13),
                             fontWeight = FontWeight.SemiBold
                         )
@@ -306,9 +304,9 @@ private fun DownloadProgressRow(
     val fraction = progress.fraction
 
     val statusText = when {
-        progress.isPaused -> "Paused"
-        progress.isFailed -> "Download failed"
-        else -> "Downloading..."
+        progress.isPaused -> stringResource(R.string.paused)
+        progress.isFailed -> stringResource(R.string.download_failed)
+        else -> stringResource(R.string.downloading)
     }
 
     Column(
@@ -399,9 +397,9 @@ private fun DownloadProgressRow(
                     ) {
                         Text(
                             when {
-                                progress.isPaused -> "Resume"
-                                progress.isFailed -> "Retry"
-                                else -> "Pause"
+                                progress.isPaused -> stringResource(R.string.resume)
+                                progress.isFailed -> stringResource(R.string.retry)
+                                else -> stringResource(R.string.pause)
                             }
                         )
                     }
@@ -410,7 +408,7 @@ private fun DownloadProgressRow(
                         onClick = onCancel,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             }

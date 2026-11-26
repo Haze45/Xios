@@ -12,8 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.PlaylistRowItem
@@ -40,7 +42,7 @@ fun PlaylistScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                "Playlists",
+                stringResource(R.string.playlists),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -64,7 +66,7 @@ fun PlaylistScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "No playlists yet — tap + to create your first one.",
+                            stringResource(R.string.no_playlists_yet),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -119,7 +121,7 @@ fun PlaylistScreen(
         ) {
             Icon(
                 Icons.Filled.Add,
-                contentDescription = "Create playlist"
+                contentDescription = stringResource(R.string.create_playlist)
             )
         }
     }
@@ -130,14 +132,14 @@ fun PlaylistScreen(
                 viewModel.onShowCreateDialog(false)
             },
             title = {
-                Text("New Playlist")
+                Text(stringResource(R.string.new_playlist))
             },
             text = {
                 OutlinedTextField(
                     value = state.newPlaylistTitle,
                     onValueChange = viewModel::onNewPlaylistTitleChange,
                     placeholder = {
-                        Text("Playlist name")
+                        Text(stringResource(R.string.playlist_name))
                     },
                     singleLine = true
                 )
@@ -145,7 +147,7 @@ fun PlaylistScreen(
             confirmButton = {
                 TextButton(onClick = viewModel::createPlaylist) {
                     Text(
-                        "Create",
+                        stringResource(R.string.create),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -156,7 +158,7 @@ fun PlaylistScreen(
                         viewModel.onShowCreateDialog(false)
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -175,14 +177,14 @@ fun PlaylistScreen(
         AlertDialog(
             onDismissRequest = viewModel::onCancelRename,
             title = {
-                Text("Rename Playlist")
+                Text(stringResource(R.string.rename_playlist))
             },
             text = {
                 OutlinedTextField(
                     value = state.renameTitle,
                     onValueChange = viewModel::onRenameTitleChange,
                     placeholder = {
-                        Text("Playlist name")
+                        Text(stringResource(R.string.playlist_name))
                     },
                     singleLine = true
                 )
@@ -190,14 +192,14 @@ fun PlaylistScreen(
             confirmButton = {
                 TextButton(onClick = viewModel::confirmRename) {
                     Text(
-                        "Save",
+                        stringResource(R.string.save),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onCancelRename) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -207,19 +209,27 @@ fun PlaylistScreen(
         AlertDialog(
             onDismissRequest = viewModel::onCancelDelete,
             title = {
-                Text("Delete Playlist")
+                Text(stringResource(R.string.delete_playlist))
             },
             text = {
-                Text("Delete \"${playlist.title}\"? This can't be undone.")
+                Text(
+                    stringResource(
+                        R.string.delete_playlist_confirmation,
+                        playlist.title
+                    )
+                )
             },
             confirmButton = {
                 TextButton(onClick = viewModel::confirmDelete) {
-                    Text("Delete", color = ErrorRed)
+                    Text(
+                        stringResource(R.string.delete),
+                        color = ErrorRed
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onCancelDelete) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

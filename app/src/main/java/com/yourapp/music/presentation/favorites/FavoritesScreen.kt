@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.SongListItem
 import com.yourapp.music.presentation.player.MiniPlayer
@@ -54,11 +56,11 @@ fun FavoritesScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.back)
                     )
                 }
                 Text(
-                    "Liked Songs",
+                    stringResource(R.string.liked_songs),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -71,7 +73,7 @@ fun FavoritesScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "No liked songs yet — tap the heart on any song to save it here.",
+                        stringResource(R.string.no_liked_songs),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -158,14 +160,14 @@ private fun SwipeToRemoveFavorite(
         ) {
             Icon(
                 imageVector = Icons.Filled.Delete,
-                contentDescription = "Remove favourite",
+                contentDescription = stringResource(R.string.remove_favorite),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
 
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = "Remove",
+                text = stringResource(R.string.remove),
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.SemiBold
             )

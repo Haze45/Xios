@@ -14,6 +14,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import com.yourapp.music.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -21,34 +23,34 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 
 data class BottomNavItem(
     val screen: Screen,
-    val label: String,
+    val labelRes: Int,
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 )
 
 val bottomNavItems = listOf(
     BottomNavItem(
         Screen.Home,
-        "Home",
+        R.string.nav_home,
         Icons.Filled.Home
     ),
     BottomNavItem(
         Screen.Library,
-        "Library",
+        R.string.nav_library,
         Icons.Filled.LibraryMusic
     ),
     BottomNavItem(
         Screen.Queue,
-        "Queue",
+        R.string.nav_queue,
         Icons.Filled.Shuffle
     ),
     BottomNavItem(
         Screen.Playlists,
-        "Playlists",
+        R.string.nav_playlists,
         Icons.AutoMirrored.Filled.PlaylistPlay
     ),
     BottomNavItem(
         Screen.Settings,
-        "Settings",
+        R.string.nav_settings,
         Icons.Filled.Settings
     )
 )
@@ -94,11 +96,13 @@ fun MusicBottomNavBar(
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.label
+                        contentDescription = stringResource(
+                            item.labelRes
+                        )
                     )
                 },
                 label = {
-                    Text(item.label)
+                    Text(stringResource(item.labelRes))
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor =

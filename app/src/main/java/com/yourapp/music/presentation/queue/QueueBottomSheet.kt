@@ -24,10 +24,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yourapp.music.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
 import com.yourapp.music.domain.model.Song
 
 @UnstableApi
@@ -67,7 +68,7 @@ fun QueueBottomSheet(
                 Spacer(Modifier.width(8.dp))
 
                 Text(
-                    text = "Playing Queue",
+                    text = stringResource(R.string.playing_queue),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -82,7 +83,7 @@ fun QueueBottomSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Queue is empty",
+                        text = stringResource(R.string.queue_is_empty),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -143,7 +144,7 @@ private fun QueueRow(
     ) {
         AsyncImage(
             model = song.albumArtUrl,
-            contentDescription = song.title,
+            contentDescription = stringResource(R.string.queue_song_artwork, song.title),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)

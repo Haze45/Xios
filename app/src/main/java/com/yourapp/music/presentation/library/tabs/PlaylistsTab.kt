@@ -11,8 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.PlaylistRowItem
@@ -24,10 +25,6 @@ fun PlaylistsTab(
     playlists: List<Playlist>,
     onPlaylistClick: (Playlist) -> Unit,
     modifier: Modifier = Modifier,
-    // Separate PlaylistViewModel instance purely for the kebab menu's
-    // rename/delete actions — the visible `playlists` list itself still
-    // comes from LibraryViewModel above, both already read the same live
-    // Room data so they never disagree.
     playlistViewModel: PlaylistViewModel = hiltViewModel()
 ) {
     val menuState by playlistViewModel.uiState.collectAsState()
@@ -58,19 +55,19 @@ fun PlaylistsTab(
     menuState.playlistBeingRenamed?.let {
         AlertDialog(
             onDismissRequest = playlistViewModel::onCancelRename,
-            title = { Text("Rename Playlist") },
+            title = { Text(stringResource(R.string.rename_playlist)) },
             text = {
                 OutlinedTextField(
                     value = menuState.renameTitle,
                     onValueChange = playlistViewModel::onRenameTitleChange,
-                    placeholder = { Text("Playlist name") },
+                    placeholder = { Text(stringResource(R.string.playlist_name)) },
                     singleLine = true
                 )
             },
             confirmButton = {
                 TextButton(onClick = playlistViewModel::confirmRename) {
                     Text(
-                        "Save",
+                        stringResource(R.string.save),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -78,7 +75,7 @@ fun PlaylistsTab(
             dismissButton = {
                 TextButton(onClick = playlistViewModel::onCancelRename) {
                     Text(
-                        "Cancel"
+                        stringResource(R.string.cancel)
                     )
                 }
             }
@@ -88,17 +85,17 @@ fun PlaylistsTab(
     menuState.playlistPendingDelete?.let { playlist ->
         AlertDialog(
             onDismissRequest = playlistViewModel::onCancelDelete,
-            title = { Text("Delete Playlist") },
-            text = { Text("Delete \"${playlist.title}\"? This can't be undone.") },
+            title = { Text(stringResource(R.string.delete_playlist)) },
+            text = { Text(stringResource(R.string.delete_playlist_confirmation, playlist.title)) },
             confirmButton = {
                 TextButton(onClick = playlistViewModel::confirmDelete) {
-                    Text("Delete", color = ErrorRed)
+                    Text(stringResource(R.string.delete), color = ErrorRed)
                 }
             },
             dismissButton = {
                 TextButton(onClick = playlistViewModel::onCancelDelete) {
                     Text(
-                        "Cancel"
+                        stringResource(R.string.cancel)
                     )
                 }
             }

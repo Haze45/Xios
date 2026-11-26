@@ -1,31 +1,20 @@
 package com.yourapp.music.presentation.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,12 +25,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.domain.model.AppLanguage
 import com.yourapp.music.domain.model.AppTheme
 import com.yourapp.music.domain.model.StreamingQuality
+import com.yourapp.music.presentation.components.SettingsToggleItem
 
 @Composable
 fun SettingsScreen(
@@ -55,16 +47,26 @@ fun SettingsScreen(
         mutableStateOf(false)
     }
 
+    val languageOptions =
+        AppLanguage.supported.map { language ->
+            val label = if (language.code == "system") {
+                stringResource(R.string.language_system_default)
+            } else {
+                language.displayName
+            }
+            label to language.code
+        }
+
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = {
                 showLogoutDialog = false
             },
             title = {
-                Text("Log out?")
+                Text(stringResource(R.string.logout_confirmation_title))
             },
             text = {
-                Text("Are you sure you want to log out of your account?")
+                Text(stringResource(R.string.logout_confirmation_message))
             },
             confirmButton = {
                 TextButton(
@@ -75,7 +77,7 @@ fun SettingsScreen(
                     }
                 ) {
                     Text(
-                        "Log out",
+                        stringResource(R.string.logout),
                         color = ErrorRed
                     )
                 }
@@ -86,7 +88,7 @@ fun SettingsScreen(
                         showLogoutDialog = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -102,11 +104,11 @@ fun SettingsScreen(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = "Settings",
+            text = stringResource(R.string.settings_title),
             style = MaterialTheme.typography.headlineMedium
         )
 
-        SectionTitle("Playback")
+        SectionTitle(stringResource(R.string.playback_section))
 
         SelectorRow(
             icon = {
@@ -115,55 +117,26 @@ fun SettingsScreen(
                     contentDescription = null
                 )
             },
-            title = "Streaming quality",
-            subtitle = "Preferred audio quality",
-            selected = settings.streamingQuality.label(),
+            title = stringResource(R.string.streaming_quality),
+            subtitle = stringResource(R.string.preferred_audio_quality),
+            selected = settings.streamingQuality.localizedLabel(),
             options = StreamingQuality.entries.map {
-                it.label() to it
+                it.localizedLabel() to it
             },
             onSelect = viewModel::onStreamingQualityChange
         )
 
-        SectionTitle("Notifications")
+        SectionTitle(stringResource(R.string.notifications_section))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.Notifications,
-                contentDescription = null
-            )
+        SettingsToggleItem(
+            icon = Icons.Default.Notifications,
+            label = stringResource(R.string.playback_notification),
+            subtitle = stringResource(R.string.playback_notification_description),
+            checked = settings.playbackNotificationsEnabled,
+            onCheckedChange = viewModel::onPlaybackNotificationsToggle
+        )
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text(
-                    "Playback notification",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    "Show the currently playing song in notifications",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Switch(
-                checked = settings.playbackNotificationsEnabled,
-                onCheckedChange =
-                    viewModel::onPlaybackNotificationsToggle,
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
-
-        SectionTitle("Appearance")
+        SectionTitle(stringResource(R.string.appearance_section))
 
         SelectorRow(
             icon = {
@@ -172,16 +145,16 @@ fun SettingsScreen(
                     contentDescription = null
                 )
             },
-            title = "Theme",
-            subtitle = "Choose your app appearance",
-            selected = settings.theme.label(),
+            title = stringResource(R.string.theme),
+            subtitle = stringResource(R.string.choose_app_appearance),
+            selected = settings.theme.localizedLabel(),
             options = AppTheme.entries.map {
-                it.label() to it
+                it.localizedLabel() to it
             },
             onSelect = viewModel::onThemeChange
         )
 
-        SectionTitle("Language")
+        SectionTitle(stringResource(R.string.language_section))
 
         SelectorRow(
             icon = {
@@ -190,14 +163,13 @@ fun SettingsScreen(
                     contentDescription = null
                 )
             },
-            title = "App language",
-            subtitle = "Choose your preferred language",
-            selected = AppLanguage.supported
-                .firstOrNull { it.code == settings.language }
-                ?.displayName ?: "System default",
-            options = AppLanguage.supported.map {
-                it.displayName to it.code
-            },
+            title = stringResource(R.string.app_language),
+            subtitle = stringResource(R.string.choose_preferred_language),
+            selected = languageOptions
+                .firstOrNull { it.second == settings.language }
+                ?.first
+                ?: stringResource(R.string.language_system_default),
+            options = languageOptions,
             onSelect = viewModel::onLanguageChange
         )
 
@@ -218,7 +190,7 @@ fun SettingsScreen(
             Spacer(Modifier.width(8.dp))
 
             Text(
-                "Log out",
+                stringResource(R.string.logout),
                 color = ErrorRed
             )
         }
@@ -311,16 +283,22 @@ private fun <T> SelectorRow(
     }
 }
 
-private fun StreamingQuality.label(): String =
-    when (this) {
-        StreamingQuality.LOW -> "Low"
-        StreamingQuality.NORMAL -> "Normal"
-        StreamingQuality.HIGH -> "High"
-    }
+@Composable
+private fun StreamingQuality.localizedLabel(): String =
+    stringResource(
+        when (this) {
+            StreamingQuality.LOW -> R.string.quality_low
+            StreamingQuality.NORMAL -> R.string.quality_normal
+            StreamingQuality.HIGH -> R.string.quality_high
+        }
+    )
 
-private fun AppTheme.label(): String =
-    when (this) {
-        AppTheme.SYSTEM -> "System"
-        AppTheme.LIGHT -> "Light"
-        AppTheme.DARK -> "Dark"
-    }
+@Composable
+private fun AppTheme.localizedLabel(): String =
+    stringResource(
+        when (this) {
+            AppTheme.SYSTEM -> R.string.theme_system
+            AppTheme.LIGHT -> R.string.theme_light
+            AppTheme.DARK -> R.string.theme_dark
+        }
+    )

@@ -7,9 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,12 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yourapp.music.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.SurfaceDark
-import com.yourapp.music.core.theme.SurfaceElevated
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.presentation.components.ShimmerPlaylistRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,13 +48,13 @@ fun AddToPlaylistSheet(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Filled.PlaylistAdd,
+                    Icons.AutoMirrored.Filled.PlaylistAdd,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Add to Playlist",
+                    stringResource(R.string.add_to_playlist),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -74,7 +72,13 @@ fun AddToPlaylistSheet(
                     OutlinedTextField(
                         value = state.newPlaylistTitle,
                         onValueChange = viewModel::onNewPlaylistTitleChange,
-                        placeholder = { Text("Playlist name") },
+                        placeholder = {
+                            Text(
+                                stringResource(
+                                    R.string.playlist_name
+                                )
+                            )
+                        },
                         singleLine = true,
                         modifier = Modifier.weight(1f)
                     )
@@ -85,7 +89,7 @@ fun AddToPlaylistSheet(
                         )
                     }) {
                         Text(
-                            "Create",
+                            stringResource(R.string.create),
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -111,13 +115,15 @@ fun AddToPlaylistSheet(
                     ) {
                         Icon(
                             Icons.Filled.Add,
-                            contentDescription = "New playlist",
+                            contentDescription = stringResource(
+                                R.string.new_playlist
+                            ),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        "New Playlist",
+                        stringResource(R.string.new_playlist),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -143,7 +149,7 @@ fun AddToPlaylistSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "You don't have any playlists yet — create one above.",
+                        stringResource(R.string.no_playlists_for_song),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -196,7 +202,10 @@ fun AddToPlaylistSheet(
                                     maxLines = 1
                                 )
                                 Text(
-                                    "${playlist.songCount} Songs",
+                                    stringResource(
+                                        R.string.song_count,
+                                        playlist.songCount
+                                    ),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -204,7 +213,9 @@ fun AddToPlaylistSheet(
                             if (alreadyAdded) {
                                 Icon(
                                     Icons.Filled.Check,
-                                    contentDescription = "Added",
+                                    contentDescription = stringResource(
+                                        R.string.added_to_playlist
+                                    ),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }

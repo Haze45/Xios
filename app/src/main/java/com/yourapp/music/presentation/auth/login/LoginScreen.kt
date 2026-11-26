@@ -10,11 +10,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 
@@ -38,10 +39,13 @@ fun LoginScreen(
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Welcome Back", style = MaterialTheme.typography.headlineLarge)
+        Text(
+            stringResource(R.string.welcome_back),
+            style = MaterialTheme.typography.headlineLarge
+        )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Log in to keep listening",
+            stringResource(R.string.login_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary
         )
@@ -50,7 +54,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.email,
             onValueChange = viewModel::onEmailChange,
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -60,7 +64,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
@@ -69,7 +73,11 @@ fun LoginScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(Modifier.height(24.dp))
@@ -77,13 +85,22 @@ fun LoginScreen(
         Button(
             onClick = viewModel::login,
             enabled = !state.isLoading,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
-            modifier = Modifier.fillMaxWidth().height(52.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = BackgroundBlack)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(
+                        20.dp
+                    ), color = BackgroundBlack
+                )
             } else {
-                Text("Log In")
+                Text(stringResource(R.string.log_in))
             }
         }
 
@@ -94,9 +111,15 @@ fun LoginScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Don't have an account?", color = TextSecondary)
+            Text(
+                stringResource(R.string.no_account_prompt),
+                color = TextSecondary
+            )
             TextButton(onClick = onNavigateToRegister) {
-                Text("Sign Up", color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.sign_up),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

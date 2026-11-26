@@ -7,11 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
@@ -51,11 +52,16 @@ fun ArtistAvatarItem(
                 .clip(RoundedCornerShape(50))
         ) {
             Text(
-                text = if (artist.isFollowing) "Following" else "Follow",
+                text = if (artist.isFollowing) stringResource(
+                    R.string.following
+                ) else stringResource(R.string.follow),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (artist.isFollowing) TextSecondary else BackgroundBlack,
                 modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                    .padding(
+                        horizontal = 10.dp,
+                        vertical = 4.dp
+                    )
             )
         }
     }

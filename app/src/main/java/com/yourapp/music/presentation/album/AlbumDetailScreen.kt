@@ -15,12 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.ShimmerDetailScreen
 import com.yourapp.music.presentation.components.SongListItem
@@ -55,11 +57,13 @@ fun AlbumDetailScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(
+                            R.string.back
+                        )
                     )
                 }
                 Text(
-                    "Album",
+                    stringResource(R.string.album),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -77,7 +81,7 @@ fun AlbumDetailScreen(
                 ) {
                     Text(
                         state.errorMessage
-                            ?: "Album not found",
+                            ?: stringResource(R.string.album_not_found),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -104,7 +108,11 @@ fun AlbumDetailScreen(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "${album.artistName} • ${album.songCount} Songs",
+                            stringResource(
+                                R.string.album_artist_song_count,
+                                album.artistName,
+                                album.songCount
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -127,7 +135,7 @@ fun AlbumDetailScreen(
                         contentDescription = null
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Play All")
+                    Text(stringResource(R.string.play_all))
                 }
 
                 Spacer(Modifier.height(12.dp))

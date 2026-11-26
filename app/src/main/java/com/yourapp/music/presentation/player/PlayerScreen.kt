@@ -33,13 +33,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.SurfaceElevated
-import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.R
 import com.yourapp.music.presentation.playlist.AddToPlaylistSheet
 import com.yourapp.music.presentation.queue.QueueBottomSheet
 
@@ -72,6 +70,8 @@ fun PlayerScreen(
     }
 
     val context = LocalContext.current
+    val storagePermissionMessage =
+        stringResource(R.string.storage_permission_download)
 
     // Android 10+ writes to Downloads via MediaStore.
     // Android 9 and below needs WRITE_EXTERNAL_STORAGE.
@@ -85,7 +85,7 @@ fun PlayerScreen(
             } else {
                 Toast.makeText(
                     context,
-                    "Storage permission is needed to save downloads",
+                    storagePermissionMessage,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -143,12 +143,12 @@ fun PlayerScreen(
             IconButton(onClick = onBackClick) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
 
             Text(
-                "Now Playing",
+                stringResource(R.string.now_playing),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -159,7 +159,7 @@ fun PlayerScreen(
                     } else {
                         Icons.Filled.FavoriteBorder
                     },
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(R.string.favorite),
                     tint = if (state.isFavorite) {
                         MaterialTheme.colorScheme.primary
                     } else {
@@ -259,7 +259,9 @@ fun PlayerScreen(
                     state.isDownloaded -> {
                         Icon(
                             Icons.Filled.DownloadDone,
-                            contentDescription = "Downloaded",
+                            contentDescription = stringResource(
+                                R.string.downloaded
+                            ),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -267,7 +269,9 @@ fun PlayerScreen(
                     else -> {
                         Icon(
                             Icons.Filled.Download,
-                            contentDescription = "Download",
+                            contentDescription = stringResource(
+                                R.string.download
+                            ),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -283,7 +287,7 @@ fun PlayerScreen(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.PlaylistAdd,
-                    contentDescription = "Add to Playlist",
+                    contentDescription = stringResource(R.string.add_to_playlist),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -388,7 +392,7 @@ fun PlayerScreen(
             IconButton(onClick = viewModel::toggleShuffle) {
                 Icon(
                     Icons.Filled.Shuffle,
-                    contentDescription = "Shuffle",
+                    contentDescription = stringResource(R.string.shuffle),
                     tint = if (state.isShuffleEnabled) {
                         MaterialTheme.colorScheme.primary
                     } else {
@@ -400,7 +404,7 @@ fun PlayerScreen(
             IconButton(onClick = viewModel::skipToPrevious) {
                 Icon(
                     Icons.Filled.SkipPrevious,
-                    contentDescription = "Previous",
+                    contentDescription = stringResource(R.string.previous),
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -418,7 +422,7 @@ fun PlayerScreen(
                     } else {
                         Icons.Filled.PlayArrow
                     },
-                    contentDescription = "Play/Pause",
+                    contentDescription = stringResource(R.string.play_pause),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
@@ -427,7 +431,7 @@ fun PlayerScreen(
             IconButton(onClick = viewModel::skipToNext) {
                 Icon(
                     Icons.Filled.SkipNext,
-                    contentDescription = "Next",
+                    contentDescription = stringResource(R.string.next),
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -439,7 +443,7 @@ fun PlayerScreen(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.QueueMusic,
-                    contentDescription = "Queue"
+                    contentDescription = stringResource(R.string.queue)
                 )
             }
         }

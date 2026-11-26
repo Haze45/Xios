@@ -19,10 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.foundation.layout.statusBarsPadding
 import coil.compose.AsyncImage
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
@@ -51,12 +52,10 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
-            // Keep content scrollable above the floating bottom controls.
             .padding(bottom = 160.dp)
     ) {
         Spacer(Modifier.height(16.dp))
 
-        // Top bar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -65,7 +64,7 @@ fun HomeScreen(
             if (state.photoUrl != null) {
                 AsyncImage(
                     model = state.photoUrl,
-                    contentDescription = "My Profile",
+                    contentDescription = stringResource(R.string.my_profile),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(44.dp)
@@ -86,14 +85,18 @@ fun HomeScreen(
                 IconButton(onClick = onSearchClick) {
                     Icon(
                         Icons.Filled.Search,
-                        contentDescription = "Search"
+                        contentDescription = stringResource(
+                            R.string.search
+                        )
                     )
                 }
 
                 IconButton(onClick = onFavoritesClick) {
                     Icon(
                         Icons.Filled.FavoriteBorder,
-                        contentDescription = "Favorites"
+                        contentDescription = stringResource(
+                            R.string.favorites
+                        )
                     )
                 }
             }
@@ -102,19 +105,21 @@ fun HomeScreen(
         Spacer(Modifier.height(12.dp))
 
         Text(
-            "Hi, ${state.userName}",
+            stringResource(
+                R.string.home_greeting,
+                state.userName
+            ),
             style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(Modifier.height(16.dp))
 
-        // Home filters
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(HomeFilter.entries.toList()) { filter ->
                 FilterPill(
-                    label = filter.label(),
+                    label = filter.localizedLabel(),
                     selected = state.selectedFilter == filter,
                     onClick = {
                         viewModel.onFilterSelected(filter)
@@ -125,14 +130,13 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Picked for You
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Picked for You",
+                stringResource(R.string.picked_for_you),
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -140,7 +144,10 @@ fun HomeScreen(
                 onClick = viewModel::refreshPersonalizedRecommendations,
                 enabled = !state.isRecommendationsLoading
             ) {
-                Text("Refresh", color = TextSecondary)
+                Text(
+                    stringResource(R.string.refresh),
+                    color = TextSecondary
+                )
             }
         }
 
@@ -172,7 +179,10 @@ fun HomeScreen(
                     ) { song ->
                         FeaturedPlaylistCard(
                             title = song.title,
-                            description = "By ${song.artist}",
+                            description = stringResource(
+                                R.string.by_artist,
+                                song.artist
+                            ),
                             imageUrl = song.albumArtUrl,
                             isPlaying = currentlyPlayingSongId == song.id &&
                                     isPlaying,
@@ -198,10 +208,9 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Recently Played
         if (state.recentlyPlayedSongs.isNotEmpty()) {
             Text(
-                "Recently Played",
+                stringResource(R.string.recently_played),
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -218,7 +227,10 @@ fun HomeScreen(
                 ) { song ->
                     FeaturedPlaylistCard(
                         title = song.title,
-                        description = "By ${song.artist}",
+                        description = stringResource(
+                            R.string.by_artist,
+                            song.artist
+                        ),
                         imageUrl = song.albumArtUrl,
                         isPlaying = currentlyPlayingSongId == song.id &&
                                 isPlaying,
@@ -235,9 +247,8 @@ fun HomeScreen(
             Spacer(Modifier.height(24.dp))
         }
 
-        // Albums
         Text(
-            "Albums",
+            stringResource(R.string.albums),
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -259,7 +270,7 @@ fun HomeScreen(
 
             state.albums.isEmpty() -> {
                 Text(
-                    "No albums yet — songs need an album tag to show up here.",
+                    stringResource(R.string.no_albums_yet),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
@@ -297,7 +308,11 @@ fun HomeScreen(
     }
 }
 
-private fun HomeFilter.label(): String = when (this) {
-    HomeFilter.ALL -> "All"
-    HomeFilter.NEW_RELEASE -> "New Release"
-}
+@Composable
+private fun HomeFilter.localizedLabel(): String =
+    stringResource(
+        when (this) {
+            HomeFilter.ALL -> R.string.filter_all
+            HomeFilter.NEW_RELEASE -> R.string.filter_new_release
+        }
+    )

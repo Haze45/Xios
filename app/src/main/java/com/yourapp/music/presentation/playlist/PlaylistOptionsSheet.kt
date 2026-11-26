@@ -12,11 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.ErrorRed
-import com.yourapp.music.core.theme.SurfaceDark
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Playlist
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,14 +27,19 @@ fun PlaylistOptionsSheet(
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
@@ -47,9 +52,16 @@ fun PlaylistOptionsSheet(
                 )
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text(playlist.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
                     Text(
-                        "${playlist.songCount} Songs",
+                        playlist.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1
+                    )
+                    Text(
+                        stringResource(
+                            R.string.song_count,
+                            playlist.songCount
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -57,7 +69,11 @@ fun PlaylistOptionsSheet(
             }
 
             Spacer(Modifier.height(16.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(
+                    alpha = 0.2f
+                )
+            )
             Spacer(Modifier.height(8.dp))
 
             Row(
@@ -67,9 +83,16 @@ fun PlaylistOptionsSheet(
                     .padding(vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(
+                    Icons.Filled.Edit,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(Modifier.width(16.dp))
-                Text("Rename", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(R.string.rename_playlist),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             Row(
@@ -79,9 +102,17 @@ fun PlaylistOptionsSheet(
                     .padding(vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Delete, contentDescription = null, tint = ErrorRed)
+                Icon(
+                    Icons.Filled.Delete,
+                    contentDescription = null,
+                    tint = ErrorRed
+                )
                 Spacer(Modifier.width(16.dp))
-                Text("Delete", style = MaterialTheme.typography.bodyLarge, color = ErrorRed)
+                Text(
+                    stringResource(R.string.delete),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = ErrorRed
+                )
             }
 
             Spacer(Modifier.height(24.dp))

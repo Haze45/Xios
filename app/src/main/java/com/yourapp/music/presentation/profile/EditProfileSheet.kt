@@ -26,10 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.ErrorRed
 import com.yourapp.music.core.theme.SurfaceDark
@@ -50,29 +51,38 @@ fun EditProfileSheet(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var name by remember { mutableStateOf(state.displayName) }
-    var pickedPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    var pickedPhotoUri by remember {
+        mutableStateOf<Uri?>(
+            null
+        )
+    }
 
     // Clear any stale error the moment the sheet opens so a previous
     // failed save doesn't show up before the user has done anything here.
     LaunchedEffect(Unit) { viewModel.clearError() }
 
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        if (uri != null) {
-            // The picker's Uri is only readable for this immediate call —
-            // copy the bytes into app-internal storage so the photo still
-            // loads after the sheet closes and on future app launches.
-            scope.launch {
-                copyToInternalStorage(context, uri)?.let { pickedPhotoUri = it }
+    val photoPickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) {
+                // The picker's Uri is only readable for this immediate call —
+                // copy the bytes into app-internal storage so the photo still
+                // loads after the sheet closes and on future app launches.
+                scope.launch {
+                    copyToInternalStorage(
+                        context,
+                        uri
+                    )?.let { pickedPhotoUri = it }
+                }
             }
         }
-    }
 
     fun dismiss() {
         viewModel.clearError()
@@ -91,20 +101,26 @@ fun EditProfileSheet(
                 .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Edit Profile", style = MaterialTheme.typography.titleLarge)
+            Text(
+                stringResource(R.string.edit_profile),
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(Modifier.height(20.dp))
 
             Box(contentAlignment = Alignment.BottomEnd) {
                 AsyncImage(
-                    model = pickedPhotoUri ?: state.photoUrl,
-                    contentDescription = "Profile photo",
+                    model = pickedPhotoUri
+                        ?: state.photoUrl,
+                    contentDescription = stringResource(R.string.profile_photo),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape)
                         .clickable {
                             photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
                             )
                         }
                 )
@@ -113,17 +129,25 @@ fun EditProfileSheet(
                         .size(36.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
-                        .border(3.dp, SurfaceDark, CircleShape)
+                        .border(
+                            3.dp,
+                            SurfaceDark,
+                            CircleShape
+                        )
                         .clickable {
                             photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
                             )
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.CameraAlt,
-                        contentDescription = "Change photo",
+                        contentDescription = stringResource(
+                            R.string.change_photo
+                        ),
                         tint = BackgroundBlack,
                         modifier = Modifier.size(18.dp)
                     )
@@ -135,7 +159,7 @@ fun EditProfileSheet(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
                 isError = state.errorMessage != null,
                 modifier = Modifier.fillMaxWidth()
@@ -143,21 +167,30 @@ fun EditProfileSheet(
 
             state.errorMessage?.let {
                 Spacer(Modifier.height(8.dp))
-                Text(it, color = ErrorRed, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    it,
+                    color = ErrorRed,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             Spacer(Modifier.height(24.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(
+                    12.dp
+                )
             ) {
                 OutlinedButton(
                     onClick = ::dismiss,
                     enabled = !state.isSaving,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancel", color = TextSecondary)
+                    Text(
+                        stringResource(R.string.cancel),
+                        color = TextSecondary
+                    )
                 }
                 Button(
                     onClick = {
@@ -168,7 +201,10 @@ fun EditProfileSheet(
                         )
                     },
                     enabled = !state.isSaving,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                     modifier = Modifier.weight(1f)
                 ) {
                     if (state.isSaving) {
@@ -178,7 +214,7 @@ fun EditProfileSheet(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }
@@ -186,21 +222,22 @@ fun EditProfileSheet(
     }
 }
 
-/**
- * Copies the picked image into the app's private storage and returns a
- * stable file:// Uri for it. Needed because content Uris returned by the
- * system photo picker are only guaranteed readable for the lifetime of
- * this call — without a durable local copy, the photo would fail to load
- * the next time the app starts.
- */
-private fun copyToInternalStorage(context: Context, sourceUri: Uri): Uri? {
+private fun copyToInternalStorage(
+    context: Context,
+    sourceUri: Uri
+): Uri? {
     return try {
-        val file = File(context.filesDir, "profile_photo_${System.currentTimeMillis()}.jpg")
-        context.contentResolver.openInputStream(sourceUri)?.use { input ->
-            file.outputStream().use { output -> input.copyTo(output) }
-        }
+        val file = File(
+            context.filesDir,
+            "profile_photo_${System.currentTimeMillis()}.jpg"
+        )
+        context.contentResolver.openInputStream(sourceUri)
+            ?.use { input ->
+                file.outputStream()
+                    .use { output -> input.copyTo(output) }
+            }
         Uri.fromFile(file)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

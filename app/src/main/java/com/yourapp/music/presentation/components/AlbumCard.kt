@@ -7,10 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Album
 
 /** Square card used in Home's Albums row — cover art is always the album's last-added song. */
@@ -36,7 +38,7 @@ fun AlbumCard(
         Spacer(Modifier.height(8.dp))
         Text(album.title, style = MaterialTheme.typography.titleMedium, maxLines = 1)
         Text(
-            "${album.artistName} • ${album.songCount} Songs",
+            stringResource(R.string.album_artist_song_count, album.artistName, album.songCount),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1

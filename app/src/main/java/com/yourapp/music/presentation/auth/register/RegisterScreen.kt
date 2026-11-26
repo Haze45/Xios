@@ -10,11 +10,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 
@@ -39,12 +40,12 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Create Account",
+            stringResource(R.string.create_account),
             style = MaterialTheme.typography.headlineLarge
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Join and start listening",
+            stringResource(R.string.register_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary
         )
@@ -53,7 +54,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.displayName,
             onValueChange = viewModel::onNameChange,
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -62,7 +63,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.email,
             onValueChange = viewModel::onEmailChange,
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -72,7 +73,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
@@ -83,7 +84,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.confirmPassword,
             onValueChange = viewModel::onConfirmPasswordChange,
-            label = { Text("Confirm Password") },
+            label = { Text(stringResource(R.string.confirm_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
@@ -119,7 +120,7 @@ fun RegisterScreen(
                     ), color = BackgroundBlack
                 )
             } else {
-                Text("Sign Up")
+                Text(stringResource(R.string.sign_up))
             }
         }
 
@@ -131,11 +132,14 @@ fun RegisterScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Already have an account?",
+                stringResource(R.string.have_account_prompt),
                 color = TextSecondary
             )
             TextButton(onClick = onNavigateToLogin) {
-                Text("Log In", color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.log_in),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

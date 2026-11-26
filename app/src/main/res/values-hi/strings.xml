@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Xios</string>
+
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="playback_section">प्लेबैक</string>
+    <string name="streaming_quality">स्ट्रीमिंग गुणवत्ता</string>
+    <string name="preferred_audio_quality">पसंदीदा ऑडियो गुणवत्ता</string>
+
+    <string name="notifications_section">सूचनाएँ</string>
+    <string name="playback_notification">प्लेबैक सूचना</string>
+    <string name="playback_notification_description">सूचनाओं में वर्तमान में चल रहा गाना दिखाएँ</string>
+
+    <string name="appearance_section">दिखावट</string>
+    <string name="theme">थीम</string>
+    <string name="choose_app_appearance">ऐप की दिखावट चुनें</string>
+
+    <string name="language_section">भाषा</string>
+    <string name="app_language">ऐप की भाषा</string>
+    <string name="choose_preferred_language">अपनी पसंदीदा भाषा चुनें</string>
+    <string name="language_system_default">सिस्टम की भाषा</string>
+
+    <string name="logout">लॉग आउट</string>
+    <string name="logout_confirmation_title">लॉग आउट करें?</string>
+    <string name="logout_confirmation_message">क्या आप वाकई अपने खाते से लॉग आउट करना चाहते हैं?</string>
+    <string name="cancel">रद्द करें</string>
+
+    <string name="quality_low">कम</string>
+    <string name="quality_normal">सामान्य</string>
+    <string name="quality_high">उच्च</string>
+
+    <string name="theme_system">सिस्टम</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
+
+
+    <string name="my_profile">मेरी प्रोफ़ाइल</string>
+    <string name="search">खोजें</string>
+    <string name="favorites">पसंदीदा</string>
+    <string name="home_greeting">नमस्ते, %1$s</string>
+    <string name="filter_all">सभी</string>
+    <string name="filter_new_release">नई रिलीज़</string>
+    <string name="picked_for_you">आपके लिए चुने गए</string>
+    <string name="refresh">रिफ़्रेश करें</string>
+    <string name="by_artist">%1$s द्वारा</string>
+    <string name="recently_played">हाल ही में चलाए गए</string>
+    <string name="albums">एल्बम</string>
+    <string name="no_albums_yet">अभी कोई एल्बम नहीं है — यहाँ दिखने के लिए गानों में एल्बम टैग होना चाहिए।</string>
+    <string name="my_music">मेरा संगीत</string>
+    <string name="more">और</string>
+    <string name="playlists">प्लेलिस्ट</string>
+    <string name="liked_songs">पसंदीदा गाने</string>
+    <string name="downloads">डाउनलोड</string>
+
+
+    <string name="back">वापस</string>
+    <string name="edit_profile">प्रोफ़ाइल संपादित करें</string>
+    <string name="following">फ़ॉलो कर रहे हैं</string>
+    <string name="followers">फ़ॉलोअर्स</string>
+    <string name="my_playlists">मेरी प्लेलिस्ट</string>
+    <string name="see_all">सभी देखें</string>
+    <string name="my_favorite_artists">मेरे पसंदीदा कलाकार</string>
+    <string name="profile_photo">प्रोफ़ाइल फ़ोटो</string>
+    <string name="change_photo">फ़ोटो बदलें</string>
+    <string name="name">नाम</string>
+    <string name="save">सेव करें</string>
+    <string name="create_playlist">प्लेलिस्ट बनाएँ</string>
+    <string name="no_playlists_yet">अभी कोई प्लेलिस्ट नहीं है — पहली प्लेलिस्ट बनाने के लिए + दबाएँ।</string>
+    <string name="new_playlist">नई प्लेलिस्ट</string>
+    <string name="playlist_name">प्लेलिस्ट का नाम</string>
+    <string name="create">बनाएँ</string>
+    <string name="rename_playlist">प्लेलिस्ट का नाम बदलें</string>
+    <string name="delete_playlist">प्लेलिस्ट हटाएँ</string>
+    <string name="delete">हटाएँ</string>
+    <string name="song_count">%1$d गाने</string>
+    <string name="delete_playlist_confirmation">"%1$s" हटाएँ? यह वापस नहीं किया जा सकता।</string>
+    <string name="search_hint">गाने, कलाकार या एल्बम खोजें...</string>
+    <string name="local_results">स्थानीय परिणाम</string>
+    <string name="hybrid_results">मिश्रित परिणाम</string>
+    <string name="suggested_songs">सुझाए गए गाने</string>
+    <string name="no_search_results">कोई मिलता-जुलता गाना नहीं मिला। कोई दूसरा नाम, कलाकार या एल्बम आज़माएँ।</string>
+    <string name="recent_searches">हाल की खोजें</string>
+    <string name="clear_all">सभी हटाएँ</string>
+    <string name="browse_by_genre">शैली के अनुसार देखें</string>
+
+
+    <string name="playlist">प्लेलिस्ट</string>
+    <string name="playlist_not_found">प्लेलिस्ट नहीं मिली</string>
+    <string name="playlist_owner_and_song_count">%1$s द्वारा • %2$d गाने</string>
+    <string name="play_all">सभी चलाएँ</string>
+    <string name="no_songs_in_playlist">इस प्लेलिस्ट में अभी कोई गाना नहीं है।</string>
+    <string name="remove_song">गाना हटाएँ</string>
+    <string name="remove">हटाएँ</string>
+    <string name="storage_permission_download">डाउनलोड सेव करने के लिए स्टोरेज अनुमति आवश्यक है</string>
+    <string name="now_playing">अभी चल रहा है</string>
+    <string name="favorite">पसंदीदा</string>
+    <string name="downloaded">डाउनलोड हो गया</string>
+    <string name="download">डाउनलोड</string>
+    <string name="add_to_playlist">प्लेलिस्ट में जोड़ें</string>
+    <string name="shuffle">शफल</string>
+    <string name="previous">पिछला</string>
+    <string name="play_pause">चलाएँ/रोकें</string>
+    <string name="next">अगला</string>
+    <string name="queue">क्यू</string>
+    <string name="nav_home">होम</string>
+    <string name="nav_library">लाइब्रेरी</string>
+    <string name="nav_queue">क्यू</string>
+    <string name="nav_playlists">प्लेलिस्ट</string>
+    <string name="nav_settings">सेटिंग्स</string>
+
+    <string name="playing_queue">चल रही कतार</string>
+    <string name="queue_is_empty">कतार खाली है</string>
+    <string name="queue_song_artwork">%1$s का कवर</string>
+    <string name="no_playlists_for_song">आपकी कोई प्लेलिस्ट नहीं है — ऊपर नई प्लेलिस्ट बनाएँ।</string>
+    <string name="added_to_playlist">जोड़ा गया</string>
+
+    <string name="album">एल्बम</string>
+    <string name="album_not_found">एल्बम नहीं मिला</string>
+    <string name="album_artist_song_count">%1$s • %2$d गाने</string>
+    <string name="welcome_back">वापसी पर स्वागत है</string>
+    <string name="login_subtitle">सुनना जारी रखने के लिए लॉग इन करें</string>
+    <string name="email">ईमेल</string>
+    <string name="password">पासवर्ड</string>
+    <string name="log_in">लॉग इन करें</string>
+    <string name="no_account_prompt">क्या आपका खाता नहीं है?</string>
+    <string name="sign_up">साइन अप करें</string>
+    <string name="create_account">खाता बनाएँ</string>
+    <string name="register_subtitle">जुड़ें और संगीत सुनना शुरू करें</string>
+    <string name="confirm_password">पासवर्ड की पुष्टि करें</string>
+    <string name="have_account_prompt">क्या आपका पहले से खाता है?</string>
+    <string name="no_liked_songs">अभी कोई पसंदीदा गाना नहीं है — यहाँ सहेजने के लिए किसी भी गाने पर दिल के निशान को दबाएँ।</string>
+    <string name="remove_favorite">पसंदीदा से हटाएँ</string>
+    <string name="delete_downloaded_song_title">डाउनलोड किया गया गाना हटाएँ?</string>
+    <string name="delete_downloaded_song_message">"%1$s" आपके ऑफ़लाइन डाउनलोड और इस डिवाइस से हटा दिया जाएगा। आप इसे बाद में फिर से डाउनलोड कर सकते हैं।</string>
+    <string name="keep_song">गाना रखें</string>
+    <string name="no_downloads_yet">अभी कोई डाउनलोड नहीं है — गाना सहेजने के लिए अभी चल रहा है स्क्रीन पर डाउनलोड आइकन दबाएँ।</string>
+    <string name="delete_downloaded_song">डाउनलोड किया गया गाना हटाएँ</string>
+    <string name="paused">रुका हुआ</string>
+    <string name="download_failed">डाउनलोड विफल</string>
+    <string name="downloading">डाउनलोड हो रहा है...</string>
+    <string name="resume">जारी रखें</string>
+    <string name="retry">फिर कोशिश करें</string>
+    <string name="pause">रोकें</string>
+    <string name="follow">फ़ॉलो करें</string>
+    <string name="playlist_owner_song_count">%1$s की प्लेलिस्ट • %2$d गाने</string>
+    <string name="playlist_options">प्लेलिस्ट विकल्प</string>
+
+    <string name="play">चलाएँ</string>
+    <string name="open">खोलें</string>
+</resources>

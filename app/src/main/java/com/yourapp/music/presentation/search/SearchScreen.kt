@@ -21,12 +21,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.GenreTile
 import com.yourapp.music.presentation.components.ShimmerSongRow
@@ -61,12 +61,14 @@ fun SearchScreen(
                 value = state.query,
                 onValueChange = viewModel::onQueryChange,
                 placeholder = {
-                    Text("Search songs, artists, albums...")
+                    Text(stringResource(R.string.search_hint))
                 },
                 leadingIcon = {
                     Icon(
                         Icons.Filled.Search,
-                        contentDescription = "Search"
+                        contentDescription = stringResource(
+                            R.string.search
+                        )
                     )
                 },
                 singleLine = true,
@@ -90,7 +92,7 @@ fun SearchScreen(
                     onCancelClick()
                 }
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
 
@@ -99,9 +101,12 @@ fun SearchScreen(
         if (state.isSearchActive) {
             Text(
                 text = when {
-                    state.isLocalFallback -> "LOCAL RESULTS"
-                    state.isHybridSearch -> "HYBRID RESULTS"
-                    else -> "SUGGESTED SONGS"
+                    state.isLocalFallback -> stringResource(
+                        R.string.local_results
+                    )
+
+                    state.isHybridSearch -> stringResource(R.string.hybrid_results)
+                    else -> stringResource(R.string.suggested_songs)
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -124,7 +129,7 @@ fun SearchScreen(
 
                 state.searchResults.isEmpty() -> {
                     Text(
-                        text = "No matching songs found. Try another title, artist or album.",
+                        text = stringResource(R.string.no_search_results),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(12.dp)
@@ -187,7 +192,7 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Recent Searches",
+                        stringResource(R.string.recent_searches),
                         style = MaterialTheme.typography.titleLarge
                     )
 
@@ -195,7 +200,7 @@ fun SearchScreen(
                         onClick = viewModel::clearRecentSearches
                     ) {
                         Text(
-                            "Clear All",
+                            stringResource(R.string.clear_all),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -234,7 +239,7 @@ fun SearchScreen(
                 Spacer(Modifier.height(24.dp))
 
                 Text(
-                    "Browse by Genre",
+                    stringResource(R.string.browse_by_genre),
                     style = MaterialTheme.typography.titleLarge
                 )
 

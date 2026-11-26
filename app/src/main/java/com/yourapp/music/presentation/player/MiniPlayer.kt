@@ -23,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
+import com.yourapp.music.R
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -68,7 +70,10 @@ fun MiniPlayer(
             )
 
             Text(
-                text = "By ${song.artist}",
+                text = stringResource(
+                    R.string.by_artist,
+                    song.artist
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -78,7 +83,7 @@ fun MiniPlayer(
         IconButton(onClick = viewModel::toggleShuffle) {
             Icon(
                 imageVector = Icons.Filled.Shuffle,
-                contentDescription = "Shuffle",
+                contentDescription = stringResource(R.string.shuffle),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -96,7 +101,7 @@ fun MiniPlayer(
                 } else {
                     Icons.Filled.PlayArrow
                 },
-                contentDescription = "Play/Pause",
+                contentDescription = stringResource(R.string.play_pause),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }
@@ -104,7 +109,7 @@ fun MiniPlayer(
         IconButton(onClick = viewModel::skipToNext) {
             Icon(
                 imageVector = Icons.Filled.SkipNext,
-                contentDescription = "Next",
+                contentDescription = stringResource(R.string.next),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

@@ -42,15 +42,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.AccentGreen
+import com.yourapp.music.R
 import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.ShimmerDetailScreen
 import com.yourapp.music.presentation.components.SongListItem
@@ -86,11 +86,13 @@ fun PlaylistDetailScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(
+                            R.string.back
+                        )
                     )
                 }
                 Text(
-                    "Playlist",
+                    stringResource(R.string.playlist),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -108,7 +110,7 @@ fun PlaylistDetailScreen(
                 ) {
                     Text(
                         state.errorMessage
-                            ?: "Playlist not found",
+                            ?: stringResource(R.string.playlist_not_found),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -134,7 +136,11 @@ fun PlaylistDetailScreen(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "By ${playlist.ownerName} • ${playlist.songCount} Songs",
+                            stringResource(
+                                R.string.playlist_owner_and_song_count,
+                                playlist.ownerName,
+                                playlist.songCount
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -165,7 +171,7 @@ fun PlaylistDetailScreen(
                         contentDescription = null
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Play All")
+                    Text(stringResource(R.string.play_all))
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -178,7 +184,7 @@ fun PlaylistDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "No songs in this playlist yet.",
+                            stringResource(R.string.no_songs_in_playlist),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -251,12 +257,12 @@ private fun SwipeToRemoveSong(
         ) {
             Icon(
                 Icons.Filled.Delete,
-                contentDescription = "Remove song",
+                contentDescription = stringResource(R.string.remove_song),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(Modifier.width(6.dp))
             Text(
-                "Remove",
+                stringResource(R.string.remove),
                 color = BackgroundBlack,
                 fontWeight = FontWeight.SemiBold
             )

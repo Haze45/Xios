@@ -5,18 +5,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.yourapp.music.core.theme.BackgroundBlack
-import com.yourapp.music.core.theme.CardDark
-import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.R
 import com.yourapp.music.domain.model.Playlist
 
 /** Small square cover used in Profile's "My Playlists" grid. */
@@ -75,7 +73,7 @@ fun PlaylistRowItem(
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                "By ${playlist.ownerName} • ${playlist.songCount} Songs",
+                stringResource(R.string.playlist_owner_song_count, playlist.ownerName, playlist.songCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -87,7 +85,7 @@ fun PlaylistRowItem(
             IconButton(onClick = onMenuClick) {
                 Icon(
                     Icons.Filled.MoreVert,
-                    contentDescription = "Playlist options"
+                    contentDescription = stringResource(R.string.playlist_options)
                 )
             }
         }
