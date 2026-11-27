@@ -147,4 +147,15 @@
 
     <string name="play">प्ले करा</string>
     <string name="open">उघडा</string>
+
+    <string name="error_generic">काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.</string>
+    <string name="profile_name_empty">नाव रिकामे असू शकत नाही.</string>
+    <string name="profile_photo_read_failed">निवडलेला फोटो वाचता आला नाही.</string>
+    <string name="search_semantic_fallback">सिमॅंटिक शोध उपलब्ध नाही. स्थानिक परिणाम दाखवत आहोत.</string>
+    <string name="search_failed">शोध अयशस्वी झाला. कृपया पुन्हा प्रयत्न करा.</string>
+    <string name="download_started">डाउनलोड पार्श्वभूमीत सुरू झाले आहे.</string>
+    <string name="delete_download_failed">डाउनलोड केलेले गाणे हटवता आले नाही.</string>
+
+    <string name="recommendations_need_activity">वैयक्तिक शिफारसी मिळवण्यासाठी काही गाणी आवडती म्हणून निवडा किंवा ऐका.</string>
+    <string name="recommendations_load_failed">शिफारसी लोड करता आल्या नाहीत. पुन्हा प्रयत्न करण्यासाठी रिफ्रेश करा.</string>
 </resources>

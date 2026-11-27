@@ -50,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.ShimmerDetailScreen
@@ -108,9 +109,9 @@ fun PlaylistDetailScreen(
                         .height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AppMessageText(
                         state.errorMessage
-                            ?: stringResource(R.string.playlist_not_found),
+                            ?: "playlist_not_found",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -172,6 +173,11 @@ fun PlaylistDetailScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.play_all))
+                }
+
+                state.errorMessage?.let { message ->
+                    AppMessageText(message)
+                    Spacer(Modifier.height(8.dp))
                 }
 
                 Spacer(Modifier.height(16.dp))

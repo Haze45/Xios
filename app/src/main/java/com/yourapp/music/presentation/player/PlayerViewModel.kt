@@ -16,6 +16,7 @@ import com.yourapp.music.domain.usecase.favorite.AddFavoriteUseCase
 import com.yourapp.music.domain.usecase.favorite.IsFavoriteUseCase
 import com.yourapp.music.domain.usecase.favorite.RemoveFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -44,6 +45,7 @@ class PlayerViewModel @Inject constructor(
     private val userId: String?
         get() = getCurrentUserUseCase()?.uid
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val favoriteFlow = connection.playerState
         .map { it.currentSong }
         .flatMapLatest { song ->
@@ -56,6 +58,7 @@ class PlayerViewModel @Inject constructor(
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val downloadedFlow = connection.playerState
         .map { it.currentSong }
         .flatMapLatest { song ->
@@ -66,6 +69,7 @@ class PlayerViewModel @Inject constructor(
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val downloadingFlow = connection.playerState
         .map { it.currentSong }
         .flatMapLatest { song ->
@@ -77,6 +81,7 @@ class PlayerViewModel @Inject constructor(
         }
 
     // Observe actual download progress for the currently playing song.
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val downloadProgressFlow =
         connection.playerState
             .map { it.currentSong }
@@ -174,13 +179,12 @@ class PlayerViewModel @Inject constructor(
 
         viewModelScope.launch {
             downloadMessage.value =
-                when (val result =
-                    downloadSongUseCase(song)) {
+                when (downloadSongUseCase(song)) {
                     is Resource.Success ->
-                        "Download started in background"
+                        "download_started"
 
                     is Resource.Error ->
-                        result.message
+                        "download_failed"
 
                     is Resource.Loading -> null
                 }

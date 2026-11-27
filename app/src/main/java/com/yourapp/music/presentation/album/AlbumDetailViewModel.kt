@@ -20,15 +20,15 @@ class AlbumDetailViewModel @Inject constructor(
     private val getAllSongsUseCase: GetAllSongsUseCase
 ) : ViewModel() {
 
-    // Album names can contain spaces/slashes/etc., so the route argument is
-    // URL-encoded on the way in (see Screen.AlbumDetail.createRoute) and
-    // decoded back here.
-    private val albumId: String = savedStateHandle.get<String>("albumId")
-        ?.let { URLDecoder.decode(it, "UTF-8") }
-        .orEmpty()
+    private val albumId: String =
+        savedStateHandle.get<String>("albumId")
+            ?.let { URLDecoder.decode(it, "UTF-8") }
+            .orEmpty()
 
-    private val _uiState = MutableStateFlow(AlbumDetailUiState())
-    val uiState: StateFlow<AlbumDetailUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(AlbumDetailUiState())
+    val uiState: StateFlow<AlbumDetailUiState> =
+        _uiState.asStateFlow()
 
     init {
         load()
@@ -37,18 +37,25 @@ class AlbumDetailViewModel @Inject constructor(
     /** Fully live — recomputes instantly if the underlying song catalog changes. */
     private fun load() {
         if (albumId.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Album not found") }
+            _uiState.update { it.copy(errorMessage = "album_not_found") }
             return
         }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             getAllSongsUseCase().collect { allSongs ->
-                val songsInAlbum = allSongs.filter { it.album == albumId }
+                val songsInAlbum =
+                    allSongs.filter { it.album == albumId }
                 if (songsInAlbum.isEmpty()) {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Album not found") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "album_not_found"
+                        )
+                    }
                     return@collect
                 }
-                val lastSong = songsInAlbum.last() // same "last added" convention as playlist/album covers elsewhere
+                val lastSong =
+                    songsInAlbum.last() // same "last added" convention as playlist/album covers elsewhere
                 val album = Album(
                     id = albumId,
                     title = albumId,
@@ -57,7 +64,12 @@ class AlbumDetailViewModel @Inject constructor(
                     songIds = songsInAlbum.map { it.id }
                 )
                 _uiState.update {
-                    it.copy(album = album, songs = songsInAlbum, isLoading = false, errorMessage = null)
+                    it.copy(
+                        album = album,
+                        songs = songsInAlbum,
+                        isLoading = false,
+                        errorMessage = null
+                    )
                 }
             }
         }

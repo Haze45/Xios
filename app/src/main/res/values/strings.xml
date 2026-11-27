@@ -76,7 +76,7 @@
     <string name="song_count">%1$d Songs</string>
     <string name="delete_playlist_confirmation">Delete "%1$s"? This can\'t be undone.</string>
 
-    <string name="search_hint">Search songs, artists, albums...</string>
+    <string name="search_hint">Search songs, artists, albums..</string>
     <string name="local_results">LOCAL RESULTS</string>
     <string name="hybrid_results">HYBRID RESULTS</string>
     <string name="suggested_songs">SUGGESTED SONGS</string>
@@ -139,7 +139,7 @@
     <string name="delete_downloaded_song">Delete downloaded song</string>
     <string name="paused">Paused</string>
     <string name="download_failed">Download failed</string>
-    <string name="downloading">Downloading...</string>
+    <string name="downloading">Downloading..</string>
     <string name="resume">Resume</string>
     <string name="retry">Retry</string>
     <string name="pause">Pause</string>
@@ -149,4 +149,15 @@
 
     <string name="play">Play</string>
     <string name="open">Open</string>
+
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="profile_name_empty">Name can\'t be empty.</string>
+    <string name="profile_photo_read_failed">Couldn\'t read the selected photo.</string>
+    <string name="search_semantic_fallback">Semantic search is unavailable. Showing local matches.</string>
+    <string name="search_failed">Search failed. Please try again.</string>
+    <string name="download_started">Download started in background.</string>
+    <string name="delete_download_failed">Couldn\'t delete the downloaded song.</string>
+
+    <string name="recommendations_need_activity">Like or listen to a few songs to get personalized recommendations.</string>
+    <string name="recommendations_load_failed">Couldn\'t load recommendations. Tap Refresh to try again.</string>
 </resources>

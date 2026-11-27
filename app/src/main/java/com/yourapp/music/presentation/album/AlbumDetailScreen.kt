@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.ShimmerDetailScreen
 import com.yourapp.music.presentation.components.SongListItem
@@ -79,11 +80,10 @@ fun AlbumDetailScreen(
                         .height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AppMessageText(
                         state.errorMessage
-                            ?: stringResource(R.string.album_not_found),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium
+                            ?: "album_not_found",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {

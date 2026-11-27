@@ -165,7 +165,7 @@ class SearchViewModel @Inject constructor(
                             ) {
                                 null
                             } else {
-                                "Semantic search is unavailable. Showing local matches."
+                                "search_semantic_fallback"
                             }
                         )
                     } else {
@@ -184,7 +184,7 @@ class SearchViewModel @Inject constructor(
                             isLoading = false,
                             isLocalFallback = true,
                             errorMessage =
-                                "Search failed. Please try again."
+                                "search_failed"
                         )
                     } else {
                         current

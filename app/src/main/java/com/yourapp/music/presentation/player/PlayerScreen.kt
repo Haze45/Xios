@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.appMessageResource
 import com.yourapp.music.presentation.playlist.AddToPlaylistSheet
 import com.yourapp.music.presentation.queue.QueueBottomSheet
 
@@ -115,7 +116,7 @@ fun PlayerScreen(
         state.downloadMessage?.let {
             Toast.makeText(
                 context,
-                it,
+                context.getString(appMessageResource(it)),
                 Toast.LENGTH_SHORT
             ).show()
 

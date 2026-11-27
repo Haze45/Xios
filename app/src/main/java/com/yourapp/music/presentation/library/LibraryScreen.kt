@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourapp.music.R
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.domain.model.Song
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.presentation.components.FilterPill
 import com.yourapp.music.presentation.components.ShimmerPlaylistList
 import com.yourapp.music.presentation.library.tabs.AllTab
@@ -116,6 +117,10 @@ fun LibraryScreen(
                     )
                 }
             }
+        }
+
+        state.errorMessage?.let { message ->
+            AppMessageText(message)
         }
     }
 }

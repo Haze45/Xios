@@ -198,7 +198,7 @@ class HomeViewModel @Inject constructor(
                         isRecommendationsLoading = false,
                         recommendationMessage =
                             if (recommendations.isEmpty()) {
-                                "Like or listen to a few songs to get personalized recommendations."
+                                "recommendations_need_activity"
                             } else {
                                 null
                             }
@@ -211,7 +211,7 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         isRecommendationsLoading = false,
                         recommendationMessage =
-                            "Couldn't load recommendations. Tap Refresh to try again."
+                            "recommendations_load_failed"
                     )
                 }
             }

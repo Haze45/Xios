@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.domain.model.Playlist
 import com.yourapp.music.presentation.components.ArtistAvatarItem
 import com.yourapp.music.presentation.components.PlaylistGridItem
@@ -209,11 +210,7 @@ fun ProfileScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            Text(
-                it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            AppMessageText(it)
         }
 
         Spacer(Modifier.height(24.dp))

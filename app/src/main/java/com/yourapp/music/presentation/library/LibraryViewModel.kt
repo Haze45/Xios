@@ -110,12 +110,11 @@ class LibraryViewModel @Inject constructor(
                 it.copy(isLoading = true)
             }
 
-            when (val result =
-                getUserPlaylistsUseCase(uid)) {
+            when (getUserPlaylistsUseCase(uid)) {
                 is Resource.Error -> {
                     _uiState.update {
                         it.copy(
-                            errorMessage = result.message,
+                            errorMessage = "error_generic",
                             isLoading = false
                         )
                     }
@@ -177,11 +176,10 @@ class LibraryViewModel @Inject constructor(
                 downloadWorkManager.deleteCompletedDownload(
                     songId
                 )
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 _uiState.update {
                     it.copy(
-                        errorMessage = exception.message
-                            ?: "Couldn't delete downloaded song."
+                        errorMessage = "delete_download_failed"
                     )
                 }
             }

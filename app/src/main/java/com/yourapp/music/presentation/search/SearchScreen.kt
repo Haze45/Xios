@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.GenreTile
 import com.yourapp.music.presentation.components.ShimmerSongRow
@@ -277,11 +278,7 @@ fun SearchScreen(
 
         state.errorMessage?.let { message ->
             Spacer(Modifier.height(8.dp))
-            Text(
-                message,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            AppMessageText(message)
         }
 
         Spacer(Modifier.height(16.dp))

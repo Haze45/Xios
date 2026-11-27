@@ -26,10 +26,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+    @param:ApplicationContext private val appContext: Context,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getUserStatsUseCase: GetUserStatsUseCase,
     private val getUserPlaylistsUseCase: GetUserPlaylistsUseCase,
@@ -44,8 +45,10 @@ class ProfileViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(ProfileUiState())
+    val uiState: StateFlow<ProfileUiState> =
+        _uiState.asStateFlow()
 
     private val userId: String? get() = getCurrentUserUseCase()?.uid
 
@@ -53,7 +56,9 @@ class ProfileViewModel @Inject constructor(
         val user = getCurrentUserUseCase()
         _uiState.update {
             it.copy(
-                displayName = user?.displayName ?: user?.email?.substringBefore("@").orEmpty(),
+                displayName = user?.displayName
+                    ?: user?.email?.substringBefore("@")
+                        .orEmpty(),
                 photoUrl = user?.photoUrl
             )
         }
@@ -79,7 +84,11 @@ class ProfileViewModel @Inject constructor(
                 .map { it.playlists.size to it.favoriteArtists.size }
                 .distinctUntilChanged()
                 .collect { (playlistCount, followingCount) ->
-                    syncProfileUseCase(uid, followingCount, playlistCount)
+                    syncProfileUseCase(
+                        uid,
+                        followingCount,
+                        playlistCount
+                    )
                 }
         }
     }
@@ -89,8 +98,20 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             when (val result = getUserStatsUseCase(uid)) {
-                is Resource.Success -> _uiState.update { it.copy(stats = result.data, isLoading = false) }
-                is Resource.Error -> _uiState.update { it.copy(errorMessage = result.message, isLoading = false) }
+                is Resource.Success -> _uiState.update {
+                    it.copy(
+                        stats = result.data,
+                        isLoading = false
+                    )
+                }
+
+                is Resource.Error -> _uiState.update {
+                    it.copy(
+                        errorMessage = "error_generic",
+                        isLoading = false
+                    )
+                }
+
                 is Resource.Loading -> Unit
             }
         }
@@ -100,8 +121,13 @@ class ProfileViewModel @Inject constructor(
         val uid = userId ?: return
         viewModelScope.launch {
             // One-shot hydration from Supabase into Room...
-            when (val result = getUserPlaylistsUseCase(uid)) {
-                is Resource.Error -> _uiState.update { it.copy(errorMessage = result.message) }
+            when (getUserPlaylistsUseCase(uid)) {
+                is Resource.Error -> _uiState.update {
+                    it.copy(
+                        errorMessage = "error_generic"
+                    )
+                }
+
                 else -> Unit
             }
             // ...then observe Room live from then on, so this grid updates
@@ -123,13 +149,23 @@ class ProfileViewModel @Inject constructor(
 
     private fun refreshFollowedArtists() {
         val uid = userId ?: return
-        viewModelScope.launch { refreshFollowedArtistsUseCase(uid) }
+        viewModelScope.launch {
+            refreshFollowedArtistsUseCase(
+                uid
+            )
+        }
     }
 
-    fun toggleFollow(artistId: String, isCurrentlyFollowing: Boolean) {
+    fun toggleFollow(
+        artistId: String,
+        isCurrentlyFollowing: Boolean
+    ) {
         val uid = userId ?: return
         viewModelScope.launch {
-            if (isCurrentlyFollowing) unfollowArtistUseCase(artistId, uid) else followArtistUseCase(artistId, uid)
+            if (isCurrentlyFollowing) unfollowArtistUseCase(
+                artistId,
+                uid
+            ) else followArtistUseCase(artistId, uid)
         }
     }
 
@@ -144,55 +180,93 @@ class ProfileViewModel @Inject constructor(
      * from). [onSaved] fires only on success, so the sheet knows when
      * it's safe to dismiss itself.
      */
-    fun updateProfile(displayName: String, photoUri: String?, onSaved: () -> Unit) {
+    fun updateProfile(
+        displayName: String,
+        photoUri: String?,
+        onSaved: () -> Unit
+    ) {
         val trimmedName = displayName.trim()
         if (trimmedName.isEmpty()) {
-            _uiState.update { it.copy(errorMessage = "Name can't be empty") }
+            _uiState.update { it.copy(errorMessage = "profile_name_empty") }
             return
         }
         val uid = userId
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isSaving = true,
+                    errorMessage = null
+                )
+            }
 
             var resolvedPhotoUrl = photoUri
             if (photoUri != null && uid != null) {
                 val bytes = try {
-                    appContext.contentResolver.openInputStream(android.net.Uri.parse(photoUri))?.use { it.readBytes() }
-                } catch (e: Exception) {
+                    appContext.contentResolver.openInputStream(
+                        photoUri.toUri()
+                    )?.use { it.readBytes() }
+                } catch (_: Exception) {
                     null
                 }
                 if (bytes == null) {
-                    _uiState.update { it.copy(isSaving = false, errorMessage = "Couldn't read the selected photo") }
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            errorMessage = "profile_photo_read_failed"
+                        )
+                    }
                     return@launch
                 }
-                when (val uploadResult = uploadProfilePhotoUseCase(uid, bytes)) {
-                    is Resource.Success -> resolvedPhotoUrl = uploadResult.data
+                when (val uploadResult =
+                    uploadProfilePhotoUseCase(uid, bytes)) {
+                    is Resource.Success -> resolvedPhotoUrl =
+                        uploadResult.data
+
                     is Resource.Error -> {
-                        _uiState.update { it.copy(isSaving = false, errorMessage = uploadResult.message) }
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                errorMessage = "error_generic"
+                            )
+                        }
                         return@launch
                     }
+
                     is Resource.Loading -> Unit
                 }
             }
 
-            when (val result = updateProfileUseCase(trimmedName, resolvedPhotoUrl)) {
+            when (val result = updateProfileUseCase(
+                trimmedName,
+                resolvedPhotoUrl
+            )) {
                 is Resource.Success -> {
                     _uiState.update {
                         it.copy(
-                            displayName = result.data.displayName ?: trimmedName,
-                            photoUrl = result.data.photoUrl ?: it.photoUrl,
+                            displayName = result.data.displayName
+                                ?: trimmedName,
+                            photoUrl = result.data.photoUrl
+                                ?: it.photoUrl,
                             isSaving = false
                         )
                     }
                     onSaved()
                 }
-                is Resource.Error -> _uiState.update { it.copy(errorMessage = result.message, isSaving = false) }
+
+                is Resource.Error -> _uiState.update {
+                    it.copy(
+                        errorMessage = "error_generic",
+                        isSaving = false
+                    )
+                }
+
                 is Resource.Loading -> Unit
             }
         }
     }
 
-    fun clearError() = _uiState.update { it.copy(errorMessage = null) }
+    fun clearError() =
+        _uiState.update { it.copy(errorMessage = null) }
 
     fun logout() = logoutUseCase()
 }

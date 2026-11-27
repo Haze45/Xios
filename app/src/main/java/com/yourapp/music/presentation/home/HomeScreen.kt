@@ -28,6 +28,7 @@ import com.yourapp.music.core.theme.SurfaceElevated
 import com.yourapp.music.core.theme.TextSecondary
 import com.yourapp.music.domain.model.Song
 import com.yourapp.music.presentation.components.AlbumCard
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.presentation.components.FeaturedPlaylistCard
 import com.yourapp.music.presentation.components.FilterPill
 import com.yourapp.music.presentation.components.ShimmerAlbumCard
@@ -199,7 +200,17 @@ fun HomeScreen(
 
             state.recommendationMessage != null -> {
                 Text(
-                    text = state.recommendationMessage!!,
+                    text = stringResource(
+                        when (state.recommendationMessage) {
+                            "recommendations_need_activity" ->
+                                R.string.recommendations_need_activity
+
+                            "recommendations_load_failed" ->
+                                R.string.recommendations_load_failed
+
+                            else -> R.string.error_generic
+                        }
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
@@ -300,10 +311,7 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         state.errorMessage?.let { message ->
-            Text(
-                message,
-                color = MaterialTheme.colorScheme.error
-            )
+            AppMessageText(messageKey = message)
         }
     }
 }

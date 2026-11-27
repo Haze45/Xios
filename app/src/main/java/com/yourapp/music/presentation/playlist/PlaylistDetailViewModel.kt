@@ -24,10 +24,13 @@ class PlaylistDetailViewModel @Inject constructor(
     private val removeSongFromPlaylistUseCase: RemoveSongFromPlaylistUseCase
 ) : ViewModel() {
 
-    private val playlistId: String = savedStateHandle.get<String>("playlistId").orEmpty()
+    private val playlistId: String =
+        savedStateHandle.get<String>("playlistId").orEmpty()
 
-    private val _uiState = MutableStateFlow(PlaylistDetailUiState())
-    val uiState: StateFlow<PlaylistDetailUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(PlaylistDetailUiState())
+    val uiState: StateFlow<PlaylistDetailUiState> =
+        _uiState.asStateFlow()
 
     init {
         load()
@@ -43,7 +46,7 @@ class PlaylistDetailViewModel @Inject constructor(
      */
     private fun load() {
         if (playlistId.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Playlist not found") }
+            _uiState.update { it.copy(errorMessage = "playlist_not_found") }
             return
         }
         viewModelScope.launch {
@@ -56,29 +59,39 @@ class PlaylistDetailViewModel @Inject constructor(
                 playlist to allSongs
             }.collect { (playlist, allSongs) ->
                 if (playlist == null) {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Playlist not found") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "playlist_not_found"
+                        )
+                    }
                     return@collect
                 }
-                val songsInPlaylist = playlist.songIds.mapNotNull { id -> allSongs.find { it.id == id } }
+                val songsInPlaylist =
+                    playlist.songIds.mapNotNull { id -> allSongs.find { it.id == id } }
                 _uiState.update {
-                    it.copy(playlist = playlist, songs = songsInPlaylist, isLoading = false, errorMessage = null)
+                    it.copy(
+                        playlist = playlist,
+                        songs = songsInPlaylist,
+                        isLoading = false,
+                        errorMessage = null
+                    )
                 }
             }
         }
     }
 
-    /**
-     * Removes a song from this playlist. No manual state patching needed
-     * here — removeSongFromPlaylistUseCase writes straight to Room
-     * (updating song_ids AND falling the cover back to whichever song is
-     * now last), and the live combine() above picks both up automatically.
-     */
     fun removeSong(songId: String) {
         viewModelScope.launch {
             val id = playlistId
             if (id.isBlank()) return@launch
-            when (val result = removeSongFromPlaylistUseCase(id, songId)) {
-                is Resource.Error -> _uiState.update { it.copy(errorMessage = result.message) }
+            when (removeSongFromPlaylistUseCase(id, songId)) {
+                is Resource.Error -> _uiState.update {
+                    it.copy(
+                        errorMessage = "error_generic"
+                    )
+                }
+
                 else -> Unit
             }
         }

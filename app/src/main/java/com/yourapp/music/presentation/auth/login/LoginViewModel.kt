@@ -20,28 +20,54 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<LoginUiState> =
+        _uiState.asStateFlow()
 
     fun onEmailChange(value: String) {
-        _uiState.update { it.copy(email = value, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                email = value,
+                errorMessage = null
+            )
+        }
     }
 
     fun onPasswordChange(value: String) {
-        _uiState.update { it.copy(password = value, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                password = value,
+                errorMessage = null
+            )
+        }
     }
 
     fun login() {
         val state = _uiState.value
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = loginUseCase(state.email, state.password)) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+            when (loginUseCase(state.email, state.password)) {
                 is Resource.Success -> {
                     favoriteSyncManager.enqueueSync() // pull down favorites saved on other devices
-                    _uiState.update { it.copy(isLoading = false, isLoginSuccessful = true) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoginSuccessful = true
+                        )
+                    }
                 }
+
                 is Resource.Error -> _uiState.update {
-                    it.copy(isLoading = false, errorMessage = result.message)
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "error_generic"
+                    )
                 }
+
                 is Resource.Loading -> Unit
             }
         }

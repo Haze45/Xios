@@ -13,8 +13,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.yourapp.music.R
 import com.yourapp.music.core.theme.TextSecondary
-
-/** A row with a leading icon, label, optional subtitle, and a trailing switch. */
 @Composable
 fun SettingsToggleItem(
     icon: ImageVector,
@@ -57,7 +55,6 @@ fun SettingsToggleItem(
     }
 }
 
-/** A row with a leading icon, label, and a trailing chevron — used for navigable rows like "Tracks". */
 @Composable
 fun SettingsNavItem(
     icon: ImageVector,

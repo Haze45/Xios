@@ -147,4 +147,15 @@
 
     <string name="play">चलाएँ</string>
     <string name="open">खोलें</string>
+
+    <string name="error_generic">कुछ गलत हो गया। कृपया फिर से कोशिश करें।</string>
+    <string name="profile_name_empty">नाम खाली नहीं हो सकता।</string>
+    <string name="profile_photo_read_failed">चुनी गई फ़ोटो पढ़ी नहीं जा सकी।</string>
+    <string name="search_semantic_fallback">सिमेंटिक खोज उपलब्ध नहीं है। स्थानीय परिणाम दिखाए जा रहे हैं।</string>
+    <string name="search_failed">खोज विफल रही। कृपया फिर से कोशिश करें।</string>
+    <string name="download_started">डाउनलोड बैकग्राउंड में शुरू हो गया है।</string>
+    <string name="delete_download_failed">डाउनलोड किया गया गाना हटाया नहीं जा सका।</string>
+
+    <string name="recommendations_need_activity">व्यक्तिगत सुझाव पाने के लिए कुछ गाने पसंद करें या सुनें।</string>
+    <string name="recommendations_load_failed">सुझाव लोड नहीं हो सके। फिर से कोशिश करने के लिए रिफ़्रेश करें।</string>
 </resources>

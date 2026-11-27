@@ -21,30 +21,77 @@ class RegisterViewModel @Inject constructor(
     private val syncProfileUseCase: SyncProfileUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RegisterUiState())
-    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(RegisterUiState())
+    val uiState: StateFlow<RegisterUiState> =
+        _uiState.asStateFlow()
 
-    fun onNameChange(value: String) = _uiState.update { it.copy(displayName = value, errorMessage = null) }
-    fun onEmailChange(value: String) = _uiState.update { it.copy(email = value, errorMessage = null) }
-    fun onPasswordChange(value: String) = _uiState.update { it.copy(password = value, errorMessage = null) }
-    fun onConfirmPasswordChange(value: String) = _uiState.update { it.copy(confirmPassword = value, errorMessage = null) }
+    fun onNameChange(value: String) = _uiState.update {
+        it.copy(
+            displayName = value,
+            errorMessage = null
+        )
+    }
+
+    fun onEmailChange(value: String) = _uiState.update {
+        it.copy(
+            email = value,
+            errorMessage = null
+        )
+    }
+
+    fun onPasswordChange(value: String) = _uiState.update {
+        it.copy(
+            password = value,
+            errorMessage = null
+        )
+    }
+
+    fun onConfirmPasswordChange(value: String) =
+        _uiState.update {
+            it.copy(
+                confirmPassword = value,
+                errorMessage = null
+            )
+        }
 
     fun register() {
         val state = _uiState.value
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = registerUseCase(state.email, state.password, state.confirmPassword, state.displayName)) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+            when (val result = registerUseCase(
+                state.email,
+                state.password,
+                state.confirmPassword,
+                state.displayName
+            )) {
                 is Resource.Success -> {
                     favoriteSyncManager.enqueueSync()
-                    // Creates the Supabase profiles row immediately (with
-                    // zeros, since a brand new account has no playlists or
-                    // followed artists yet) — without this, the row would
-                    // never exist until/unless something else happened to
-                    // write to it, which nothing else in the app does.
-                    syncProfileUseCase(result.data.uid, followingCount = 0, playlistCount = 0)
-                    _uiState.update { it.copy(isLoading = false, isRegisterSuccessful = true) }
+                    syncProfileUseCase(
+                        result.data.uid,
+                        followingCount = 0,
+                        playlistCount = 0
+                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isRegisterSuccessful = true
+                        )
+                    }
                 }
-                is Resource.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+
+                is Resource.Error -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "error_generic"
+                    )
+                }
+
                 is Resource.Loading -> Unit
             }
         }

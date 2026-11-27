@@ -147,4 +147,15 @@
 
     <string name="play">চালান</string>
     <string name="open">খুলুন</string>
+
+    <string name="error_generic">কিছু একটা সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+    <string name="profile_name_empty">নাম খালি রাখা যাবে না।</string>
+    <string name="profile_photo_read_failed">নির্বাচিত ছবিটি পড়া যায়নি।</string>
+    <string name="search_semantic_fallback">সেম্যান্টিক অনুসন্ধান উপলভ্য নয়। স্থানীয় ফলাফল দেখানো হচ্ছে।</string>
+    <string name="search_failed">অনুসন্ধান ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</string>
+    <string name="download_started">ব্যাকগ্রাউন্ডে ডাউনলোড শুরু হয়েছে।</string>
+    <string name="delete_download_failed">ডাউনলোড করা গানটি মুছে ফেলা যায়নি।</string>
+
+    <string name="recommendations_need_activity">ব্যক্তিগত সুপারিশ পেতে কয়েকটি গান পছন্দ করুন বা শুনুন।</string>
+    <string name="recommendations_load_failed">সুপারিশ লোড করা যায়নি। আবার চেষ্টা করতে রিফ্রেশ করুন।</string>
 </resources>

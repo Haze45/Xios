@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourapp.music.R
+import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
 
@@ -93,11 +94,7 @@ fun RegisterScreen(
 
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            Text(
-                it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            AppMessageText(it)
         }
 
         Spacer(Modifier.height(24.dp))
