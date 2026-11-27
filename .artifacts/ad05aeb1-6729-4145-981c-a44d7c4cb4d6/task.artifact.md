@@ -1,3 +1,0 @@
-- [x] Apply Compose BOM to all relevant configurations in `app/build.gradle.kts`
-- [x] Verify Gradle Sync
-- [x] Run build to verify fix
