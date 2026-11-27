@@ -1,5 +1,17 @@
 package com.yourapp.music.core.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Home
@@ -8,23 +20,27 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
-import com.yourapp.music.R
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.yourapp.music.R
 
 data class BottomNavItem(
     val screen: Screen,
     val labelRes: Int,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+    val icon: ImageVector
 )
 
 val bottomNavItems = listOf(
@@ -65,57 +81,96 @@ fun MusicBottomNavBar(
 
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 0.dp
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val unselectedColor = Color(0xFFB3B3B3)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0x99080808),
+                        Color(0xE6080808),
+                        Color(0xFF080808)
+                    )
+                )
+            )
+            .navigationBarsPadding()
     ) {
-        bottomNavItems.forEach { item ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            bottomNavItems.forEach { item ->
 
-            val selected = currentRoute == item.screen.route
+                val selected =
+                    currentRoute == item.screen.route
 
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    if (item.screen == Screen.Queue) {
-                        onQueueClick()
-                    } else {
-                        val returnedToExistingDestination =
-                            navController.popBackStack(
-                                item.screen.route,
-                                inclusive = false
-                            )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable {
+                            if (item.screen == Screen.Queue) {
+                                onQueueClick()
+                            } else {
+                                val returnedToExistingDestination =
+                                    navController.popBackStack(
+                                        item.screen.route,
+                                        inclusive = false
+                                    )
 
-                        if (!returnedToExistingDestination) {
-                            navController.navigate(item.screen.route) {
-                                launchSingleTop = true
+                                if (!returnedToExistingDestination) {
+                                    navController.navigate(
+                                        item.screen.route
+                                    ) {
+                                        launchSingleTop =
+                                            true
+                                    }
+                                }
                             }
-                        }
-                    }
-                },
-                icon = {
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = stringResource(
                             item.labelRes
-                        )
+                        ),
+                        modifier = Modifier.size(29.dp),
+                        tint = if (selected) {
+                            selectedColor
+                        } else {
+                            unselectedColor
+                        }
                     )
-                },
-                label = {
-                    Text(stringResource(item.labelRes))
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor =
-                        MaterialTheme.colorScheme.primary,
-                    selectedTextColor =
-                        MaterialTheme.colorScheme.primary,
-                    unselectedIconColor =
-                        MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor =
-                        MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = Color.Transparent
-                )
-            )
+
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    Text(
+                        text = stringResource(item.labelRes),
+                        color = if (selected) {
+                            selectedColor
+                        } else {
+                            unselectedColor
+                        },
+                        fontSize = 11.sp,
+                        fontWeight = if (selected) {
+                            FontWeight.SemiBold
+                        } else {
+                            FontWeight.Normal
+                        },
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Clip
+                    )
+                }
+            }
         }
     }
 }

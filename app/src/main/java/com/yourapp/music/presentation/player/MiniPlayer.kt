@@ -1,7 +1,9 @@
 package com.yourapp.music.presentation.player
 
 import androidx.annotation.OptIn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -22,14 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import com.yourapp.music.R
 
-@OptIn(UnstableApi::class)
+@OptIn(UnstableApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun MiniPlayer(
     onExpandClick: () -> Unit,
@@ -64,9 +66,18 @@ fun MiniPlayer(
         ) {
             Text(
                 text = song.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        initialDelayMillis = 1000,
+                        repeatDelayMillis = 1000,
+                        velocity = 35.dp
+                    ),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1
+                maxLines = 1,
+                softWrap = false
             )
 
             Text(
@@ -76,7 +87,8 @@ fun MiniPlayer(
                 ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
+                maxLines = 1,
+                softWrap = false
             )
         }
 

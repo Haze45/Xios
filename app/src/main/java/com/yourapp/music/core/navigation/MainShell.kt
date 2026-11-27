@@ -3,12 +3,10 @@ package com.yourapp.music.core.navigation
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -57,9 +55,6 @@ fun MainShell(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-
-        // Handle the top system inset centrally.
-        // Bottom navigation remains an overlay.
         contentWindowInsets = WindowInsets.safeDrawing.only(
             WindowInsetsSides.Top
         )
@@ -68,11 +63,11 @@ fun MainShell(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(
+                    top = innerPadding.calculateTopPadding()
+                )
         ) {
 
-            // Main screen content.
-            // It continues behind the floating bottom controls.
             NavHost(
                 navController = bottomNavController,
                 startDestination = Screen.Home.route,
@@ -90,7 +85,8 @@ fun MainShell(
                         },
                         onFavoritesClick = onNavigateToFavorites,
                         onAlbumClick = onNavigateToAlbumDetail,
-                        currentlyPlayingSongId = playerState.currentSong?.id,
+                        currentlyPlayingSongId =
+                            playerState.currentSong?.id,
                         isPlaying = playerState.isPlaying,
                         onSongPlay = { song, queue ->
                             playerViewModel.playSong(
@@ -160,7 +156,6 @@ fun MainShell(
                 }
             }
 
-            // Floating bottom controls.
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -173,10 +168,7 @@ fun MainShell(
                         .padding(horizontal = 12.dp)
                 )
 
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
-
+                // No spacer: MiniPlayer touches the navigation area.
                 MusicBottomNavBar(
                     navController = bottomNavController,
                     onQueueClick = {

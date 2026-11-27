@@ -160,4 +160,30 @@
 
     <string name="recommendations_need_activity">Like or listen to a few songs to get personalized recommendations.</string>
     <string name="recommendations_load_failed">Couldn\'t load recommendations. Tap Refresh to try again.</string>
+    <string name="google_sign_in_failed">Google sign-in failed. Please try again.</string>
+    <string name="auth_fields_required">Please fill in all required fields.</string>
+    <string name="auth_name_required">Please enter your name.</string>
+    <string name="auth_invalid_email">Enter a valid email address.</string>
+    <string name="auth_invalid_credentials">Email or password is incorrect.</string>
+    <string name="auth_email_already_in_use">An account already exists with this email address.</string>
+    <string name="auth_weak_password">Use a password with at least 6 characters.</string>
+    <string name="auth_password_mismatch">Passwords do not match.</string>
+    <string name="auth_too_many_requests">Too many attempts. Please wait and try again.</string>
+    <string name="auth_network_error">Network error. Check your connection and try again.</string>
+    <string name="auth_user_disabled">This account has been disabled.</string>
+    <string name="auth_provider_disabled">This sign-in method is currently unavailable.</string>
+    <string name="auth_account_exists_different_provider">An account already exists with this email using another sign-in method.</string>
+    <string name="auth_login_failed">Could not log in. Please try again.</string>
+    <string name="auth_register_failed">Could not create your account. Please try again.</string>
+    <string name="auth_failed">Authentication failed. Please try again.</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="or">OR</string>
+    <string name="google_logo_description">Google logo</string>
+    <string name="xios_logo_description">Xios logo</string>
+    <string name="signing_in">Signing in…</string>
+    <string name="creating_account_loading">Creating account…</string>
+    <string name="link_google_account_title">Link Google to your existing account</string>
+    <string name="link_google_account_message">An account already exists for %1$s. Enter your existing Xios password to securely link Google to that account. Your playlists and favorites will stay with the same account.</string>
+    <string name="link_account">Link account</string>
+    <string name="auth_password_required">Enter your existing password to continue.</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourapp.music.core.sync.FavoriteSyncManager
 import com.yourapp.music.core.util.Resource
+import com.yourapp.music.domain.repository.AuthRepository
 import com.yourapp.music.domain.usecase.auth.RegisterUseCase
 import com.yourapp.music.domain.usecase.profile.SyncProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val favoriteSyncManager: FavoriteSyncManager,
-    private val syncProfileUseCase: SyncProfileUseCase
+    private val syncProfileUseCase: SyncProfileUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState =
@@ -55,6 +57,24 @@ class RegisterViewModel @Inject constructor(
             )
         }
 
+    fun setGoogleLoading(loading: Boolean) {
+        _uiState.update {
+            it.copy(
+                isLoading = loading,
+                errorMessage = if (loading) null else it.errorMessage
+            )
+        }
+    }
+
+    fun onGoogleError(messageKey: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                errorMessage = messageKey
+            )
+        }
+    }
+
     fun register() {
         val state = _uiState.value
         viewModelScope.launch {
@@ -88,11 +108,61 @@ class RegisterViewModel @Inject constructor(
                 is Resource.Error -> _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "error_generic"
+                        errorMessage = result.message
                     )
                 }
 
-                is Resource.Loading -> Unit
+                is Resource.Loading -> _uiState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    fun registerWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            when (val result =
+                authRepository.loginWithGoogle(idToken)) {
+                is Resource.Success -> {
+                    favoriteSyncManager.enqueueSync()
+
+                    syncProfileUseCase(
+                        result.data.uid,
+                        followingCount = 0,
+                        playlistCount = 0
+                    )
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isRegisterSuccessful = true
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
+                }
+
+                is Resource.Loading -> _uiState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package com.yourapp.music.data.remote.firebase
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -51,13 +52,6 @@ class FirebaseAuthService @Inject constructor(
         return user
     }
 
-    /**
-     * Updates the signed-in user's display name and/or photo. Either
-     * parameter can be null to leave that field untouched. Reloads the
-     * user afterwards so the returned FirebaseUser reflects the change
-     * immediately (updateProfile() alone doesn't mutate the cached
-     * FirebaseUser.displayName/photoUrl properties in place).
-     */
     suspend fun updateProfile(
         displayName: String?,
         photoUri: Uri?
@@ -93,4 +87,44 @@ class FirebaseAuthService @Inject constructor(
                 )
             }
         }
+
+    suspend fun linkGoogleToEmailPasswordAccount(
+        email: String,
+        password: String,
+        googleIdToken: String
+    ): FirebaseUser {
+        val signInResult = firebaseAuth
+            .signInWithEmailAndPassword(email, password)
+            .await()
+        val existingUser = signInResult.user
+            ?: error("Email/password sign-in returned no user")
+
+        val googleCredential = GoogleAuthProvider.getCredential(
+            googleIdToken,
+            null
+        )
+        val linkResult = existingUser
+            .linkWithCredential(googleCredential)
+            .await()
+
+        return linkResult.user
+            ?: firebaseAuth.currentUser
+            ?: error("Google account linking returned no user")
+    }
+
+    suspend fun signInWithGoogleIdToken(
+        idToken: String
+    ): FirebaseUser {
+        val credential = GoogleAuthProvider.getCredential(
+            idToken,
+            null
+        )
+
+        val result = firebaseAuth.signInWithCredential(
+            credential
+        ).await()
+
+        return result.user
+            ?: error("Google sign-in failed: no user returned")
+    }
 }

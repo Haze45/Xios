@@ -158,4 +158,30 @@
 
     <string name="recommendations_need_activity">व्यक्तिगत सुझाव पाने के लिए कुछ गाने पसंद करें या सुनें।</string>
     <string name="recommendations_load_failed">सुझाव लोड नहीं हो सके। फिर से कोशिश करने के लिए रिफ़्रेश करें।</string>
+    <string name="google_sign_in_failed">Google से साइन इन नहीं हो सका। कृपया पुनः प्रयास करें।</string>
+    <string name="auth_fields_required">कृपया सभी आवश्यक फ़ील्ड भरें।</string>
+    <string name="auth_name_required">कृपया अपना नाम दर्ज करें।</string>
+    <string name="auth_invalid_email">एक वैध ईमेल पता दर्ज करें।</string>
+    <string name="auth_invalid_credentials">ईमेल या पासवर्ड गलत है।</string>
+    <string name="auth_email_already_in_use">इस ईमेल पते के साथ एक खाता पहले से मौजूद है।</string>
+    <string name="auth_weak_password">कम से कम 6 वर्णों वाले पासवर्ड का उपयोग करें।</string>
+    <string name="auth_password_mismatch">पासवर्ड मेल नहीं खाते।</string>
+    <string name="auth_too_many_requests">बहुत अधिक प्रयास। कृपया प्रतीक्षा करें और पुनः प्रयास करें।</string>
+    <string name="auth_network_error">नेटवर्क त्रुटि। अपना कनेक्शन जांचें और पुनः प्रयास करें।</string>
+    <string name="auth_user_disabled">यह खाता अक्षम कर दिया गया है।</string>
+    <string name="auth_provider_disabled">यह साइन-इन विधि वर्तमान में अनुपलब्ध है।</string>
+    <string name="auth_account_exists_different_provider">किसी अन्य साइन-इन विधि का उपयोग करके इस ईमेल के साथ एक खाता पहले से मौजूद है।</string>
+    <string name="auth_login_failed">लॉग इन नहीं किया जा सका। कृपया पुनः प्रयास करें।</string>
+    <string name="auth_register_failed">आपका खाता नहीं बनाया जा सका। कृपया पुनः प्रयास करें।</string>
+    <string name="auth_failed">प्रमाणीकरण विफल रहा। कृपया पुनः प्रयास करें।</string>
+    <string name="continue_with_google">Google के साथ जारी रखें</string>
+    <string name="or">या</string>
+    <string name="google_logo_description">Google लोगो</string>
+    <string name="xios_logo_description">Xios लोगो</string>
+    <string name="signing_in">साइन इन किया जा रहा है…</string>
+    <string name="creating_account_loading">खाता बनाया जा रहा है…</string>
+    <string name="link_google_account_title">Google को अपने मौजूदा खाते से लिंक करें</string>
+    <string name="link_google_account_message">%1$s के लिए एक खाता पहले से मौजूद है. Google को उस खाते से सुरक्षित रूप से लिंक करने के लिए अपना मौजूदा Xios पासवर्ड डालें. आपकी प्लेलिस्ट और पसंदीदा चीज़ें उसी खाते में रहेंगी.</string>
+    <string name="link_account">खाता लिंक करें</string>
+    <string name="auth_password_required">जारी रखने के लिए अपना मौजूदा पासवर्ड डालें.</string>
 </resources>

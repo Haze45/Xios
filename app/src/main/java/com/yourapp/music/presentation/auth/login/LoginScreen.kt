@@ -1,15 +1,16 @@
 package com.yourapp.music.presentation.auth.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -19,6 +20,7 @@ import com.yourapp.music.R
 import com.yourapp.music.presentation.components.AppMessageText
 import com.yourapp.music.core.theme.BackgroundBlack
 import com.yourapp.music.core.theme.TextSecondary
+import com.yourapp.music.presentation.auth.GoogleSignInButton
 
 @Composable
 fun LoginScreen(
@@ -27,9 +29,69 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-
     LaunchedEffect(state.isLoginSuccessful) {
         if (state.isLoginSuccessful) onLoginSuccess()
+    }
+
+    if (state.showGoogleLinkDialog) {
+        AlertDialog(
+            onDismissRequest = viewModel::dismissGoogleLinkDialog,
+            title = { Text(stringResource(R.string.link_google_account_title)) },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        10.dp
+                    )
+                ) {
+                    Text(
+                        stringResource(
+                            R.string.link_google_account_message,
+                            state.pendingGoogleEmail.orEmpty()
+                        )
+                    )
+                    OutlinedTextField(
+                        value = state.googleLinkPassword,
+                        onValueChange = viewModel::onGoogleLinkPasswordChange,
+                        label = { Text(stringResource(R.string.password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password
+                        ),
+                        singleLine = true,
+                        enabled = !state.isLoading
+                    )
+                    state.errorMessage?.let {
+                        AppMessageText(
+                            it,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = viewModel::confirmGoogleAccountLink,
+                    enabled = !state.isLoading
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(stringResource(R.string.link_account))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = viewModel::dismissGoogleLinkDialog,
+                    enabled = !state.isLoading
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     Column(
@@ -37,9 +99,18 @@ fun LoginScreen(
             .fillMaxSize()
             .background(BackgroundBlack)
             .systemBarsPadding()
-            .padding(horizontal = 24.dp),
+            .imePadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 28.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(R.drawable.ic_launcher_foreground),
+            contentDescription = stringResource(R.string.xios_logo_description),
+            modifier = Modifier.size(180.dp)
+        )
+        Spacer(Modifier.height(20.dp))
         Text(
             stringResource(R.string.welcome_back),
             style = MaterialTheme.typography.headlineLarge
@@ -50,7 +121,7 @@ fun LoginScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary
         )
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(28.dp))
 
         OutlinedTextField(
             value = state.email,
@@ -58,10 +129,10 @@ fun LoginScreen(
             label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
+            enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(16.dp))
-
+        Spacer(Modifier.height(14.dp))
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
@@ -69,55 +140,81 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
+            enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
-
         state.errorMessage?.let {
             Spacer(Modifier.height(12.dp))
-            AppMessageText(it)
+            AppMessageText(
+                it,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-
-        Spacer(Modifier.height(24.dp))
-
+        Spacer(Modifier.height(22.dp))
         Button(
             onClick = viewModel::login,
             enabled = !state.isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
         ) {
             if (state.isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(
-                        20.dp
-                    ), color = BackgroundBlack
+                    Modifier.size(20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
                 )
-            } else {
-                Text(stringResource(R.string.log_in))
-            }
+                Spacer(Modifier.width(10.dp))
+                Text(stringResource(R.string.signing_in))
+            } else Text(stringResource(R.string.log_in))
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Spacer(Modifier.height(18.dp))
+        AuthOrDivider()
+        Spacer(Modifier.height(18.dp))
+        GoogleSignInButton(
+            enabled = !state.isLoading,
+            isLoading = state.isLoading,
+            onLoadingChange = viewModel::setGoogleLoading,
+            onTokenReceived = viewModel::loginWithGoogle,
+            onError = viewModel::onGoogleError
+        )
+        Spacer(Modifier.height(18.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.no_account_prompt),
                 color = TextSecondary
             )
-            TextButton(onClick = onNavigateToRegister) {
+            TextButton(
+                onClick = onNavigateToRegister,
+                enabled = !state.isLoading
+            ) {
                 Text(
                     stringResource(R.string.sign_up),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun AuthOrDivider() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        HorizontalDivider(
+            Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
+        Text(
+            stringResource(R.string.or),
+            modifier = Modifier.padding(horizontal = 14.dp),
+            color = TextSecondary
+        )
+        HorizontalDivider(
+            Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
     }
 }
