@@ -144,7 +144,7 @@
     <string name="auth_fields_required">براہ کرم تمام مطلوبہ فیلڈز پر کریں۔</string>
     <string name="auth_name_required">براہ کرم اپنا نام درج کریں۔</string>
     <string name="auth_invalid_email">ایک درست ای میل پتہ درج کریں۔</string>
-    <string name="auth_invalid_credentials">ای میل یا پاس ورڈ غلط ہے۔</string>
+    <string name="auth_invalid_credentials">غلط ای میل یا پاس ورڈ۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="auth_email_already_in_use">اس ای میل پتے کے ساتھ ایک اکاؤنٹ پہلے سے موجود ہے۔</string>
     <string name="auth_weak_password">کم از کم 6 حروف والا پاس ورڈ استعمال کریں۔</string>
     <string name="auth_password_mismatch">پاس ورڈز مماثل نہیں ہیں۔</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">نیٹ ورک کی خربی۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="auth_user_disabled">یہ اکاؤنٹ غیر فعال کر دیا گیا ہے۔</string>
     <string name="auth_provider_disabled">یہ سائن ان کا طریقہ فی الحال دستیاب نہیں ہے۔</string>
-    <string name="auth_account_exists_different_provider">کسی اور سائن ان کا طریقہ استعمال کرتے ہوئے اس ای میل کے ساتھ ایک اکاؤنٹ پہلے سے موجود ہے۔</string>
+    <string name="auth_account_exists_different_provider">اس ای میل کے ساتھ ایک اکاؤنٹ پہلے سے موجود ہے۔ Google کو لنک کرنے کے لیے اپنے موجودہ طریقہ کار کا استعمال کرتے ہوئے سائن ان کریں۔</string>
     <string name="auth_login_failed">لاگ ان نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="auth_register_failed">آپ کا اکاؤنٹ نہیں بنایا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="auth_failed">تصدیق ناکام ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s کے لیے پہلے ہی ایک اکاؤنٹ موجود ہے۔ Google کو اس اکاؤنٹ سے محفوظ طریقے سے لنک کرنے کے لیے اپنا موجودہ Xios پاس ورڈ درج کریں۔ آپ کی پلے لسٹس اور پسندیدہ اسی اکاؤنٹ کے ساتھ رہیں گے۔</string>
     <string name="link_account">اکاؤنٹ لنک کریں</string>
     <string name="auth_password_required">جاری رکھنے کے لیے اپنا موجودہ پاس ورڈ درج کریں۔</string>
+    <string name="auth_google_credential_already_used">یہ Google اکاؤنٹ پہلے ہی کسی دوسرے اکاؤنٹ سے منسلک ہے۔</string>
+    <string name="auth_email_not_verified">لاگ ان کرنے سے پہلے براہ کرم اپنے ای میل ایڈریس کی تصدیق کریں۔ اپنا ان باکس چیک کریں یا تصدیقی ای میل دوبارہ بھیجیں۔</string>
+    <string name="auth_link_failed">آپ کا Google اکاؤنٹ لنک کرنے سے قاصر ہے۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="auth_email_already_verified">آپ کا ای میل پہلے ہی تصدیق شدہ ہے۔ آپ لاگ ان کر سکتے ہیں۔</string>
+    <string name="auth_credentials_required">تصدیقی ای میل دوبارہ بھیجنے کے لیے اپنا ای میل اور پاس ورڈ درج کریں۔</string>
 </resources>

@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Bitte füllen Sie alle Pflichtfelder aus.</string>
     <string name="auth_name_required">Bitte geben Sie Ihren Namen ein.</string>
     <string name="auth_invalid_email">Geben Sie eine gültige E-Mail-Adresse ein.</string>
-    <string name="auth_invalid_credentials">E-Mail oder Passwort ist falsch.</string>
+    <string name="auth_invalid_credentials">Falsche E-Mail oder falsches Passwort. Bitte versuche es erneut.</string>
     <string name="auth_email_already_in_use">Es existiert bereits ein Konto mit dieser E-Mail-Adresse.</string>
     <string name="auth_weak_password">Verwenden Sie ein Passwort mit mindestens 6 Zeichen.</string>
     <string name="auth_password_mismatch">Passwörter stimmen nicht überein.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Netzwerkfehler. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
     <string name="auth_user_disabled">Dieses Konto wurde deaktiviert.</string>
     <string name="auth_provider_disabled">Diese Anmeldemethode ist derzeit nicht verfügbar.</string>
-    <string name="auth_account_exists_different_provider">Es existiert bereits ein Konto mit dieser E-Mail über eine andere Anmeldemethode.</string>
+    <string name="auth_account_exists_different_provider">Ein Konto mit dieser E-Mail existiert bereits. Melde dich mit deiner bestehenden Methode an, um Google zu verknüpfen.</string>
     <string name="auth_login_failed">Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
     <string name="auth_register_failed">Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
     <string name="auth_failed">Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Es existiert bereits ein Konto für %1$s. Geben Sie Ihr bestehendes Xios-Passwort ein, um Google sicher mit diesem Konto zu verknüpfen. Ihre Playlists und Favoriten bleiben in demselben Konto erhalten.</string>
     <string name="link_account">Konto verknüpfen</string>
     <string name="auth_password_required">Geben Sie Ihr bestehendes Passwort ein, um fortzufahren.</string>
+    <string name="auth_google_credential_already_used">Dieses Google-Konto ist bereits mit einem anderen Konto verknüpft.</string>
+    <string name="auth_email_not_verified">Bitte verifizieren Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden. Überprüfen Sie Ihren Posteingang oder senden Sie die Bestätigungs-E-Mail erneut.</string>
+    <string name="auth_link_failed">Ihr Google-Konto konnte nicht verknüpft werden. Bitte versuchen Sie es erneut.</string>
+    <string name="auth_email_already_verified">Ihre E-Mail-Adresse ist bereits verifiziert. Sie können sich anmelden.</string>
+    <string name="auth_credentials_required">Geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein, um die Bestätigungs-E-Mail erneut zu senden.</string>
 </resources>

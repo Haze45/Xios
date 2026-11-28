@@ -144,7 +144,7 @@
     <string name="auth_fields_required">தேவையான அனைத்து புலங்களையும் நிரப்பவும்.</string>
     <string name="auth_name_required">உங்கள் பெயரை உள்ளிடவும்.</string>
     <string name="auth_invalid_email">செல்லுபடியாகும் மின்னஞ்சல் முகவரியை உள்ளிடவும்.</string>
-    <string name="auth_invalid_credentials">மின்னஞ்சல் அல்லது கடவுச்சொல் தவறானது.</string>
+    <string name="auth_invalid_credentials">தவறான மின்னஞ்சல் அல்லது கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.</string>
     <string name="auth_email_already_in_use">இந்த மின்னஞ்சல் முகவரியுடன் ஏற்கனவே கணக்கு உள்ளது.</string>
     <string name="auth_weak_password">குறைந்தது 6 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.</string>
     <string name="auth_password_mismatch">கடவுச்சொற்கள் பொருந்தவில்லை.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">நெட்வொர்க் பிழை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.</string>
     <string name="auth_user_disabled">இந்தக் கணக்கு முடக்கப்பட்டுள்ளது.</string>
     <string name="auth_provider_disabled">இந்த உள்நுழைவு முறை தற்போது கிடைக்கவில்லை.</string>
-    <string name="auth_account_exists_different_provider">வேறொரு உள்நுழைவு முறையைப் பயன்படுத்தி இந்த மின்னஞ்சலுடன் ஏற்கனவே ஒரு கணக்கு உள்ளது.</string>
+    <string name="auth_account_exists_different_provider">இந்த மின்னஞ்சலில் ஏற்கனவே ஒரு கணக்கு உள்ளது. Google ஐ இணைக்க உங்களிடம் உள்ள முறையைப் பயன்படுத்தி உள்நுழையவும்.</string>
     <string name="auth_login_failed">உள்நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</string>
     <string name="auth_register_failed">உங்கள் கணக்கை உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</string>
     <string name="auth_failed">அங்கீகரிப்பு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s என்பவருக்கு ஏற்கனவே கணக்கு உள்ளது. பாதுகாப்பாக Google ஐ அந்தக் கணக்குடன் இணைக்க, உங்களின் தற்போதைய Xios கடவுச்சொல்லை உள்ளிடவும். உங்கள் பிளேலிஸ்ட்களும் பிடித்தவைகளும் அதே கணக்கில் இருக்கும்.</string>
     <string name="link_account">கணக்கை இணை</string>
     <string name="auth_password_required">தொடர உங்களின் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்.</string>
+    <string name="auth_google_credential_already_used">இந்த Google கணக்கு ஏற்கனவே வேறு கணக்குடன் இணைக்கப்பட்டுள்ளது.</string>
+    <string name="auth_email_not_verified">உள்நுழைவதற்கு முன் உங்கள் மின்னஞ்சல் முகவரியைச் சரிபார்க்கவும். உங்கள் இன்பாக்ஸைச் சரிபார்க்கவும் அல்லது சரிபார்ப்பு மின்னஞ்சலை மீண்டும் அனுப்பவும்.</string>
+    <string name="auth_link_failed">உங்கள் Google கணக்கை இணைக்க முடியவில்லை. மீண்டும் முயலவும்.</string>
+    <string name="auth_email_already_verified">உங்கள் மின்னஞ்சல் ஏற்கனவே சரிபார்க்கப்பட்டது. நீங்கள் உள்நுழையலாம்.</string>
+    <string name="auth_credentials_required">சரிபார்ப்பு மின்னஞ்சலை மீண்டும் அனுப்ப உங்கள் மின்னஞ்சல் மற்றும் கடவுச்சொல்லை உள்ளிடவும்.</string>
 </resources>

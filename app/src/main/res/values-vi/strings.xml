@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Vui lòng điền vào tất cả các trường bắt buộc.</string>
     <string name="auth_name_required">Vui lòng nhập tên của bạn.</string>
     <string name="auth_invalid_email">Nhập địa chỉ email hợp lệ.</string>
-    <string name="auth_invalid_credentials">Email hoặc mật khẩu không chính xác.</string>
+    <string name="auth_invalid_credentials">Email hoặc mật khẩu không chính xác. Vui lòng thử lại.</string>
     <string name="auth_email_already_in_use">Một tài khoản đã tồn tại với địa chỉ email này.</string>
     <string name="auth_weak_password">Sử dụng mật khẩu có ít nhất 6 ký tự.</string>
     <string name="auth_password_mismatch">Mật khẩu không khớp.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Lỗi mạng. Kiểm tra kết nối của bạn và thử lại.</string>
     <string name="auth_user_disabled">Tài khoản này đã bị vô hiệu hóa.</string>
     <string name="auth_provider_disabled">Phương thức đăng nhập này hiện không khả dụng.</string>
-    <string name="auth_account_exists_different_provider">Một tài khoản đã tồn tại với email này bằng phương thức đăng nhập khác.</string>
+    <string name="auth_account_exists_different_provider">Đã có tài khoản sử dụng email này. Đăng nhập bằng phương thức hiện tại của bạn để liên kết Google.</string>
     <string name="auth_login_failed">Không thể đăng nhập. Vui lòng thử lại.</string>
     <string name="auth_register_failed">Không thể tạo tài khoản của bạn. Vui lòng thử lại.</string>
     <string name="auth_failed">Xác thực không thành công. Vui lòng thử lại.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Đã có tài khoản cho %1$s. Nhập mật khẩu Xios hiện tại của bạn để liên kết Google với tài khoản đó một cách an toàn. Danh sách phát và danh sách yêu thích của bạn sẽ vẫn ở trên cùng một tài khoản.</string>
     <string name="link_account">Liên kết tài khoản</string>
     <string name="auth_password_required">Nhập mật khẩu hiện tại của bạn để tiếp tục.</string>
+    <string name="auth_google_credential_already_used">Tài khoản Google này đã được liên kết với một tài khoản khác.</string>
+    <string name="auth_email_not_verified">Vui lòng xác minh địa chỉ email của bạn trước khi đăng nhập. Kiểm tra hộp thư đến của bạn hoặc gửi lại email xác minh.</string>
+    <string name="auth_link_failed">Không thể liên kết tài khoản Google của bạn. Vui lòng thử lại.</string>
+    <string name="auth_email_already_verified">Email của bạn đã được xác minh. Bạn có thể đăng nhập.</string>
+    <string name="auth_credentials_required">Nhập email và mật khẩu của bạn để gửi lại email xác minh.</string>
 </resources>

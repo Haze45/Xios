@@ -144,7 +144,7 @@
     <string name="auth_fields_required">请填写所有必填字段。</string>
     <string name="auth_name_required">请输入您的姓名。</string>
     <string name="auth_invalid_email">请输入有效的电子邮件地址。</string>
-    <string name="auth_invalid_credentials">电子邮件或密码不正确。</string>
+    <string name="auth_invalid_credentials">电子邮件或密码不正确。请重试。</string>
     <string name="auth_email_already_in_use">已存在使用此电子邮件地址的帐户。</string>
     <string name="auth_weak_password">请使用至少包含6个字符的密码。</string>
     <string name="auth_password_mismatch">密码不匹配。</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">网络错误。请检查您的连接并重试。</string>
     <string name="auth_user_disabled">此帐户已被禁用。</string>
     <string name="auth_provider_disabled">此登录方法当前不可用。</string>
-    <string name="auth_account_exists_different_provider">已存在使用此电子邮件和其他登录方法的帐户。</string>
+    <string name="auth_account_exists_different_provider">该电子邮件已存在关联帐户。请使用您现有的方式登录以关联 Google。</string>
     <string name="auth_login_failed">无法登录。请重试。</string>
     <string name="auth_register_failed">无法创建您的帐户。请重试。</string>
     <string name="auth_failed">身份验证失败。请重试。</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s 已有帐号。请输入您现有的 Xios 密码，以便将 Google 安全地关联到该帐号。您的播放列表和收藏夹将保留在该帐号中。</string>
     <string name="link_account">关联帐号</string>
     <string name="auth_password_required">请输入您现有的密码以继续。</string>
+    <string name="auth_google_credential_already_used">此 Google 帐号已关联到其他帐号。</string>
+    <string name="auth_email_not_verified">请在登录前验证您的电子邮件地址。检查您的收件箱或重新发送验证邮件。</string>
+    <string name="auth_link_failed">无法关联您的 Google 帐号。请重试。</string>
+    <string name="auth_email_already_verified">您的邮箱已验证。您可以登录了。</string>
+    <string name="auth_credentials_required">输入您的邮箱和密码以重新发送验证邮件。</string>
 </resources>

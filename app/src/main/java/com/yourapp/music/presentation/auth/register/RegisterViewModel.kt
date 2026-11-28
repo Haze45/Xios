@@ -25,37 +25,45 @@ class RegisterViewModel @Inject constructor(
 
     private val _uiState =
         MutableStateFlow(RegisterUiState())
+
     val uiState: StateFlow<RegisterUiState> =
         _uiState.asStateFlow()
 
-    fun onNameChange(value: String) = _uiState.update {
-        it.copy(
-            displayName = value,
-            errorMessage = null
-        )
+    fun onNameChange(value: String) {
+        _uiState.update {
+            it.copy(
+                displayName = value,
+                errorMessage = null
+            )
+        }
     }
 
-    fun onEmailChange(value: String) = _uiState.update {
-        it.copy(
-            email = value,
-            errorMessage = null
-        )
+    fun onEmailChange(value: String) {
+        _uiState.update {
+            it.copy(
+                email = value,
+                errorMessage = null
+            )
+        }
     }
 
-    fun onPasswordChange(value: String) = _uiState.update {
-        it.copy(
-            password = value,
-            errorMessage = null
-        )
+    fun onPasswordChange(value: String) {
+        _uiState.update {
+            it.copy(
+                password = value,
+                errorMessage = null
+            )
+        }
     }
 
-    fun onConfirmPasswordChange(value: String) =
+    fun onConfirmPasswordChange(value: String) {
         _uiState.update {
             it.copy(
                 confirmPassword = value,
                 errorMessage = null
             )
         }
+    }
 
     fun setGoogleLoading(loading: Boolean) {
         _uiState.update {
@@ -75,53 +83,77 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Registers an email/password account.
+     * The verification email is sent by FirebaseAuthService.
+     * The user is then signed out until their email is verified.
+     */
     fun register() {
         val state = _uiState.value
+
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    errorMessage = null
+                    errorMessage = null,
+                    isVerificationEmailSent = false
                 )
             }
-            when (val result = registerUseCase(
-                state.email,
-                state.password,
-                state.confirmPassword,
-                state.displayName
-            )) {
+
+            when (
+                val result = registerUseCase(
+                    state.email.trim(),
+                    state.password,
+                    state.confirmPassword,
+                    state.displayName
+                )
+            ) {
                 is Resource.Success -> {
-                    favoriteSyncManager.enqueueSync()
+                    // Create/sync the user's profile while the newly
+                    // created Firebase user is still available.
                     syncProfileUseCase(
                         result.data.uid,
                         followingCount = 0,
                         playlistCount = 0
                     )
+
+                    // Do not keep an unverified user signed in.
+                    authRepository.logout()
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            isRegisterSuccessful = true
+                            isRegisterSuccessful = false,
+                            isVerificationEmailSent = true,
+                            errorMessage = null,
+                            password = "",
+                            confirmPassword = ""
                         )
                     }
                 }
 
-                is Resource.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = result.message
-                    )
+                is Resource.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
                 }
 
-                is Resource.Loading -> _uiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
+                is Resource.Loading -> Unit
             }
         }
     }
 
-    fun registerWithGoogle(idToken: String) {
+    /**
+     * Same Google authentication and collision handling
+     * as the Login screen.
+     */
+    fun registerWithGoogle(
+        idToken: String,
+        googleEmail: String
+    ) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -130,8 +162,10 @@ class RegisterViewModel @Inject constructor(
                 )
             }
 
-            when (val result =
-                authRepository.loginWithGoogle(idToken)) {
+            when (
+                val result =
+                    authRepository.loginWithGoogle(idToken)
+            ) {
                 is Resource.Success -> {
                     favoriteSyncManager.enqueueSync()
 
@@ -150,6 +184,107 @@ class RegisterViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
+                    if (
+                        result.message ==
+                        "auth_account_exists_different_provider"
+                    ) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                email = googleEmail,
+                                pendingGoogleIdToken = idToken,
+                                pendingGoogleEmail = googleEmail,
+                                googleLinkPassword = "",
+                                showGoogleLinkDialog = true,
+                                errorMessage = null
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = result.message
+                            )
+                        }
+                    }
+                }
+
+                is Resource.Loading -> Unit
+            }
+        }
+    }
+
+    fun onGoogleLinkPasswordChange(value: String) {
+        _uiState.update {
+            it.copy(
+                googleLinkPassword = value,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun dismissGoogleLinkDialog() {
+        _uiState.update {
+            it.copy(
+                showGoogleLinkDialog = false,
+                pendingGoogleIdToken = null,
+                pendingGoogleEmail = null,
+                googleLinkPassword = "",
+                errorMessage = null
+            )
+        }
+    }
+
+    fun confirmGoogleAccountLink() {
+        val state = _uiState.value
+        val token = state.pendingGoogleIdToken ?: return
+        val email = state.pendingGoogleEmail ?: return
+
+        if (state.googleLinkPassword.isBlank()) {
+            _uiState.update {
+                it.copy(errorMessage = "auth_password_required")
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            when (
+                val result =
+                    authRepository.linkGoogleToExistingAccount(
+                        email = email,
+                        password = state.googleLinkPassword,
+                        googleIdToken = token
+                    )
+            ) {
+                is Resource.Success -> {
+                    favoriteSyncManager.enqueueSync()
+
+                    syncProfileUseCase(
+                        result.data.uid,
+                        followingCount = 0,
+                        playlistCount = 0
+                    )
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isRegisterSuccessful = true,
+                            showGoogleLinkDialog = false,
+                            pendingGoogleIdToken = null,
+                            pendingGoogleEmail = null,
+                            googleLinkPassword = ""
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -158,11 +293,7 @@ class RegisterViewModel @Inject constructor(
                     }
                 }
 
-                is Resource.Loading -> _uiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
+                is Resource.Loading -> Unit
             }
         }
     }

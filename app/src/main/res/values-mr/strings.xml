@@ -162,7 +162,7 @@
     <string name="auth_fields_required">कृपया सर्व आवश्यक फील्ड भरा.</string>
     <string name="auth_name_required">कृपया तुमचे नाव एंटर करा.</string>
     <string name="auth_invalid_email">वैध ईमेल पत्ता एंटर करा.</string>
-    <string name="auth_invalid_credentials">ईमेल किंवा पासवर्ड चुकीचा आहे.</string>
+    <string name="auth_invalid_credentials">चुकीचा ईमेल किंवा पासवर्ड. कृपया पुन्हा प्रयत्न करा.</string>
     <string name="auth_email_already_in_use">या ईमेल पत्त्यासह खाते आधीपासूनच अस्तित्वात आहे.</string>
     <string name="auth_weak_password">किमान 6 वर्णांचा पासवर्ड वापरा.</string>
     <string name="auth_password_mismatch">पासवर्ड जुळत नाहीत.</string>
@@ -170,7 +170,7 @@
     <string name="auth_network_error">नेटवर्क त्रुटी. तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.</string>
     <string name="auth_user_disabled">हे खाते बंद केले आहे.</string>
     <string name="auth_provider_disabled">ही साइन-इन पद्धत सध्या अनुपलब्ध आहे.</string>
-    <string name="auth_account_exists_different_provider">दुसरी साइन-इन पद्धत वापरून या ईमेलसह खाते आधीपासूनच अस्तित्वात आहे.</string>
+    <string name="auth_account_exists_different_provider">या ईमेलसह आधीपासूनच एक खाते अस्तित्वात आहे. Google लिंक करण्यासाठी तुमच्या विद्यमान पद्धतीचा वापर करून साइन इन करा.</string>
     <string name="auth_login_failed">लॉग इन करू शकलो नाही. कृपया पुन्हा प्रयत्न करा.</string>
     <string name="auth_register_failed">तुमचे खाते तयार करू शकलो नाही. कृपया पुन्हा प्रयत्न करा.</string>
     <string name="auth_failed">प्रमाणीकरण अयशस्वी. कृपया पुन्हा प्रयत्न करा.</string>
@@ -184,4 +184,9 @@
     <string name="link_google_account_message">%1$s साठी खाते आधीपासूनच अस्तित्वात आहे. Google ला त्या खात्याशी सुरक्षितपणे लिंक करण्यासाठी तुमचा विद्यमान Xios पासवर्ड एंटर करा. तुमच्या प्लेलिस्ट आणि आवडी त्याच खात्यावर राहतील.</string>
     <string name="link_account">खाते लिंक करा</string>
     <string name="auth_password_required">सुरू ठेवण्यासाठी तुमचा विद्यमान पासवर्ड एंटर करा.</string>
+    <string name="auth_google_credential_already_used">हे Google खाते आधीपासूनच दुसऱ्या खात्याशी जोडलेले आहे.</string>
+    <string name="auth_email_not_verified">कृपया लॉग इन करण्यापूर्वी तुमचा ईमेल पत्ता पडताळून पहा. तुमचा इनबॉक्स तपासा किंवा पडताळणी ईमेल पुन्हा पाठवा.</string>
+    <string name="auth_link_failed">तुमचे Google खाते लिंक करण्यात अक्षम. कृपया पुन्हा प्रयत्न करा.</string>
+    <string name="auth_email_already_verified">तुमचा ईमेल आधीच सत्यापित आहे. तुम्ही लॉग इन करू शकता.</string>
+    <string name="auth_credentials_required">सत्यापन ईमेल पुन्हा पाठवण्यासाठी तुमचा ईमेल आणि पासवर्ड एंटर करा.</string>
 </resources>

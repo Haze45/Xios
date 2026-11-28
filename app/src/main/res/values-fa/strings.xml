@@ -144,7 +144,7 @@
     <string name="auth_fields_required">لطفاً همه فیلدهای الزامی را پر کنید.</string>
     <string name="auth_name_required">لطفاً نام خود را وارد کنید.</string>
     <string name="auth_invalid_email">یک آدرس ایمیل معتبر وارد کنید.</string>
-    <string name="auth_invalid_credentials">ایمیل یا رمز عبور نادرست است.</string>
+    <string name="auth_invalid_credentials">ایمیل یا رمز عبور نادرست است. لطفا دوباره تلاش کنید.</string>
     <string name="auth_email_already_in_use">حسابی با این آدرس ایمیل از قبل وجود دارد.</string>
     <string name="auth_weak_password">از رمز عبوری با حداقل ۶ نویسه استفاده کنید.</string>
     <string name="auth_password_mismatch">رمزهای عبور مطابقت ندارند.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">خطای شبکه. اتصال خود را بررسی کنید و دوباره امتحان کنید.</string>
     <string name="auth_user_disabled">این حساب غیرفعال شده است.</string>
     <string name="auth_provider_disabled">این روش ورود به سیستم در حال حاضر در دسترس نیست.</string>
-    <string name="auth_account_exists_different_provider">حسابی با این ایمیل با استفاده از روش ورود به سیستم دیگری از قبل وجود دارد.</string>
+    <string name="auth_account_exists_different_provider">حسابی با این ایمیل از قبل وجود دارد. برای پیوند دادن Google با روش فعلی خود به سیستم وارد شوید.</string>
     <string name="auth_login_failed">ورود به سیستم انجام نشد. لطفاً دوباره امتحان کنید.</string>
     <string name="auth_register_failed">ایجاد حساب شما انجام نشد. لطفاً دوباره امتحان کنید.</string>
     <string name="auth_failed">احراز هویت انجام نشد. لطفاً دوباره امتحان کنید.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">در حال حاضر حسابی برای %1$s وجود دارد. برای پیوند ایمن Google به آن حساب، رمز عبور Xios فعلی خود را وارد کنید. لیست‌های پخش و موارد دلخواه شما در همان حساب باقی می‌مانند.</string>
     <string name="link_account">پیوند حساب</string>
     <string name="auth_password_required">برای ادامه، رمز عبور فعلی خود را وارد کنید.</string>
+    <string name="auth_google_credential_already_used">این حساب Google از قبل به حساب دیگری پیوند داده شده است.</string>
+    <string name="auth_email_not_verified">لطفاً قبل از ورود به سیستم، آدرس ایمیل خود را تأیید کنید. صندوق ورودی خود را بررسی کنید یا ایمیل تأیید را دوباره ارسال کنید.</string>
+    <string name="auth_link_failed">پیوند دادن حساب Google شما امکان‌پذیر نیست. لطفاً دوباره تلاش کنید.</string>
+    <string name="auth_email_already_verified">ایمیل شما قبلاً تأیید شده است. می‌توانید وارد شوید.</string>
+    <string name="auth_credentials_required">ایمیل و رمز عبور خود را برای ارسال مجدد ایمیل تأیید وارد کنید.</string>
 </resources>

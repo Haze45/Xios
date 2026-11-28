@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Harap isi semua kolom yang wajib diisi.</string>
     <string name="auth_name_required">Silakan masukkan nama Anda.</string>
     <string name="auth_invalid_email">Masukkan alamat email yang valid.</string>
-    <string name="auth_invalid_credentials">Email atau sandi salah.</string>
+    <string name="auth_invalid_credentials">Email atau sandi salah. Silakan coba lagi.</string>
     <string name="auth_email_already_in_use">Akun dengan alamat email ini sudah ada.</string>
     <string name="auth_weak_password">Gunakan sandi minimal 6 karakter.</string>
     <string name="auth_password_mismatch">Sandi tidak cocok.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.</string>
     <string name="auth_user_disabled">Akun ini telah dinonaktifkan.</string>
     <string name="auth_provider_disabled">Metode login ini saat ini tidak tersedia.</string>
-    <string name="auth_account_exists_different_provider">Akun dengan email ini sudah ada menggunakan metode login lain.</string>
+    <string name="auth_account_exists_different_provider">Akun sudah ada dengan email ini. Masuk menggunakan metode Anda saat ini untuk menautkan Google.</string>
     <string name="auth_login_failed">Tidak dapat login. Silakan coba lagi.</string>
     <string name="auth_register_failed">Tidak dapat membuat akun Anda. Silakan coba lagi.</string>
     <string name="auth_failed">Autentikasi gagal. Silakan coba lagi.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Akun sudah ada untuk %1$s. Masukkan sandi Xios Anda yang sudah ada untuk menautkan Google dengan aman ke akun tersebut. Playlist dan favorit Anda akan tetap berada di akun yang sama.</string>
     <string name="link_account">Tautkan akun</string>
     <string name="auth_password_required">Masukkan sandi Anda yang sudah ada untuk melanjutkan.</string>
+    <string name="auth_google_credential_already_used">Akun Google ini sudah ditautkan ke akun lain.</string>
+    <string name="auth_email_not_verified">Harap verifikasi alamat email Anda sebelum login. Periksa kotak masuk Anda atau kirim ulang email verifikasi.</string>
+    <string name="auth_link_failed">Tidak dapat menautkan akun Google Anda. Silakan coba lagi.</string>
+    <string name="auth_email_already_verified">Email Anda sudah diverifikasi. Anda dapat masuk.</string>
+    <string name="auth_credentials_required">Masukkan email dan kata sandi Anda untuk mengirim ulang email verifikasi.</string>
 </resources>

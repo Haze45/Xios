@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Preencha todos os campos obrigatórios.</string>
     <string name="auth_name_required">Insira seu nome.</string>
     <string name="auth_invalid_email">Insira um endereço de e-mail válido.</string>
-    <string name="auth_invalid_credentials">E-mail ou senha incorretos.</string>
+    <string name="auth_invalid_credentials">E-mail ou senha incorretos. Tente novamente.</string>
     <string name="auth_email_already_in_use">Já existe uma conta com este endereço de e-mail.</string>
     <string name="auth_weak_password">Use uma senha com pelo menos 6 caracteres.</string>
     <string name="auth_password_mismatch">As senhas não coincidem.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Erro de rede. Verifique sua conexão e tente novamente.</string>
     <string name="auth_user_disabled">Esta conta foi desativada.</string>
     <string name="auth_provider_disabled">Este método de login está indisponível no momento.</string>
-    <string name="auth_account_exists_different_provider">Já existe uma conta com este e-mail usando outro método de login.</string>
+    <string name="auth_account_exists_different_provider">Já existe uma conta com este e-mail. Faça login usando seu método atual para vincular o Google.</string>
     <string name="auth_login_failed">Não foi possível fazer o login. Tente novamente.</string>
     <string name="auth_register_failed">Não foi possível criar sua conta. Tente novamente.</string>
     <string name="auth_failed">Falha na autenticação. Tente novamente.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Já existe uma conta para %1$s. Insira a sua palavra-passe existente do Xios para vincular o Google a essa conta de forma segura. As suas playlists e os seus favoritos permanecerão na mesma conta.</string>
     <string name="link_account">Vincular conta</string>
     <string name="auth_password_required">Insira a sua palavra-passe existente para continuar.</string>
+    <string name="auth_google_credential_already_used">Esta conta do Google já está vinculada a outra conta.</string>
+    <string name="auth_email_not_verified">Verifique seu endereço de e-mail antes de fazer login. Verifique sua caixa de entrada ou reenvie o e-mail de verificação.</string>
+    <string name="auth_link_failed">Não foi possível vincular sua conta do Google. Tente novamente.</string>
+    <string name="auth_email_already_verified">Seu e-mail já está verificado. Você pode entrar.</string>
+    <string name="auth_credentials_required">Insira seu e-mail e senha para reenviar o e-mail de verificação.</string>
 </resources>

@@ -29,18 +29,29 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+
     LaunchedEffect(state.isLoginSuccessful) {
-        if (state.isLoginSuccessful) onLoginSuccess()
+        if (state.isLoginSuccessful) {
+            onLoginSuccess()
+        }
     }
 
     if (state.showGoogleLinkDialog) {
         AlertDialog(
-            onDismissRequest = viewModel::dismissGoogleLinkDialog,
-            title = { Text(stringResource(R.string.link_google_account_title)) },
+            onDismissRequest = {
+                if (!state.isLoading) {
+                    viewModel.dismissGoogleLinkDialog()
+                }
+            },
+            title = {
+                Text(
+                    stringResource(R.string.link_google_account_title)
+                )
+            },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
-                        10.dp
+                        12.dp
                     )
                 ) {
                     Text(
@@ -49,20 +60,27 @@ fun LoginScreen(
                             state.pendingGoogleEmail.orEmpty()
                         )
                     )
+
                     OutlinedTextField(
                         value = state.googleLinkPassword,
-                        onValueChange = viewModel::onGoogleLinkPasswordChange,
-                        label = { Text(stringResource(R.string.password)) },
-                        visualTransformation = PasswordVisualTransformation(),
+                        onValueChange =
+                            viewModel::onGoogleLinkPasswordChange,
+                        label = {
+                            Text(stringResource(R.string.password))
+                        },
+                        singleLine = true,
+                        enabled = !state.isLoading,
+                        visualTransformation =
+                            PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password
                         ),
-                        singleLine = true,
-                        enabled = !state.isLoading
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    state.errorMessage?.let {
+
+                    state.errorMessage?.let { message ->
                         AppMessageText(
-                            it,
+                            message,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -107,50 +125,87 @@ fun LoginScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = stringResource(R.string.xios_logo_description),
+            contentDescription =
+                stringResource(R.string.xios_logo_description),
             modifier = Modifier.size(180.dp)
         )
+
         Spacer(Modifier.height(20.dp))
+
         Text(
             stringResource(R.string.welcome_back),
             style = MaterialTheme.typography.headlineLarge
         )
+
         Spacer(Modifier.height(8.dp))
+
         Text(
             stringResource(R.string.login_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary
         )
+
         Spacer(Modifier.height(28.dp))
 
         OutlinedTextField(
             value = state.email,
             onValueChange = viewModel::onEmailChange,
             label = { Text(stringResource(R.string.email)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            ),
             singleLine = true,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(Modifier.height(14.dp))
+
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
             label = { Text(stringResource(R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password
+            ),
             singleLine = true,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
-        state.errorMessage?.let {
+
+        state.errorMessage?.let { message ->
             Spacer(Modifier.height(12.dp))
+
             AppMessageText(
-                it,
+                message,
                 modifier = Modifier.fillMaxWidth()
             )
         }
+
+        if (state.canResendVerificationEmail) {
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(
+                onClick = viewModel::resendVerificationEmail,
+                enabled = !state.isLoading
+            ) {
+                Text("Resend verification email")
+            }
+        }
+
+        if (state.verificationEmailSent) {
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "Verification email sent. Please check your inbox and spam folder.",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
         Spacer(Modifier.height(22.dp))
+
         Button(
             onClick = viewModel::login,
             enabled = !state.isLoading,
@@ -164,13 +219,20 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 2.dp
                 )
+
                 Spacer(Modifier.width(10.dp))
                 Text(stringResource(R.string.signing_in))
-            } else Text(stringResource(R.string.log_in))
+            } else {
+                Text(stringResource(R.string.log_in))
+            }
         }
+
         Spacer(Modifier.height(18.dp))
+
         AuthOrDivider()
+
         Spacer(Modifier.height(18.dp))
+
         GoogleSignInButton(
             enabled = !state.isLoading,
             isLoading = state.isLoading,
@@ -178,12 +240,15 @@ fun LoginScreen(
             onTokenReceived = viewModel::loginWithGoogle,
             onError = viewModel::onGoogleError
         )
+
         Spacer(Modifier.height(18.dp))
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.no_account_prompt),
                 color = TextSecondary
             )
+
             TextButton(
                 onClick = onNavigateToRegister,
                 enabled = !state.isLoading
@@ -207,11 +272,13 @@ private fun AuthOrDivider() {
             Modifier.weight(1f),
             color = MaterialTheme.colorScheme.outlineVariant
         )
+
         Text(
             stringResource(R.string.or),
             modifier = Modifier.padding(horizontal = 14.dp),
             color = TextSecondary
         )
+
         HorizontalDivider(
             Modifier.weight(1f),
             color = MaterialTheme.colorScheme.outlineVariant

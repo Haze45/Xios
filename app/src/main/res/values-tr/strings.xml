@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Lütfen tüm zorunlu alanları doldurun.</string>
     <string name="auth_name_required">Lütfen adınızı girin.</string>
     <string name="auth_invalid_email">Geçerli bir e-posta adresi girin.</string>
-    <string name="auth_invalid_credentials">E-posta veya şifre yanlış.</string>
+    <string name="auth_invalid_credentials">Hatalı e-posta veya şifre. Lütfen tekrar deneyin.</string>
     <string name="auth_email_already_in_use">Bu e-posta adresiyle bir hesap zaten var.</string>
     <string name="auth_weak_password">En az 6 karakterlik bir şifre kullanın.</string>
     <string name="auth_password_mismatch">Şifreler eşleşmiyor.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Ağ hatası. Bağlantınızı kontrol edip tekrar deneyin.</string>
     <string name="auth_user_disabled">Bu hesap devre dışı bırakıldı.</string>
     <string name="auth_provider_disabled">Bu oturum açma yöntemi şu anda kullanılamıyor.</string>
-    <string name="auth_account_exists_different_provider">Bu e-posta adresiyle başka bir oturum açma yöntemi kullanılarak bir hesap zaten var.</string>
+    <string name="auth_account_exists_different_provider">Bu e-posta ile zaten bir hesap var. Google\'ı bağlamak için mevcut yönteminizle oturum açın.</string>
     <string name="auth_login_failed">Giriş yapılamadı. Lütfen tekrar deneyin.</string>
     <string name="auth_register_failed">Hesabınız oluşturulamadı. Lütfen tekrar deneyin.</string>
     <string name="auth_failed">Kimlik doğrulama başarısız oldu. Lütfen tekrar deneyin.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s için zaten bir hesap var. Google\'ı bu hesaba güvenli bir şekilde bağlamak için mevcut Xios şifrenizi girin. Oynatma listeleriniz ve favorileriniz aynı hesapta kalacaktır.</string>
     <string name="link_account">Hesabı bağla</string>
     <string name="auth_password_required">Devam etmek için mevcut şifrenizi girin.</string>
+    <string name="auth_google_credential_already_used">Bu Google hesabı zaten başka bir hesaba bağlı.</string>
+    <string name="auth_email_not_verified">Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın. Gelen kutunuzu kontrol edin veya doğrulama e-postasını yeniden gönderin.</string>
+    <string name="auth_link_failed">Google hesabınız bağlanamadı. Lütfen tekrar deneyin.</string>
+    <string name="auth_email_already_verified">E-postanız zaten doğrulandı. Giriş yapabilirsiniz.</string>
+    <string name="auth_credentials_required">Doğrulama e-postasını yeniden göndermek için e-postanızı ve şifrenizi girin.</string>
 </resources>

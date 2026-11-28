@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Compila tutti i campi obbligatori.</string>
     <string name="auth_name_required">Inserisci il tuo nome.</string>
     <string name="auth_invalid_email">Inserisci un indirizzo email valido.</string>
-    <string name="auth_invalid_credentials">Email o password non corretta.</string>
+    <string name="auth_invalid_credentials">Email o password errati. Riprova.</string>
     <string name="auth_email_already_in_use">Esiste già un account con questo indirizzo email.</string>
     <string name="auth_weak_password">Usa una password di almeno 6 caratteri.</string>
     <string name="auth_password_mismatch">Le password non corrispondono.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Errore di rete. Controlla la tua connessione e riprova.</string>
     <string name="auth_user_disabled">Questo account è stato disabilitato.</string>
     <string name="auth_provider_disabled">Questo metodo di accesso non è al momento disponibile.</string>
-    <string name="auth_account_exists_different_provider">Esiste già un account con questa email che utilizza un altro metodo di accesso.</string>
+    <string name="auth_account_exists_different_provider">Esiste già un account con questa email. Accedi utilizzando il tuo metodo esistente per collegare Google.</string>
     <string name="auth_login_failed">Impossibile accedere. Riprova.</string>
     <string name="auth_register_failed">Impossibile creare il tuo account. Riprova.</string>
     <string name="auth_failed">Autenticazione non riuscita. Riprova.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Esiste già un account per %1$s. Inserisci la tua password Xios attuale per collegare in modo sicuro Google a quell\'account. Le tue playlist e i tuoi preferiti rimarranno nello stesso account.</string>
     <string name="link_account">Collega account</string>
     <string name="auth_password_required">Inserisci la tua password attuale per continuare.</string>
+    <string name="auth_google_credential_already_used">Questo account Google è già collegato a un altro account.</string>
+    <string name="auth_email_not_verified">Verifica il tuo indirizzo email prima di accedere. Controlla la tua casella di posta o invia nuovamente l\'email di verifica.</string>
+    <string name="auth_link_failed">Impossibile collegare il tuo account Google. Riprova.</string>
+    <string name="auth_email_already_verified">La tua email è già verificata. Puoi accedere.</string>
+    <string name="auth_credentials_required">Inserisci email e password per inviare nuovamente l\'email di verifica.</string>
 </resources>

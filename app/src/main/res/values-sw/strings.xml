@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Tafadhali jaza sehemu zote zinazohitajika.</string>
     <string name="auth_name_required">Tafadhali weka jina lako.</string>
     <string name="auth_invalid_email">Weka anwani halali ya barua pepe.</string>
-    <string name="auth_invalid_credentials">Barua pepe au nenosiri si sahihi.</string>
+    <string name="auth_invalid_credentials">Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.</string>
     <string name="auth_email_already_in_use">Akaunti tayari ipo iliyo na anwani hii ya barua pepe.</string>
     <string name="auth_weak_password">Tumia nenosiri lenye angalau herufi 6.</string>
     <string name="auth_password_mismatch">Manenosiri hayalingani.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Hitilafu ya mtandao. Angalia muunganisho wako na ujaribu tena.</string>
     <string name="auth_user_disabled">Akaunti hii imezimwa.</string>
     <string name="auth_provider_disabled">Njia hii ya kuingia haipatikani kwa sasa.</string>
-    <string name="auth_account_exists_different_provider">Akaunti tayari ipo iliyo na barua pepe hii ikitumia njia nyingine ya kuingia.</string>
+    <string name="auth_account_exists_different_provider">Tayari kuna akaunti iliyo na barua pepe hii. Ingia kwa kutumia njia yako ya sasa ili kuunganisha Google.</string>
     <string name="auth_login_failed">Haikuweza kuingia. Tafadhali ujaribu tena.</string>
     <string name="auth_register_failed">Haikuweza kufungua akaunti yako. Tafadhali ujaribu tena.</string>
     <string name="auth_failed">Uthibitishaji umeshindwa. Tafadhali ujaribu tena.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Tayari kuna akaunti ya %1$s. Weka nenosiri lako la sasa la Xios ili kuunganisha Google kwa usalama kwenye akaunti hiyo. Orodha zako za kucheza na vipendwa vitasalia kwenye akaunti hiyo.</string>
     <string name="link_account">Unganisha akaunti</string>
     <string name="auth_password_required">Weka nenosiri lako la sasa ili uendelee.</string>
+    <string name="auth_google_credential_already_used">Akaunti hii ya Google tayari imeunganishwa na akaunti nyingine.</string>
+    <string name="auth_email_not_verified">Tafadhali thibitisha anwani yako ya barua pepe kabla ya kuingia. Angalia kikasha chako au utume tena barua pepe ya kuthibitisha.</string>
+    <string name="auth_link_failed">Imeshindwa kuunganisha akaunti yako ya Google. Tafadhali jaribu tena.</string>
+    <string name="auth_email_already_verified">Barua pepe yako tayari imethibitishwa. Unaweza kuingia.</string>
+    <string name="auth_credentials_required">Ingiza barua pepe na nenosiri lako ili kutuma tena barua pepe ya uthibitishaji.</string>
 </resources>

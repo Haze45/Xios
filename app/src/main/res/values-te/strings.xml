@@ -144,7 +144,7 @@
     <string name="auth_fields_required">దయచేసి అవసరమైన అన్ని ఫీల్డ్‌లను పూరించండి.</string>
     <string name="auth_name_required">దయచేసి మీ పేరును నమోదు చేయండి.</string>
     <string name="auth_invalid_email">చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి.</string>
-    <string name="auth_invalid_credentials">ఇమెయిల్ లేదా పాస్‌వర్డ్ తప్పు.</string>
+    <string name="auth_invalid_credentials">తప్పు ఇమెయిల్ లేదా పాస్‌వర్డ్. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
     <string name="auth_email_already_in_use">ఈ ఇమెయిల్ చిరునామాతో ఇప్పటికే ఖాతా ఉంది.</string>
     <string name="auth_weak_password">కనీసం 6 అక్షరాలు గల పాస్‌వర్డ్‌ను ఉపయోగించండి.</string>
     <string name="auth_password_mismatch">పాస్‌వర్డ్‌లు సరిపోలలేదు.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">నెట్‌వర్క్ లోపం. మీ కనెక్షన్‌ని తనిఖీ చేసి, మళ్లీ ప్రయత్నించండి.</string>
     <string name="auth_user_disabled">ఈ ఖాతా నిలిపివేయబడింది.</string>
     <string name="auth_provider_disabled">ఈ సైన్-ఇన్ పద్ధతి ప్రస్తుతం అందుబాటులో లేదు.</string>
-    <string name="auth_account_exists_different_provider">మరొక సైన్-ఇన్ పద్ధతిని ఉపయోగించి ఈ ఇమెయిల్‌తో ఖాతా ఇప్పటికే ఉంది.</string>
+    <string name="auth_account_exists_different_provider">ఈ ఇమెయిల్‌తో ఇప్పటికే ఒక ఖాతా ఉంది. Googleని లింక్ చేయడానికి మీ ప్రస్తుత పద్ధతిని ఉపయోగించి సైన్ ఇన్ చేయండి.</string>
     <string name="auth_login_failed">లాగిన్ చేయబడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
     <string name="auth_register_failed">మీ ఖాతాను సృష్టించడం సాధ్యపడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
     <string name="auth_failed">ప్రామాణీకరణ విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s కోసం ఖాతా ఇప్పటికే ఉంది. ఆ ఖాతాకు Googleని సురక్షితంగా లింక్ చేయడానికి మీ ప్రస్తుత Xios పాస్‌వర్డ్‌ను ఎంటర్ చేయండి. మీ ప్లేలిస్ట్‌లు, ఫేవరెట్‌లు అదే ఖాతాలో ఉంటాయి.</string>
     <string name="link_account">ఖాతాను లింక్ చేయండి</string>
     <string name="auth_password_required">కొనసాగించడానికి మీ ప్రస్తుత పాస్‌వర్డ్‌ను ఎంటర్ చేయండి.</string>
+    <string name="auth_google_credential_already_used">ఈ Google ఖాతా ఇప్పటికే మరొక ఖాతాకు లింక్ చేయబడింది.</string>
+    <string name="auth_email_not_verified">దయచేసి లాగిన్ చేయడానికి ముందు మీ ఇమెయిల్ అడ్రస్‌ను వెరిఫై చేయండి. మీ ఇన్‌బాక్స్‌ను చెక్ చేయండి లేదా వెరిఫికేషన్ ఇమెయిల్‌ను మళ్లీ పంపండి.</string>
+    <string name="auth_link_failed">మీ Google ఖాతాను లింక్ చేయడం సాధ్యపడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
+    <string name="auth_email_already_verified">మీ ఇమెయిల్ ఇప్పటికే ధృవీకరించబడింది. మీరు లాగిన్ చేయవచ్చు.</string>
+    <string name="auth_credentials_required">ధృవీకరణ ఇమెయిల్‌ను మళ్లీ పంపడానికి మీ ఇమెయిల్ మరియు పాస్‌వర్డ్‌ను నమోదు చేయండి.</string>
 </resources>

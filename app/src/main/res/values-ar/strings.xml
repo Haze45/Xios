@@ -144,7 +144,7 @@
     <string name="auth_fields_required">يرجى ملء جميع الحقول المطلوبة.</string>
     <string name="auth_name_required">يرجى إدخال اسمك.</string>
     <string name="auth_invalid_email">أدخل عنوان بريد إلكتروني صالح.</string>
-    <string name="auth_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة.</string>
+    <string name="auth_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.</string>
     <string name="auth_email_already_in_use">يوجد حساب بالفعل بهذا البريد الإلكتروني.</string>
     <string name="auth_weak_password">استخدم كلمة مرور لا تقل عن 6 أحرف.</string>
     <string name="auth_password_mismatch">كلمات المرور غير متطابقة.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">خطأ في الشبكة. تحقق من اتصالك وحاول مرة أخرى.</string>
     <string name="auth_user_disabled">تم تعطيل هذا الحساب.</string>
     <string name="auth_provider_disabled">طريقة تسجيل الدخول هذه غير متاحة حاليًا.</string>
-    <string name="auth_account_exists_different_provider">يوجد حساب بالفعل بهذا البريد الإلكتروني باستخدام طريقة تسجيل دخول أخرى.</string>
+    <string name="auth_account_exists_different_provider">يوجد حساب بالفعل بهذا البريد الإلكتروني. سجل الدخول باستخدام طريقتك الحالية لربط حساب Google.</string>
     <string name="auth_login_failed">تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى.</string>
     <string name="auth_register_failed">تعذر إنشاء حسابك. يرجى المحاولة مرة أخرى.</string>
     <string name="auth_failed">فشلت المصادقة. يرجى المحاولة مرة أخرى.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">هناك حساب موجود بالفعل للعنوان %1$s. أدخل كلمة مرور Xios الحالية لربط حساب Google بذلك الحساب بأمان. ستبقى قوائم التشغيل والمفضلة في نفس الحساب.</string>
     <string name="link_account">ربط الحساب</string>
     <string name="auth_password_required">أدخل كلمة المرور الحالية للمتابعة.</string>
+    <string name="auth_google_credential_already_used">حساب Google هذا مرتبط بالفعل بحساب آخر.</string>
+    <string name="auth_email_not_verified">يرجى التحقق من عنوان بريدك الإلكتروني قبل تسجيل الدخول. تحقق من صندوق الوارد الخاص بك أو أعد إرسال بريد التحقق الإلكتروني.</string>
+    <string name="auth_link_failed">تعذر ربط حساب Google الخاص بك. يرجى المحاولة مرة أخرى.</string>
+    <string name="auth_email_already_verified">تم التحقق من بريدك الإلكتروني بالفعل. يمكنك تسجيل الدخول.</string>
+    <string name="auth_credentials_required">أدخل بريدك الإلكتروني وكلمة المرور لإعادة إرسال بريد التحقق.</string>
 </resources>

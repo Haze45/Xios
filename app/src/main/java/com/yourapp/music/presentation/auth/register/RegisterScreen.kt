@@ -29,8 +29,129 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+
     LaunchedEffect(state.isRegisterSuccessful) {
-        if (state.isRegisterSuccessful) onRegisterSuccess()
+        if (state.isRegisterSuccessful) {
+            onRegisterSuccess()
+        }
+    }
+
+    // Email verification confirmation
+    if (state.isVerificationEmailSent) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BackgroundBlack)
+                .systemBarsPadding()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Verify your email",
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "We've sent a verification link to ${state.email}. " +
+                        "Please open your inbox and verify your email address. " +
+                        "After verification, return to the login screen.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextSecondary
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            Button(
+                onClick = onNavigateToLogin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Text("Go to login")
+            }
+        }
+
+        return
+    }
+
+    // Google account linking dialog
+    if (state.showGoogleLinkDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!state.isLoading) {
+                    viewModel.dismissGoogleLinkDialog()
+                }
+            },
+            title = {
+                Text(
+                    stringResource(R.string.link_google_account_title)
+                )
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(
+                        12.dp
+                    )
+                ) {
+                    Text(
+                        stringResource(
+                            R.string.link_google_account_message,
+                            state.pendingGoogleEmail.orEmpty()
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = state.googleLinkPassword,
+                        onValueChange =
+                            viewModel::onGoogleLinkPasswordChange,
+                        label = {
+                            Text(stringResource(R.string.password))
+                        },
+                        visualTransformation =
+                            PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password
+                        ),
+                        singleLine = true,
+                        enabled = !state.isLoading,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    state.errorMessage?.let { message ->
+                        AppMessageText(
+                            message,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = viewModel::confirmGoogleAccountLink,
+                    enabled = !state.isLoading
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(stringResource(R.string.link_account))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = viewModel::dismissGoogleLinkDialog,
+                    enabled = !state.isLoading
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     Column(
@@ -46,20 +167,26 @@ fun RegisterScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = stringResource(R.string.xios_logo_description),
+            contentDescription =
+                stringResource(R.string.xios_logo_description),
             modifier = Modifier.size(130.dp)
         )
+
         Spacer(Modifier.height(14.dp))
+
         Text(
             stringResource(R.string.create_account),
             style = MaterialTheme.typography.headlineLarge
         )
+
         Spacer(Modifier.height(6.dp))
+
         Text(
             stringResource(R.string.register_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary
         )
+
         Spacer(Modifier.height(22.dp))
 
         OutlinedTextField(
@@ -70,46 +197,64 @@ fun RegisterScreen(
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(Modifier.height(12.dp))
+
         OutlinedTextField(
             value = state.email,
             onValueChange = viewModel::onEmailChange,
             label = { Text(stringResource(R.string.email)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            ),
             singleLine = true,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(Modifier.height(12.dp))
+
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
             label = { Text(stringResource(R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password
+            ),
             singleLine = true,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(Modifier.height(12.dp))
+
         OutlinedTextField(
             value = state.confirmPassword,
             onValueChange = viewModel::onConfirmPasswordChange,
-            label = { Text(stringResource(R.string.confirm_password)) },
+            label = {
+                Text(stringResource(R.string.confirm_password))
+            },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password
+            ),
             singleLine = true,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         )
-        state.errorMessage?.let {
+
+        state.errorMessage?.let { message ->
             Spacer(Modifier.height(10.dp))
+
             AppMessageText(
-                it,
+                message,
                 modifier = Modifier.fillMaxWidth()
             )
         }
+
         Spacer(Modifier.height(18.dp))
+
         Button(
             onClick = viewModel::register,
             enabled = !state.isLoading,
@@ -119,15 +264,23 @@ fun RegisterScreen(
         ) {
             if (state.isLoading) {
                 CircularProgressIndicator(
-                    Modifier.size(20.dp),
+                    modifier = Modifier.size(20.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 2.dp
                 )
+
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.creating_account_loading))
-            } else Text(stringResource(R.string.sign_up))
+
+                Text(
+                    stringResource(R.string.creating_account_loading)
+                )
+            } else {
+                Text(stringResource(R.string.sign_up))
+            }
         }
+
         Spacer(Modifier.height(16.dp))
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -136,34 +289,44 @@ fun RegisterScreen(
                 Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
+
             Text(
                 stringResource(R.string.or),
                 modifier = Modifier.padding(horizontal = 14.dp),
                 color = TextSecondary
             )
+
             HorizontalDivider(
                 Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
+
         Spacer(Modifier.height(16.dp))
+
         GoogleSignInButton(
             enabled = !state.isLoading,
             isLoading = state.isLoading,
             onLoadingChange = viewModel::setGoogleLoading,
-            onTokenReceived = { token, _ ->
+            onTokenReceived = { token, email ->
                 viewModel.registerWithGoogle(
-                    token
+                    idToken = token,
+                    googleEmail = email
                 )
             },
             onError = viewModel::onGoogleError
         )
+
         Spacer(Modifier.height(14.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 stringResource(R.string.have_account_prompt),
                 color = TextSecondary
             )
+
             TextButton(
                 onClick = onNavigateToLogin,
                 enabled = !state.isLoading

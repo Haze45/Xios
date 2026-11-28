@@ -6,6 +6,12 @@ data class LoginUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isLoginSuccessful: Boolean = false,
+
+    // Email verification
+    val canResendVerificationEmail: Boolean = false,
+    val verificationEmailSent: Boolean = false,
+
+    // Google account linking
     val showGoogleLinkDialog: Boolean = false,
     val pendingGoogleIdToken: String? = null,
     val pendingGoogleEmail: String? = null,

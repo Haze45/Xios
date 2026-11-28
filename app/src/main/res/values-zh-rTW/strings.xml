@@ -144,7 +144,7 @@
     <string name="auth_fields_required">請填寫所有必填欄位。</string>
     <string name="auth_name_required">請輸入您的姓名。</string>
     <string name="auth_invalid_email">請輸入有效的電子郵件地址。</string>
-    <string name="auth_invalid_credentials">電子郵件或密碼不正確。</string>
+    <string name="auth_invalid_credentials">電子郵件或密碼不正確。請重試。</string>
     <string name="auth_email_already_in_use">已有使用此電子郵件地址的帳戶。</string>
     <string name="auth_weak_password">請使用至少包含6個字元的密碼。</string>
     <string name="auth_password_mismatch">密碼不相符。</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">網路錯誤。請檢查您的連線並重試。</string>
     <string name="auth_user_disabled">此帳戶已被停用。</string>
     <string name="auth_provider_disabled">此登入方法目前無法使用。</string>
-    <string name="auth_account_exists_different_provider">已有使用此電子郵件和其他登入方法的帳戶。</string>
+    <string name="auth_account_exists_different_provider">此電子郵件已有關聯帳戶。請使用您現有的登入方式以連結 Google。</string>
     <string name="auth_login_failed">無法登入。請重試。</string>
     <string name="auth_register_failed">無法建立您的帳戶。請重試。</string>
     <string name="auth_failed">身分驗證失敗。請重試。</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">%1$s 的帳戶已經存在。請輸入您現有的 Xios 密碼，以安全地將 Google 連結至該帳戶。您的播放清單和最愛內容會保留在同一個帳戶中。</string>
     <string name="link_account">連結帳戶</string>
     <string name="auth_password_required">請輸入您現有的密碼以繼續。</string>
+    <string name="auth_google_credential_already_used">此 Google 帳戶已連結到其他帳戶。</string>
+    <string name="auth_email_not_verified">登入前請先驗證您的電子郵件地址。檢查您的收件匣或重新傳送驗證電子郵件。</string>
+    <string name="auth_link_failed">無法連結您的 Google 帳戶。請再試一次。</string>
+    <string name="auth_email_already_verified">您的電子郵件已驗證。您可以登入了。</string>
+    <string name="auth_credentials_required">輸入您的電子郵件和密碼以重新發送驗證郵件。</string>
 </resources>

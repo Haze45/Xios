@@ -144,7 +144,7 @@
     <string name="auth_fields_required">Пожалуйста, заполните все обязательные поля.</string>
     <string name="auth_name_required">Пожалуйста, введите ваше имя.</string>
     <string name="auth_invalid_email">Введите действительный адрес электронной почты.</string>
-    <string name="auth_invalid_credentials">Неверный адрес электронной почты или пароль.</string>
+    <string name="auth_invalid_credentials">Неверный адрес электронной почты или пароль. Пожалуйста, попробуйте еще раз.</string>
     <string name="auth_email_already_in_use">Аккаунт с таким адресом электронной почты уже существует.</string>
     <string name="auth_weak_password">Используйте пароль, содержащий не менее 6 символов.</string>
     <string name="auth_password_mismatch">Пароли не совпадают.</string>
@@ -152,7 +152,7 @@
     <string name="auth_network_error">Ошибка сети. Проверьте подключение и попробуйте снова.</string>
     <string name="auth_user_disabled">Этот аккаунт отключен.</string>
     <string name="auth_provider_disabled">Этот способ входа в настоящее время недоступен.</string>
-    <string name="auth_account_exists_different_provider">Аккаунт с этим адресом электронной почты уже использует другой способ входа.</string>
+    <string name="auth_account_exists_different_provider">Аккаунт с этим адресом электронной почты уже существует. Войдите с помощью существующего метода, чтобы связать Google.</string>
     <string name="auth_login_failed">Не удалось войти. Пожалуйста, попробуйте снова.</string>
     <string name="auth_register_failed">Не удалось создать аккаунт. Пожалуйста, попробуйте снова.</string>
     <string name="auth_failed">Сбой аутентификации. Пожалуйста, попробуйте снова.</string>
@@ -166,4 +166,9 @@
     <string name="link_google_account_message">Аккаунт для %1$s уже существует. Введите текущий пароль Xios, чтобы безопасно связать Google с этим аккаунтом. Ваши плейлисты и избранное останутся в том же аккаунте.</string>
     <string name="link_account">Связать аккаунт</string>
     <string name="auth_password_required">Чтобы продолжить, введите текущий пароль.</string>
+    <string name="auth_google_credential_already_used">Этот аккаунт Google уже связан с другим аккаунтом.</string>
+    <string name="auth_email_not_verified">Пожалуйста, подтвердите свой адрес электронной почты перед входом в систему. Проверьте свой почтовый ящик или отправьте письмо с подтверждением повторно.</string>
+    <string name="auth_link_failed">Не удалось связать ваш аккаунт Google. Пожалуйста, попробуйте еще раз.</string>
+    <string name="auth_email_already_verified">Ваш адрес электронной почты уже подтвержден. Вы можете войти.</string>
+    <string name="auth_credentials_required">Введите свой адрес электронной почты и пароль, чтобы повторно отправить письмо с подтверждением.</string>
 </resources>

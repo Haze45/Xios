@@ -163,7 +163,7 @@
     <string name="auth_fields_required">অনুগ্রহ করে সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন।</string>
     <string name="auth_name_required">অনুগ্রহ করে আপনার নাম লিখুন।</string>
     <string name="auth_invalid_email">একটি বৈধ ইমেল ঠিকানা লিখুন।</string>
-    <string name="auth_invalid_credentials">ইমেল বা পাসওয়ার্ড ভুল।</string>
+    <string name="auth_invalid_credentials">ইমেইল বা পাসওয়ার্ড ভুল। অনুগ্রহ করে আবার চেষ্টা করুন。</string>
     <string name="auth_email_already_in_use">এই ইমেল ঠিকানা দিয়ে ইতিমধ্যেই একটি অ্যাকাউন্ট বিদ্যমান।</string>
     <string name="auth_weak_password">অন্তত ৬টি অক্ষরের একটি পাসওয়ার্ড ব্যবহার করুন।</string>
     <string name="auth_password_mismatch">পাসওয়ার্ড মিলছে না।</string>
@@ -171,7 +171,7 @@
     <string name="auth_network_error">নেটওয়ার্ক ত্রুটি। আপনার সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।</string>
     <string name="auth_user_disabled">এই অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে।</string>
     <string name="auth_provider_disabled">এই সাইন-ইন পদ্ধতিটি বর্তমানে উপলব্ধ নয়।</string>
-    <string name="auth_account_exists_different_provider">অন্য সাইন-ইন পদ্ধতি ব্যবহার করে এই ইমেলের সাথে একটি অ্যাকাউন্ট ইতিমধ্যেই বিদ্যমান।</string>
+    <string name="auth_account_exists_different_provider">এই ইমেল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট বিদ্যমান। Google লিঙ্ক করতে আপনার বর্তমান পদ্ধতি ব্যবহার করে সাইন ইন করুন।</string>
     <string name="auth_login_failed">লগ ইন করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
     <string name="auth_register_failed">আপনার অ্যাকাউন্ট তৈরি করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
     <string name="auth_failed">প্রমাণীকরণ ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
@@ -185,4 +185,9 @@
     <string name="link_google_account_message">%1$s এর জন্য আগে থেকেই একটি অ্যাকাউন্ট আছে। সেই অ্যাকাউন্টের সাথে Google-কে নিরাপদে লিঙ্ক করতে আপনার বিদ্যমান Xios পাসওয়ার্ডটি লিখুন। আপনার প্লেলিস্ট এবং ফেভারিটগুলি একই অ্যাকাউন্টে থাকবে।</string>
     <string name="link_account">অ্যাকাউন্ট লিঙ্ক করুন</string>
     <string name="auth_password_required">চালিয়ে যেতে আপনার বিদ্যমান পাসওয়ার্ড লিখুন।</string>
+    <string name="auth_google_credential_already_used">এই Google অ্যাকাউন্টটি ইতিমধ্যে অন্য একটি অ্যাকাউন্টের সাথে লিঙ্ক করা আছে।</string>
+    <string name="auth_email_not_verified">লগ ইন করার আগে অনুগ্রহ করে আপনার ইমেল ঠিকানা যাচাই করুন। আপনার ইনবক্স চেক করুন বা যাচাইকরণ ইমেলটি পুনরায় পাঠান।</string>
+    <string name="auth_link_failed">আপনার Google অ্যাকাউন্ট লিঙ্ক করতে অক্ষম। আবার চেষ্টা করুন।</string>
+    <string name="auth_email_already_verified">আপনার ইমেইল ইতিমধ্যে যাচাই করা হয়েছে। আপনি লগ ইন করতে পারেন।</string>
+    <string name="auth_credentials_required">যাচাইকরণ ইমেইল আবার পাঠাতে আপনার ইমেইল এবং পাসওয়ার্ড লিখুন।</string>
 </resources>

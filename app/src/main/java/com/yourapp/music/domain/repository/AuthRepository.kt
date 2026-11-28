@@ -5,6 +5,7 @@ import com.yourapp.music.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
+
     suspend fun login(
         email: String,
         password: String
@@ -22,14 +23,26 @@ interface AuthRepository {
     ): Resource<User>
 
     fun logout()
+
     fun getCurrentUser(): User?
+
     fun observeAuthState(): Flow<User?>
 
-    suspend fun loginWithGoogle(idToken: String): Resource<User>
+    suspend fun loginWithGoogle(
+        idToken: String
+    ): Resource<User>
 
     suspend fun linkGoogleToExistingAccount(
         email: String,
         password: String,
         googleIdToken: String
     ): Resource<User>
+
+    suspend fun resendVerificationEmail(): Resource<Boolean>
+    suspend fun resendVerificationEmail(
+        email: String,
+        password: String
+    ): Resource<Boolean>
+
+    suspend fun isCurrentEmailVerified(): Boolean
 }
